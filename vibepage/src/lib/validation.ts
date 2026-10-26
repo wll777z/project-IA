@@ -1,8 +1,10 @@
 import { z } from "zod";
 export const credentialsSchema = z.object({
   email: z
-    .email("Informe um e-mail válido.")
+    .string()
+    .trim()
     .max(254)
+    .pipe(z.email("Informe um e-mail válido."))
     .transform((v) => v.trim().toLowerCase()),
   password: z
     .string()
@@ -10,7 +12,12 @@ export const credentialsSchema = z.object({
     .max(128, "Use até 128 caracteres."),
 });
 export const registrationSchema = credentialsSchema.extend({
-  name: z.string().trim().min(2, "Informe seu nome.").max(60),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Informe seu nome.")
+    .max(60)
+    .refine((v) => !/[\u0000-\u001f\u007f]/.test(v), "Nome inválido."),
 });
 export const reservedUsernames = new Set([
   "api",
@@ -46,31 +53,54 @@ export const usernameSchema = z
   .refine((v) => !reservedUsernames.has(v), "Esse username é reservado.");
 // Never fetch user-provided links on the server.
 export const safeLinkSchema = z
-  .url()
+  .string()
   .max(2048)
   .refine((value) => {
-    const url = new URL(value);
-    const host = url.hostname.toLowerCase();
-    return (
-      url.protocol === "https:" &&
-      !url.username &&
-      !url.password &&
-      !url.port &&
-      host.includes(".") &&
-      !host.endsWith(".local") &&
-      !host.endsWith(".localhost") &&
-      !host.endsWith(".internal") &&
-      !/^[\d.]+$/.test(host) &&
-      !host.includes(":") &&
-      !host.startsWith("[")
-    );
-  }, "Use um link HTTPS público, sem credenciais.");
+    // Refinements must be total: the preview validates partially typed URLs too.
+    if (/[\u0000-\u0020\u007f]/.test(value) || value.includes("\\"))
+      return false;
+    try {
+      const url = new URL(value);
+      const host = url.hostname.toLowerCase().replace(/\.+$/, "");
+      return (
+        url.protocol === "https:" &&
+        !url.username &&
+        !url.password &&
+        !url.port &&
+        host.includes(".") &&
+        !host.endsWith(".local") &&
+        !host.endsWith(".localhost") &&
+        !host.endsWith(".internal") &&
+        !/^[\d.]+$/.test(host) &&
+        !host.includes(":") &&
+        !host.startsWith("[")
+      );
+    } catch {
+      return false;
+    }
+  }, "Use um link HTTPS público, sem credenciais.")
+  .transform((value) => new URL(value).href);
 
 export const profileSchema = z
   .object({
     username: usernameSchema,
-    displayName: z.string().trim().min(1, "Informe seu nome público.").max(60),
-    bio: z.string().trim().max(240, "A bio pode ter até 240 caracteres."),
+    displayName: z
+      .string()
+      .trim()
+      .min(1, "Informe seu nome público.")
+      .max(60)
+      .refine(
+        (v) => !/[\u0000-\u001f\u007f]/.test(v),
+        "Nome público inválido.",
+      ),
+    bio: z
+      .string()
+      .trim()
+      .max(240, "A bio pode ter até 240 caracteres.")
+      .refine(
+        (v) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(v),
+        "Biografia inválida.",
+      ),
     themeId: z.enum([
       "midnight-purple",
       "cyber-neon",

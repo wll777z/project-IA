@@ -1,11 +1,12 @@
 "use client";
 import { useEffect, useRef } from "react";
 export function ViewRecorder({ username }: { username: string }) {
-  const sent = useRef(false);
+  const sent = useRef<string | null>(null);
   useEffect(() => {
     function record() {
-      if (sent.current || document.visibilityState !== "visible") return;
-      sent.current = true;
+      if (sent.current === username || document.visibilityState !== "visible")
+        return;
+      sent.current = username;
       const key = `vibepage:view:${username}:${new Date().toISOString().slice(0, 10)}`;
       try {
         if (sessionStorage.getItem(key)) return;

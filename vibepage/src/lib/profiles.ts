@@ -30,22 +30,24 @@ export async function getOwnedProfile(userId: string) {
     include: profileInclude,
   });
   if (!profile) return null;
-  return profileSchema.parse({
+  // Preserve legacy invalid values so owners can open the editor and fix them.
+  // All new writes still go through profileSchema; renderers validate links.
+  return {
     username: profile.username,
     displayName: profile.displayName,
     bio: profile.bio,
-    themeId: profile.themeId,
+    themeId: profile.themeId as ProfileInput["themeId"],
     accentColor: profile.accentColor,
     backgroundColor: profile.backgroundColor,
-    buttonStyle: profile.buttonStyle,
-    animation: profile.animation,
+    buttonStyle: profile.buttonStyle as ProfileInput["buttonStyle"],
+    animation: profile.animation as ProfileInput["animation"],
     hideBranding: profile.hideBranding,
     published: profile.published,
     avatarKey: profile.avatarKey,
     backgroundKey: profile.backgroundKey,
     revision: profile.revision,
     links: profile.links.map((l) => ({ id: l.id, title: l.title, url: l.url })),
-  });
+  };
 }
 export async function saveProfile(userId: string, body: unknown) {
   const data = profileSchema.parse(body);
@@ -121,12 +123,18 @@ export async function saveProfile(userId: string, body: unknown) {
         where: { profileId: profile.id },
         data: { position: { increment: 1000 } },
       });
-      for (const [position, link] of links.entries())
-        await tx.profileLink.upsert({
-          where: { id: link.id },
-          create: { ...link, profileId: profile.id, position },
-          update: { title: link.title, url: link.url, position },
+      for (const [position, link] of links.entries()) {
+        // Never upsert by a global, client-supplied id: another owner can claim
+        // a new id after the preflight check. A collision must roll back.
+        const owned = await tx.profileLink.updateMany({
+          where: { id: link.id, profileId: profile.id },
+          data: { title: link.title, url: link.url, position },
         });
+        if (!owned.count)
+          await tx.profileLink.create({
+            data: { ...link, profileId: profile.id, position },
+          });
+      }
       return { ...data, revision: profile.revision };
     },
     { timeout: 15000 },

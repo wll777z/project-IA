@@ -7,3 +7,6 @@ try {
 } catch (error) {
   if (error.code !== "ENOENT") throw error;
 }
+
+for (const file of ["launch.mjs", "production-env.mjs"])
+  await cp(`scripts/${file}`, `.next/standalone/${file}`);

@@ -12,7 +12,7 @@ assert(address && typeof address !== "string");
 const port = address.port;
 await new Promise<void>((r) => probe.close(() => r()));
 const origin = `http://127.0.0.1:${port}`;
-const app = spawn(process.execPath, [".next/standalone/server.js"], {
+const app = spawn(process.execPath, [".next/standalone/launch.mjs"], {
   env: {
     ...process.env,
     NODE_ENV: "production",
@@ -68,6 +68,14 @@ try {
   }
   const landing = await request("/");
   check(landing.status === 200, "landing responde HTTP 200");
+  check(
+    landing.headers.get("referrer-policy") === "no-referrer",
+    "URLs com tokens não são encaminhadas como Referer",
+  );
+  check(
+    (await request("/api/account/export")).status === 401,
+    "exportação exige sessão",
+  );
   const landingHTML = await landing.text();
   const css = landingHTML.match(/href="([^\"]+\.css[^\"]*)"/);
   check(
@@ -111,7 +119,7 @@ try {
   let profile = {
     ...emptyProfile("HTTP Player"),
     username: "http_player",
-    bio: "Meu universo de teste.",
+    bio: "Meu universo de teste. <img src=x onerror=alert(1)>",
     links: [
       {
         id: randomUUID(),
@@ -120,6 +128,23 @@ try {
       },
     ],
   };
+  const csrf = await fetch(origin + "/api/profile", {
+    method: "PUT",
+    headers: {
+      origin: "https://attacker.example",
+      "content-type": "application/json",
+      cookie,
+    },
+    body: JSON.stringify(profile),
+  });
+  check(csrf.status === 403, "origem externa não altera perfil autenticado");
+  const exported = await (await request("/api/account/export")).json();
+  check(
+    exported.email === credentials.email &&
+      !JSON.stringify(exported).includes(password) &&
+      !exported.sessions,
+    "exportação não expõe credenciais ou sessões",
+  );
   let saved = await request("/api/profile", "PUT", profile);
   check(saved.status === 200, "editor salva perfil e links");
   profile = (await saved.json()).profile;
@@ -127,13 +152,23 @@ try {
     (await request("/http_player", "GET", undefined, "")).status === 404,
     "rascunho invisível publicamente",
   );
+  check(
+    (await request("/http_player/opengraph-image", "GET", undefined, ""))
+      .status === 404,
+    "rascunho não gera imagem de compartilhamento",
+  );
   saved = await request("/api/profile", "PUT", { ...profile, published: true });
   check(saved.status === 200, "perfil pode ser publicado");
   const publicPage = await request("/http_player", "GET", undefined, "");
+  const publicHTML = await publicPage.text();
   check(
-    publicPage.status === 200 &&
-      (await publicPage.text()).includes("Meu universo de teste."),
+    publicPage.status === 200 && publicHTML.includes("Meu universo de teste."),
     "perfil público renderiza dados persistidos",
+  );
+  check(
+    publicHTML.includes("&lt;img") &&
+      !publicHTML.includes("<img src=x onerror="),
+    "bio com HTML é escapada, sem executar conteúdo do usuário",
   );
   const og = await request(
     "/http_player/opengraph-image",
@@ -144,6 +179,10 @@ try {
   check(
     og.status === 200 && og.headers.get("content-type")?.includes("image/png"),
     "imagem de compartilhamento gerada",
+  );
+  check(
+    og.headers.get("cache-control")?.includes("no-store"),
+    "Open Graph não fica em cache após despublicação",
   );
   check(
     (await request("/api/views/http_player", "POST", undefined, "")).status ===
@@ -191,6 +230,11 @@ try {
   check(
     (await request("/http_player", "GET", undefined, "")).status === 404,
     "página excluída não permanece pública",
+  );
+  check(
+    (await request("/http_player/opengraph-image", "GET", undefined, ""))
+      .status === 404,
+    "imagem da conta excluída também retorna 404",
   );
   console.log(`HTTP smoke: ${checks} verificações aprovadas.`);
 } finally {
