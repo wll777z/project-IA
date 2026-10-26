@@ -75,11 +75,15 @@ npm start
 
 `test:http` exige um build atual e inicia uma instância isolada do Next e PostgreSQL embarcado PGlite para testar a aplicação por HTTP. Não usa nem modifica seu banco de desenvolvimento. `npm test` testa regras, autenticação, APIs, uploads, permissões e agregados com Prisma e PGlite reais, sem mocks de senha ou sessão.
 
-Veja [VALIDATION.md](VALIDATION.md) para os resultados reais, incluindo limitações. O workflow está em `../.github/workflows/vibepage.yml`, na raiz do repositório. Ele executa as verificações dentro de `vibepage/`.
+Veja [VALIDATION.md](VALIDATION.md) para os resultados reais e [docs/LAUNCH_AUDIT.md](docs/LAUNCH_AUDIT.md) para os achados e bloqueios de lançamento. O workflow está em `../.github/workflows/vibepage.yml`, na raiz do repositório. Ele executa as verificações dentro de `vibepage/`.
 
-## E-mail opcional
+## E-mail e confirmação de conta
 
-Preencha `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `SMTP_FROM`. Porta 465 usa TLS; outras portas exigem STARTTLS. Reinicie a aplicação. A recuperação permanece indisponível sem configuração. A confirmação de e-mail no cadastro ainda não é obrigatória; por isso não apresente as contas como e-mails verificados. Não houve envio real nem contratação de serviço de e-mail.
+No desenvolvimento local, `REQUIRE_EMAIL_VERIFICATION=false` permite testar sem serviço de e-mail. Sem SMTP, a recuperação permanece indisponível.
+
+Em uma origem pública, configure `REQUIRE_EMAIL_VERIFICATION=true`, `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `SMTP_FROM`. O cadastro envia um link, o login só libera a conta após a confirmação e uma nova tentativa de login com a senha correta pode reenviar a confirmação. Porta 465 usa TLS; outras portas exigem STARTTLS. Não há envio de marketing.
+
+O launcher de produção recusa origens públicas sem HTTPS, chave exclusiva, confirmação habilitada e SMTP completo. Isso inclui contas existentes: usuários sem e-mail confirmado precisam confirmar antes de realizar operações autenticadas pela API. O serviço de e-mail, DNS e a entrega real devem ser configurados e testados pelo operador; os testes automatizados capturam as mensagens em memória, sem enviá-las.
 
 ## Publicação completa
 
@@ -87,16 +91,16 @@ Para disponibilizar contas e perfis reais na internet é necessário um ambiente
 
 O código inclui `Dockerfile` com saída standalone do Next. Em um host de sua escolha:
 
-1. Configure `DATABASE_URL`, `BETTER_AUTH_URL` com a origem HTTPS exata e uma chave forte exclusiva em `BETTER_AUTH_SECRET`.
+1. Configure `DATABASE_URL`, `BETTER_AUTH_URL` com a origem HTTPS exata, uma chave aleatória exclusiva em `BETTER_AUTH_SECRET`, `REQUIRE_EMAIL_VERIFICATION=true` e SMTP completo. Consulte `.env.example`.
 2. Aplique migrations com `npm run db:migrate` e seed com `npm run db:seed` em um ambiente com dependências de desenvolvimento instaladas.
-3. Execute `npm run build` e `npm start`, ou construa e execute o Dockerfile passando as variáveis em tempo de execução. O segredo usado no build do Docker é somente um placeholder; é obrigatório definir uma chave real ao executar.
+3. Execute `npm run build` e `npm start`, ou construa e execute o Dockerfile passando as variáveis em tempo de execução. O build pode usar uma chave efêmera somente para compilação; o launcher recusa execução pública com configuração incompleta ou chaves de exemplo. Não inicie `server.js` diretamente: `npm start` e o Dockerfile usam `launch.mjs`, que valida a configuração antes de abrir o servidor. `npm start` também carrega o `.env` local quando existir.
 4. Configure proxy confiável, backups, operação, e-mail e os dados legais antes de receber público real.
 
 Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibilidade de planos de hospedagem dependem do provedor e não foram presumidas.
 
 ## Segurança e limites
 
-- Senhas scrypt e sessões no banco, cookies HttpOnly/SameSite e Secure com HTTPS. Recuperação revoga sessões anteriores. Cadastro duplicado não revela existência da conta; login usa erro genérico.
+- Senhas scrypt e sessões no banco, cookies HttpOnly/SameSite e Secure com HTTPS. Recuperação revoga sessões anteriores. Cadastro duplicado não revela existência da conta; login usa erro genérico. Produção pública exige confirmação de e-mail.
 - Validação no servidor e no formulário; payload de autenticação limitado a 16 KB e perfil a 64 KB. Não há HTML ou JavaScript arbitrário. React escapa os textos.
 - URLs somente HTTPS público, sem credenciais, IPs literais/locais ou portas alternativas. O redirecionamento usa somente o destino armazenado, não uma URL recebida na query. Não fazemos fetch de URLs de usuários. A validação sintática não detecta phishing em domínios públicos; moderação e denúncias serão necessárias para lançamento amplo.
 - Todos os writes autenticados verificam a origem exata. Rate limits ficam no banco e resistem a requisições concorrentes. Limites: login 5/min, cadastro e recuperação 3/min, gravação de perfil 30/min, upload 8/min, views 60/min e cliques 90/min.
@@ -104,7 +108,8 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 - Imagens permitidas: PNG, JPEG e WebP estáticos. SVG/GIF e dados incompatíveis com o MIME são recusados. No máximo quatro imagens normalizadas de até 1 MB por conta (ativa e rascunho por tipo). Imagens não publicadas exigem sessão do dono; exclusão de conta elimina os arquivos do banco.
 - Os números são aproximações, não visitantes únicos. Cada aba tenta registrar uma visita diária por perfil usando sessionStorage. Limites, bloqueadores e bots alteram a contagem. Cliques são totais; não são garantia de pessoa real ou conversão. Dados diários ficam em UTC.
 - Execute `npm run db:cleanup` diariamente para remover sessões, tokens e limites expirados. Não criamos agendamento externo.
-- CSP restringe recursos ao próprio site e impede frames. Scripts/styles inline necessários ao Next permanecem permitidos; CSP com nonce é um endurecimento futuro.
+- Imagens de compartilhamento usam `no-store` e retornam 404 para rascunhos e contas removidas. Cópias já baixadas ou armazenadas por terceiros não podem ser revogadas pelo site. `Referrer-Policy: no-referrer` impede que URLs de confirmação/recuperação sejam enviadas como Referer.
+- CSP restringe recursos ao próprio site e impede frames e objetos embutidos. Scripts/styles inline necessários ao Next permanecem permitidos; CSP com nonce é um endurecimento futuro.
 - Termos e privacidade ainda precisam de identificação do controlador, contato, política de backups e definições para público menor de idade antes de lançamento real.
 - O npm avisa que ESLint 9 está fora de suporte. Foi mantido por compatibilidade com os plugins do Next instalados. O lint passa; atualize o conjunto antes de lançamento amplo.
 
@@ -130,3 +135,7 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 O repositório [async-labs/saas](https://github.com/async-labs/saas), licença MIT, foi consultado pelo plugin GitHub. Aproveitamos padrões de separação entre interface, API e domínio; não copiamos código, cobranças, mensagens ou dependências. Detalhes em `docs/REFERENCE.md`.
 
 O aplicativo está em `vibepage/` no repositório https://github.com/wll777z/project-IA. O PastaPronta foi preservado na raiz. Clone o repositório, rode `cd project-IA/vibepage` e siga os comandos acima. O histórico de desenvolvimento local possui commits por etapa; nenhum arquivo do `nexa-ai` foi alterado. A demonstração online usa seu repositório de hospedagem separado.
+
+## Revisão de lançamento
+
+A branch `fix/vibepage-launch-readiness` parte da `main` e mantém o visual existente. A auditoria corrige URLs parciais que quebravam o editor, canonicalização de URLs, condição de corrida entre donos de links, privacidade de imagens Open Graph e configuração de autenticação pública. Links antigos agora considerados inválidos permanecem editáveis pelo dono e são omitidos da página pública até correção. Não há mudança de schema nem migration nova nesta revisão. Não houve merge ou deploy.
