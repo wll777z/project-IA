@@ -5,8 +5,8 @@
   "scripts": {
     "test": "prisma generate && vitest run",
     "dev": "next dev",
-    "build": "prisma generate && next build && node scripts/prepare-standalone.mjs",
-    "start": "node .next/standalone/server.js",
+    "build": "prisma generate && node scripts/build.mjs && node scripts/prepare-standalone.mjs",
+    "start": "node --env-file-if-exists=.env .next/standalone/launch.mjs",
     "lint": "eslint .",
     "typecheck": "prisma generate && tsc --noEmit",
     "db:generate": "prisma generate",

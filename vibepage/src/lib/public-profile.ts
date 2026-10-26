@@ -1,6 +1,10 @@
 import { cache } from "react";
 import { db } from "@/lib/db";
-import { usernameSchema, type ProfileInput } from "@/lib/validation";
+import {
+  usernameSchema,
+  safeLinkSchema,
+  type ProfileInput,
+} from "@/lib/validation";
 import { findTheme } from "@/lib/themes";
 import { isPro } from "@/lib/entitlements";
 export const getPublicProfile = cache(async (username: string) => {
@@ -35,7 +39,12 @@ export const getPublicProfile = cache(async (username: string) => {
     avatarKey: profile.avatarKey,
     backgroundKey: profile.backgroundKey,
     revision: profile.revision,
-    links: profile.links.map((l) => ({ id: l.id, title: l.title, url: l.url })),
+    links: profile.links.flatMap((l) => {
+      const parsed = safeLinkSchema.safeParse(l.url);
+      return parsed.success
+        ? [{ id: l.id, title: l.title, url: parsed.data }]
+        : [];
+    }),
   };
   return { profile: data, pro };
 });

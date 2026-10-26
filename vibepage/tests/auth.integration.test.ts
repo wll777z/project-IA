@@ -48,6 +48,16 @@ beforeAll(async () => {
   process.env.BETTER_AUTH_URL = origin;
   process.env.BETTER_AUTH_SECRET =
     "integration-only-secret-which-is-never-for-production-12345";
+  // Never inherit a real mail provider or public signup policy in isolated tests.
+  process.env.REQUIRE_EMAIL_VERIFICATION = "false";
+  for (const key of [
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_FROM",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+  ])
+    delete process.env[key];
   ({ auth } = await import("../src/lib/auth"));
   ({ db } = await import("../src/lib/db"));
 });

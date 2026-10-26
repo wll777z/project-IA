@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import { getPublicProfile } from "@/lib/public-profile";
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 export const alt = "VibePage — perfil público";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -11,7 +12,12 @@ export default async function Image({
 }) {
   const { username } = await params;
   const data = await getPublicProfile(username);
-  const profile = data?.profile;
+  if (!data)
+    return new Response(null, {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
+  const profile = data.profile;
   return new ImageResponse(
     <div
       style={{
@@ -62,6 +68,12 @@ export default async function Image({
         {profile?.bio.slice(0, 120) || "Explore esse universo no VibePage."}
       </div>
     </div>,
-    size,
+    {
+      ...size,
+      headers: {
+        "Cache-Control": "private, no-store, max-age=0",
+        "X-Robots-Tag": "noindex",
+      },
+    },
   );
 }
