@@ -1,1 +1,0 @@
-"""StudioPilot local bridge."""
