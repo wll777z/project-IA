@@ -23,7 +23,7 @@ class PastaProntaTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             folder = Path(tmp)
             (folder / "a.txt").write_text("A")
-            (folder / "doc_001.txt").write_text("already")
+            (folder / "doc_001.txt").mkdir()
             with self.assertRaises(ValueError):
                 plan(folder, "doc", ".txt")
 
