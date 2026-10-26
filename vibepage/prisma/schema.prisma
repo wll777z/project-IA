@@ -1,0 +1,173 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Plan {
+  FREE
+  PRO
+}
+
+model User {
+  id            String       @id
+  name          String
+  email         String       @unique
+  emailVerified Boolean      @default(false)
+  image         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  profile       Profile?
+  entitlement   Entitlement?
+  uploads       Upload[]
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@index([expiresAt])
+}
+
+model RateLimit {
+  id          String @id
+  key         String @unique
+  count       Int
+  lastRequest BigInt
+}
+
+model Profile {
+  id              String        @id @default(cuid())
+  userId          String        @unique
+  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username        String        @unique @db.VarChar(24)
+  displayName     String        @db.VarChar(60)
+  bio             String        @default("") @db.VarChar(240)
+  avatarKey       String?
+  backgroundKey   String?
+  accentColor     String        @default("#a78bfa") @db.VarChar(7)
+  revision        Int           @default(0)
+  backgroundColor String        @default("#100c1b") @db.VarChar(7)
+  buttonStyle     String        @default("soft")
+  animation       String        @default("none")
+  hideBranding    Boolean       @default(false)
+  published       Boolean       @default(false)
+  themeId         String        @default("midnight-purple")
+  theme           Theme         @relation(fields: [themeId], references: [id], onDelete: Restrict)
+  links           ProfileLink[]
+  views           PageView[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model ProfileLink {
+  id        String      @id @default(cuid())
+  profileId String
+  profile   Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  title     String      @db.VarChar(80)
+  url       String      @db.VarChar(2048)
+  clicks    LinkClick[]
+  position  Int
+
+  @@unique([profileId, position])
+}
+
+model Theme {
+  id       String    @id
+  name     String
+  premium  Boolean   @default(false)
+  profiles Profile[]
+}
+
+// Aggregate daily counts only: no visitor IPs, fingerprinting or location.
+model PageView {
+  profileId String
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  day       DateTime @db.Date
+  count     Int      @default(0)
+  clicks    Int      @default(0)
+
+  @@id([profileId, day])
+  @@index([day])
+}
+
+// No billing provider or paid activation in stage 1. Missing entitlement = FREE.
+model Entitlement {
+  id        String    @id @default(cuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan      Plan      @default(FREE)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Upload {
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind      String
+  slot      Int      @default(0)
+  content   Bytes
+  mimeType  String   @default("image/webp")
+  width     Int
+  height    Int
+  createdAt DateTime @default(now())
+
+  @@unique([userId, kind, slot])
+}
+
+model LinkClick {
+  linkId String
+  link   ProfileLink @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  day    DateTime    @db.Date
+  count  Int         @default(0)
+
+  @@id([linkId, day])
+  @@index([day])
+}

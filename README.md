@@ -29,3 +29,16 @@ python pastapronta.py teste --desfazer
 2. Interface grafica com Tkinter.
 3. Regras configuraveis e perfis salvos.
 4. Entrevistas com potenciais usuarios para validar se pagariam.
+
+## VibePage
+
+O VibePage está na pasta [`vibepage/`](./vibepage), com editor de perfis, autenticação, temas e estatísticas.
+
+```powershell
+cd vibepage
+npm ci
+npm run setup
+npm run dev
+```
+
+Consulte o [README do VibePage](./vibepage/README.md) e a [validação](./vibepage/VALIDATION.md). O setup requer Node.js 24 e Docker Desktop aberto. O endereço online disponível é uma demonstração; contas reais online dependem de hospedagem Node.js e PostgreSQL remoto.

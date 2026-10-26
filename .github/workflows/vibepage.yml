@@ -1,0 +1,31 @@
+name: VibePage checks
+on:
+  push:
+    paths: ["vibepage/**", ".github/workflows/vibepage.yml"]
+  pull_request:
+    paths: ["vibepage/**", ".github/workflows/vibepage.yml"]
+permissions:
+  contents: read
+defaults:
+  run:
+    working-directory: vibepage
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: vibepage/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/test
+          BETTER_AUTH_URL: http://localhost:3000
+          BETTER_AUTH_SECRET: ci-only-build-key-never-use-in-production-123456789
+      - run: npm run test:http

@@ -1,0 +1,134 @@
+import { db } from "@/lib/db";
+import { profileSchema, type ProfileInput } from "@/lib/validation";
+import { isPro } from "@/lib/entitlements";
+import { findTheme } from "@/lib/themes";
+import { HttpError } from "@/lib/http";
+export const profileInclude = {
+  links: { orderBy: { position: "asc" as const } },
+};
+export function emptyProfile(name = ""): ProfileInput {
+  return {
+    username: "",
+    displayName: name,
+    bio: "",
+    themeId: "midnight-purple",
+    accentColor: "#a78bfa",
+    backgroundColor: "#100c1b",
+    buttonStyle: "soft",
+    animation: "none",
+    hideBranding: false,
+    published: false,
+    avatarKey: null,
+    backgroundKey: null,
+    revision: 0,
+    links: [],
+  };
+}
+export async function getOwnedProfile(userId: string) {
+  const profile = await db.profile.findUnique({
+    where: { userId },
+    include: profileInclude,
+  });
+  if (!profile) return null;
+  return profileSchema.parse({
+    username: profile.username,
+    displayName: profile.displayName,
+    bio: profile.bio,
+    themeId: profile.themeId,
+    accentColor: profile.accentColor,
+    backgroundColor: profile.backgroundColor,
+    buttonStyle: profile.buttonStyle,
+    animation: profile.animation,
+    hideBranding: profile.hideBranding,
+    published: profile.published,
+    avatarKey: profile.avatarKey,
+    backgroundKey: profile.backgroundKey,
+    revision: profile.revision,
+    links: profile.links.map((l) => ({ id: l.id, title: l.title, url: l.url })),
+  });
+}
+export async function saveProfile(userId: string, body: unknown) {
+  const data = profileSchema.parse(body);
+  return db.$transaction(
+    async (tx) => {
+      // Serialize saves for the same owner; compare revision to reject stale tabs.
+      await tx.$queryRaw`SELECT id FROM "User" WHERE id=${userId} FOR UPDATE`;
+      const entitlement = await tx.entitlement.findUnique({
+        where: { userId },
+      });
+      const pro = isPro(entitlement);
+      const theme = findTheme(data.themeId);
+      if (
+        !pro &&
+        (theme.premium ||
+          data.hideBranding ||
+          data.animation !== "none" ||
+          data.buttonStyle !== "soft" ||
+          data.backgroundColor !== theme.background)
+      )
+        throw new HttpError(403, "Essa personalização precisa do plano Pro.");
+      const current = await tx.profile.findUnique({ where: { userId } });
+      if (data.revision !== (current?.revision ?? 0))
+        throw new HttpError(
+          409,
+          "Seu perfil foi alterado em outra aba. Recarregue antes de salvar.",
+        );
+      const keys = [data.avatarKey, data.backgroundKey].filter(
+        (k): k is string => !!k,
+      );
+      const uploads = await tx.upload.findMany({
+        where: { userId, id: { in: keys } },
+        select: { id: true, kind: true },
+      });
+      if (
+        (data.avatarKey &&
+          !uploads.some(
+            (u) => u.id === data.avatarKey && u.kind === "avatar",
+          )) ||
+        (data.backgroundKey &&
+          !uploads.some(
+            (u) => u.id === data.backgroundKey && u.kind === "background",
+          ))
+      )
+        throw new HttpError(403, "Use apenas imagens enviadas pela sua conta.");
+      const foreign = await tx.profileLink.findFirst({
+        where: {
+          id: { in: data.links.map((l) => l.id) },
+          ...(current ? { profileId: { not: current.id } } : {}),
+        },
+      });
+      if (foreign)
+        throw new HttpError(403, "Um dos links não pertence ao seu perfil.");
+      await tx.theme.upsert({
+        where: { id: theme.id },
+        create: { id: theme.id, name: theme.name, premium: theme.premium },
+        update: {},
+      });
+      const { links, revision, ...fields } = data;
+      const profile = current
+        ? await tx.profile.update({
+            where: { id: current.id },
+            data: { ...fields, revision: { increment: 1 } },
+          })
+        : await tx.profile.create({
+            data: { ...fields, userId, revision: revision + 1 },
+          });
+      await tx.profileLink.deleteMany({
+        where: { profileId: profile.id, id: { notIn: links.map((l) => l.id) } },
+      });
+      // Move existing positions out of the target range before reordering unique slots.
+      await tx.profileLink.updateMany({
+        where: { profileId: profile.id },
+        data: { position: { increment: 1000 } },
+      });
+      for (const [position, link] of links.entries())
+        await tx.profileLink.upsert({
+          where: { id: link.id },
+          create: { ...link, profileId: profile.id, position },
+          update: { title: link.title, url: link.url, position },
+        });
+      return { ...data, revision: profile.revision };
+    },
+    { timeout: 15000 },
+  );
+}
