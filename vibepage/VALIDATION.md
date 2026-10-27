@@ -1,3 +1,27 @@
+# Polimento final — 27/10/2026
+
+Base `release/vibepage-3.0-rc1` em `2c1735e`, branch `fix/vibepage-final-polish`. Resultados desta revisão, sem merge/deploy:
+
+| Verificação         | Resultado real                           |
+| ------------------- | ---------------------------------------- |
+| `npm run lint`      | Aprovado                                 |
+| `npm run typecheck` | Aprovado; Prisma gerado                  |
+| `npm test`          | 203 testes, 26 arquivos aprovados        |
+| `npm run build`     | Aprovado; inclui `/sitemap.xml` estático |
+| `npm run test:http` | 96 verificações aprovadas                |
+
+`npm run format:check` aprovado. Parse estrutural do Compose conferiu o encaminhamento da origem de build; Docker não foi executado.
+
+Cinco testes de polimento cobrem destinos/rota ativa, administração, orientações iniciais, bloqueios de compartilhamento por estado e sitemap/robots. HTTP verifica noindex de auth/demo, X-Robots-Tag das APIs, sitemap/canonical, OG do perfil, primeiro acesso, rascunho/publicado/indisponível, expiração Pro e manutenção do bloqueio de compras (`/pro/pix` 404, PR #8 separado). O primeiro ensaio apontou expectativas excessivamente estritas sobre ordem de atributos e barra final de URL; os testes foram ajustados para comparar os elementos/URLs equivalentes, sem afrouxar as condições de elegibilidade ou autorização.
+
+QA visual: nove estados em cada largura 360/390/768/1440, em frames de Chrome desktop com snapshots HTTP sintéticos. Sem overflow horizontal nos 36 cenários. Menu mobile com abertura por Enter, navegação por Tab, indicador de página ativa e foco visível; links medidos em 48–58 px. Evidências em `docs/evidence/polish-layouts.json` e `docs/evidence/polish-mobile.jpg`. O guia do editor foi reduzido após conferência para preservar espaço útil.
+
+Snapshots têm somente scripts do transporte de HTML streamed do React, sem hidratação do aplicativo, sessões, saves ou chamadas autenticadas no navegador. Não foram validados iOS/Safari, Android físico, leitor de tela real, SMTP, PostgreSQL nativo ou Docker/Caddy. QA visual/árvore de acessibilidade não certifica WCAG. Avisos de depreciação de pg nas fixtures continuam. Nenhuma alteração de schema, migration ou dependência.
+
+Decisões e origem de build: [FINAL_POLISH_REVIEW](docs/FINAL_POLISH_REVIEW.md). **NO-GO beta/público/Pro comercial continua**, pelas pendências operacionais já registradas. As seções seguintes são evidência histórica das respectivas branches.
+
+---
+
 # Candidata 3.0.0-rc.1 — validação de 27/10/2026
 
 Resultados reais desta candidata, sobre a auditoria `7d9758f`:

@@ -1,3 +1,20 @@
+# Polimento final da RC1
+
+- [x] Conferir RC1 `2c1735e` e PR #8 no GitHub; PR de Pix permanece draft separado.
+- [x] Preservar oito rotas do dashboard, acesso administrativo e recursos existentes.
+- [x] Menu mobile nativo, contexto ativo, teclado e alvos de toque conferidos.
+- [x] Guia inicial e estados de publicação/indisponibilidade sem notas privadas.
+- [x] Sitemap curado sem banco/usernames; noindex e canonical/OG conferidos por HTTP.
+- [x] Lint, typecheck, 203 testes, build e 96 verificações HTTP executados.
+- [x] 36 snapshots em 360/390/768/1440 px sem overflow em Chrome desktop.
+- [ ] Aprovar celulares físicos e leitor de tela; snapshots não validam jornada autenticada no browser.
+- [ ] Configurar origem real no build/runtime e validar SEO no domínio final.
+- [ ] Cumprir gates de PostgreSQL/SMTP/HTTPS/backups/operação antes de beta real.
+
+Sem deploy, merge ou habilitação de vendas. [Relatório do polimento](docs/FINAL_POLISH_REVIEW.md). Os gates anteriores continuam abaixo.
+
+---
+
 # Gates da candidata 3.0.0-rc.1
 
 27/10/2026. Escopo restrito a lançamento, sem novas funcionalidades visuais.

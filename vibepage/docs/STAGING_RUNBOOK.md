@@ -24,7 +24,7 @@ docker compose --env-file .env.staging -f compose.staging.yaml config --quiet
 docker compose --env-file .env.staging -f compose.staging.yaml up --build -d
 ```
 
-O preflight deve concluir antes do banco; migrations/seed antes de web. Caddy termina HTTPS e exige acesso privado; SMTP é saída de rede, não servidor falso. Somente proxy publica portas 80/443. Não abrir porta 3000/5432 externamente. O IP confiável é sobrescrito pelo proxy; validar que cabeçalho enviado pelo cliente não modifica limite. Volumes preservam banco/certificados. Não executar `down -v`.
+O build recebe a origem pública `BETTER_AUTH_URL` via build arg para canonical, robots e sitemap; runtime deve usar a mesma origem. Mudar domínio exige rebuild. O preflight deve concluir antes do banco; migrations/seed antes de web. Caddy termina HTTPS e exige acesso privado; SMTP é saída de rede, não servidor falso. Somente proxy publica portas 80/443. Não abrir porta 3000/5432 externamente. O IP confiável é sobrescrito pelo proxy; validar que cabeçalho enviado pelo cliente não modifica limite. Volumes preservam banco/certificados. Não executar `down -v`.
 
 O template não agenda backups, cleanup ou alertas. Antes de usuários reais: configurar rotina diária de cleanup, backup criptografado fora do host, monitoramento, operador responsável, RPO/RTO e rollback. Não imprimir configuração completa ou logs com senhas, tokens, cookies ou URLs de confirmação. A falta de logs de acesso no Caddy evita registrar tokens; estabelecer política de logs sanitizados para incidentes.
 

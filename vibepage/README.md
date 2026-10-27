@@ -1,5 +1,11 @@
 # VibePage
 
+## Polimento final da candidata
+
+A branch `fix/vibepage-final-polish` parte da RC1 completa (`2c1735e`). Ajusta navegação mobile/página ativa, orientação inicial, mensagens de publicação/indisponibilidade e SEO. Rotas preservadas; sem novas funcionalidades grandes ou mudanças em cobrança. PR #8 examinado e mantido separado: `/pro/pix` não está nesta candidata e Pro continua indisponível para compra. Evidência e decisões em [FINAL_POLISH_REVIEW](docs/FINAL_POLISH_REVIEW.md).
+
+O sitemap é curado: apenas a landing, **sem consultas ao banco nem enumeração de perfis**. Configure `BETTER_AUTH_URL` para a origem real tanto no build quanto no runtime. O Dockerfile aceita `--build-arg BETTER_AUTH_URL=https://seu-dominio`; o Compose de homologação já encaminha a variável. Alterar domínio exige rebuild para atualizar metadados estáticos. Não usar origem localhost no build de produção.
+
 ## Candidata 3.0.0-rc.1 — estabilização para lançamento
 
 A candidata `release/vibepage-3.0-rc1` parte da auditoria `7d9758fb112206bcd4fe706c8bef6f9ba612953c` e contém toda a cadeia Ultimate → Next Level → auditoria, sem merge automático. Não adiciona temas, cartões, layouts ou efeitos. Consulte [RELEASE_CANDIDATE](docs/RELEASE_CANDIDATE.md) e [STAGING_RUNBOOK](docs/STAGING_RUNBOOK.md).
