@@ -3840,3 +3840,20 @@ a.gamer-card:focus-visible,
     scroll-margin-top: 190px;
   }
 }
+
+/* Release audit: intrinsic upload widths must not expand the mobile editor. */
+.editor-fields {
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (max-width: 600px) {
+  .upload-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+/* The decorative tablet orbits stay inside their scene, not the page width. */
+@media (min-width: 761px) and (max-width: 1050px) {
+  .profile-scene {
+    overflow: clip;
+  }
+}

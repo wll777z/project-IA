@@ -47,10 +47,10 @@ export function GamerCardEditor({
         </p>
       </div>
       {fields.length > limit && (
-        <p role="alert" className="field-error">
-          Seu plano permite {limit} cartões. Os demais continuam salvos, mas
-          ficam ocultos no perfil público. Remova explicitamente os excedentes
-          antes de salvar.
+        <p role="status" className="analytics-note">
+          Seu plano exibe até {limit} cartões no perfil público. Os demais
+          continuam privados e podem ser mantidos ao salvar. Para adicionar um
+          cartão novo, respeite o limite do plano.
         </p>
       )}
       {fields.map((field, index) => (

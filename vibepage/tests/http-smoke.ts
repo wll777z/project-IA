@@ -3,7 +3,7 @@ import jsQR from "jsqr";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import assert from "node:assert/strict";
-import { randomUUID } from "node:crypto";
+import { createHmac, randomUUID } from "node:crypto";
 import { setupDB } from "./setup-db";
 Object.assign(process.env, { NODE_ENV: "test" });
 const fixture = await setupDB();
@@ -296,6 +296,25 @@ try {
     og.headers.get("cache-control")?.includes("no-store"),
     "Open Graph não fica em cache após despublicação",
   );
+  const { consumeLimit } = await import("../src/lib/limits");
+  for (let i = 0; i < 12; i++) {
+    try {
+      await consumeLimit("shared", "public-og", 12);
+    } catch {
+      /* Exhaust this isolated test bucket. */
+    }
+  }
+  check(
+    (await request("/http_player/opengraph-image", "GET", undefined, ""))
+      .status === 429,
+    "Open Graph limita geração PNG no servidor",
+  );
+  const ogBucket =
+    "app:" +
+    createHmac("sha256", process.env.BETTER_AUTH_SECRET!)
+      .update("public-og:shared")
+      .digest("hex");
+  await fixture.db.rateLimit.deleteMany({ where: { key: ogBucket } });
   check(
     (await request("/api/views/http_player", "POST", undefined, "")).status ===
       204,

@@ -1,3 +1,6 @@
+import { headers } from "next/headers";
+import { consumeLimit, clientIdentity } from "@/lib/limits";
+import { apiError } from "@/lib/http";
 import { ImageResponse } from "next/og";
 import { getPublicProfile } from "@/lib/public-profile";
 export const runtime = "nodejs";
@@ -17,6 +20,15 @@ export default async function Image({
       status: 404,
       headers: { "Cache-Control": "no-store" },
     });
+  try {
+    await consumeLimit(
+      clientIdentity({ headers: await headers() }),
+      "public-og",
+      12,
+    );
+  } catch (error) {
+    return apiError(error);
+  }
   const profile = data.profile;
   return new ImageResponse(
     <div

@@ -58,3 +58,45 @@ export function applyTheme(
     })),
   };
 }
+
+// Called only after validating Free inputs and ownership on the server. Keep
+// dormant Pro presentation in existing columns; the public DTO still downgrades it.
+export function retainPrivateProAppearance(
+  current: ProfileInput,
+  input: ProfileInput,
+): ProfileInput {
+  const basic = editableAppearance(current, false, true);
+  return {
+    ...input,
+    themeId: input.themeId === basic.themeId ? current.themeId : input.themeId,
+    backgroundKey: current.backgroundKey,
+    backgroundColor:
+      current.backgroundColor === basic.backgroundColor
+        ? input.backgroundColor
+        : current.backgroundColor,
+    buttonStyle: current.buttonStyle,
+    animation: current.animation,
+    hideBranding: current.hideBranding,
+    backgroundEffect: current.backgroundEffect,
+    avatarEffect: current.avatarEffect,
+    buttonEffect: current.buttonEffect,
+    fontFamily: current.fontFamily,
+    entranceEffect:
+      input.entranceEffect === basic.entranceEffect
+        ? current.entranceEffect
+        : input.entranceEffect,
+    gamerCards: input.gamerCards.map((card) => {
+      const old = current.gamerCards.find((c) => c.id === card.id);
+      const oldBasic = basic.gamerCards.find((c) => c.id === card.id);
+      return old && oldBasic
+        ? {
+            ...card,
+            style: card.style === oldBasic.style ? old.style : card.style,
+            layout: old.layout,
+            glow: old.glow,
+            animated: old.animated,
+          }
+        : card;
+    }),
+  };
+}

@@ -19,7 +19,7 @@ Coleções guardam tema, cores, fontes, layout, botões, efeitos, configuraçõe
 
 Ao expirar Pro, Studio/blocos/galeria/estilos premium deixam de ser públicos, mas suas configurações e arquivos permanecem privados. Um save Free não apaga os novos dados privados. Agendamentos ficam suspensos e o dono pode cancelá-los. Aplicar coleções, criar temporadas e personalizar Studio exigem Pro no servidor.
 
-Consulte [VALIDATION.md](VALIDATION.md), [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md) e [docs/RELEASE_AUDIT.md](docs/RELEASE_AUDIT.md). Há pendências de infraestrutura e operação que impedem afirmar lançamento público concluído.
+Consulte a decisão atual em [docs/FINAL_RELEASE_REVIEW.md](docs/FINAL_RELEASE_REVIEW.md). Consulte [VALIDATION.md](VALIDATION.md), [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md) e [docs/RELEASE_AUDIT.md](docs/RELEASE_AUDIT.md). Há pendências de infraestrutura e operação que impedem afirmar lançamento público concluído.
 
 MVP de páginas de perfil para gamers, comunidades e criadores, com identidade visual própria. Next.js App Router, TypeScript, Tailwind, PostgreSQL, Prisma, Better Auth, Zod, React Hook Form, Motion e Lucide.
 
@@ -84,7 +84,7 @@ npm run admin:plan -- pessoa@exemplo.com PRO 2026-12-31
 npm run admin:plan -- pessoa@exemplo.com FREE
 ```
 
-A expiração é validada em cada leitura pública, gravação e consulta de estatísticas. Um perfil que perde Pro volta a exibir tema gratuito e marca; o editor normaliza as opções visuais. Cartões excedentes permanecem no banco e no editor, com aviso; só os três primeiros ficam públicos no Free. É necessário remover explicitamente os excedentes para salvar no limite Free. As imagens desses cartões ocultos também exigem sessão do dono.
+A expiração é validada em cada leitura pública, gravação e consulta de estatísticas. Um perfil que perde Pro volta a exibir tema gratuito e marca; o editor normaliza as opções visuais. Cartões excedentes permanecem no banco e no editor, com aviso; só os três primeiros ficam públicos no Free. Cartões legados excedentes podem ser mantidos ao salvar; só os três primeiros ficam públicos. Enquanto houver mais de três, o servidor não permite incluir IDs novos. Personalizações Pro não alteradas permanecem privadas para uma reativação autorizada. As imagens desses cartões ocultos também exigem sessão do dono.
 
 ## Validação e execução de produção
 
@@ -193,3 +193,5 @@ A sétima migration adiciona `ProfileBlock`, `SavedAppearance`, `AppearanceSched
 Dependências adicionadas com versões exatas: `qrcode@1.5.4`, `@types/qrcode@1.5.6` e `jsqr@1.4.0` (decodificação independente nos testes). Referências oficiais: [node-qrcode](https://github.com/soldair/node-qrcode), [jsQR](https://github.com/cozmo/jsQR). QR não depende de serviço externo.
 
 No editor, **Salvar alterações** fica na barra superior durante a rolagem. **Ver prévia / Voltar a editar** evita procurar o outro painel. No celular, use **Editar seção** para escolher Perfil, Links, Cartões, Studio e as demais opções; no desktop as abas permanecem. Erros de validação abrem a seção correspondente.
+
+A auditoria final não fez merge ou deploy. O resultado atual é **NO-GO para beta com usuários reais, lançamento público e venda do Pro** até concluir os bloqueadores operacionais registrados no relatório. A demo hospedada não substitui a homologação Node/PostgreSQL/SMTP.
