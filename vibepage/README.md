@@ -1,8 +1,12 @@
 # VibePage
 
-## Ultimate Edition — revisão incremental
+## Ultimate Release — revisão sobre a main
 
-A branch `feature/vibepage-ultimate` parte do trabalho do PR #1, sem mergeá-lo. Adiciona cartões gamer persistentes, efeitos configuráveis, sete temas originais, editor ampliado e melhorias na landing/dashboard. Consulte [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md) e [VALIDATION.md](VALIDATION.md) antes de usar uma origem pública. Não houve deploy.
+A branch `feature/vibepage-ultimate-release` parte da `main` `080141f` e incorpora, sem merge, o código dos PRs #1 e #2. Preserva cartões, efeitos, editor, landing e estatísticas já criados; completa as diferenças desta revisão. Consulte [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md), [VALIDATION.md](VALIDATION.md) e [docs/RELEASE_AUDIT.md](docs/RELEASE_AUDIT.md). Esta entrega não fez deploy nem alterou a prévia hospedada.
+
+O fundo por imagem agora é Pro em todas as camadas: upload, salvamento, DTO público, renderer e acesso à mídia. Ao expirar, a imagem deixa de ser pública, mas permanece no banco e acessível ao dono. O Free pode continuar usando avatar, avatares dos cartões e cores de destaque.
+
+Aurora Blue amplia o catálogo para 13 temas, preservando os cinco originais e os sete do PR anterior. A seção **Temas** permite aplicar uma receita de paleta, fonte, botões, estilo dos cartões e efeitos; desmarque a opção para trocar somente a paleta. **Aparência** continua disponível para ajustes individuais. A seleção é persistida e continua sujeita ao plano no servidor.
 
 MVP de páginas de perfil para gamers, comunidades e criadores, com identidade visual própria. Next.js App Router, TypeScript, Tailwind, PostgreSQL, Prisma, Better Auth, Zod, React Hook Form, Motion e Lucide.
 
@@ -39,13 +43,13 @@ No PowerShell a cópia é `Copy-Item .env.example .env`; no Linux/macOS, `cp .en
 
 ## O que está implementado
 
-- Landing com demonstração interativa do renderer público e do editor, galeria de 12 temas e presets ilustrativos claramente identificados.
+- Landing com demonstração interativa do renderer público e do editor, galeria de 13 temas e presets ilustrativos claramente identificados.
 - Cadastro, login, logout, sessões persistentes, proteção no servidor, exclusão com senha e recuperação de senha quando SMTP estiver configurado.
 - Dashboard com totais, status de publicação, links, compartilhamento e prévia.
 - Editor com username único, nome público, bio, avatar, fundo, cores, temas, até 100 links, ordenação, prévia ao vivo e salvamento transacional.
 - Cartões Roblox, Discord, Minecraft (Java/Bedrock), Fortnite, Valorant, Free Fire, League of Legends, Pokémon e personalizados. Nome, handle, detalhe, link HTTPS opcional, avatar normalizado, cor, ícone e reordenação. Sem integração oficial ou status online.
 - Seis visuais de cartão, layouts compacto/banner, bordas luminosas e animação; oito efeitos de fundo, cinco de avatar, seis de botões e quatro entradas. Efeitos opcionais, pausa manual, movimento reduzido e pausa quando fora da tela/aba oculta.
-- Editor em sete seções, prévia mobile/desktop com o mesmo renderer, alterações pendentes, bloqueio dos campos durante save/upload e redefinição de aparência com confirmação.
+- Editor em oito seções, prévia mobile/desktop com o mesmo renderer, alterações pendentes, bloqueio dos campos durante save/upload e redefinição de aparência com confirmação.
 - Controle de revisão para impedir que uma aba antiga sobrescreva alterações novas. Dados da conta e perfis de outros usuários não podem ser editados pelo cliente.
 - Uploads com verificação real do formato, limite de 4 MB e 16 milhões de pixels, normalização WebP, remoção de metadados e limite de armazenamento. A imagem publicada permanece até salvar a substituta.
 - Páginas `/username`, metadados Open Graph/Twitter, imagem de compartilhamento gerada e links externos seguros.
@@ -58,7 +62,7 @@ No PowerShell a cópia é `Copy-Item .env.example .env`; no Linux/macOS, `cp .en
 
 Free: um perfil, até 100 links, 3 cartões (Neon Gamer/Minimal Dark compactos), username disponível, cores de destaque, uploads, temas Midnight Purple/Minimal Black/Ice Blue, marca e total de visitas.
 
-Pro: até 12 cartões, seis estilos e banner, sete temas adicionais além de Cyber Neon/Pink Dream, efeitos e fontes locais, animações, formato de botões, fundo personalizado, remoção da marca, cliques e detalhamento diário de 30 dias e seleção de gráfico dos últimos 7/30 dias. R$ 9,90/mês continua sendo apenas uma sugestão de preço: **não há checkout nem cobrança**.
+Pro: até 12 cartões, seis estilos e banner, oito temas adicionais além de Cyber Neon/Pink Dream, efeitos e fontes locais, animações, formato de botões, fundo personalizado, remoção da marca, cliques e detalhamento diário de 30 dias e seleção de gráfico dos últimos 7/30 dias. R$ 9,90/mês continua sendo apenas uma sugestão de preço: **não há checkout nem cobrança**.
 
 Não existe endpoint para o usuário promover a própria conta. O administrador pode conceder ou revogar uma permissão pelo terminal, sem registrar pagamento:
 
@@ -131,7 +135,7 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 | `src/app/api/`                               | Perfil, uploads, mídia, views, stats e exportação                              |
 | `src/components/`                            | Componentes do editor, perfil, formulários e gráfico acessível                 |
 | `src/lib/`                                   | Validação, regras de acesso, permissões, limites, perfis, temas e estatísticas |
-| `prisma/`                                    | Schema, cinco migrations SQL, índices, checks e seed                           |
+| `prisma/`                                    | Schema, seis migrations SQL, índices, checks e seed                            |
 | `tests/`                                     | Suítes e smoke HTTP com banco isolado                                          |
 | `scripts/`                                   | Setup, manutenção, permissões administrativas e exportação da demo             |
 | `compose.yaml`, `Dockerfile`, `.env.example` | Execução local e preparação para hospedagem                                    |
@@ -149,8 +153,10 @@ A branch `fix/vibepage-launch-readiness` parte da `main` e mantém o visual exis
 
 ## Atualizar uma instalação existente
 
-Faça backup e valide restauração antes de atualizar um ambiente com dados. Em homologação, rode `npm ci`, `npm run db:migrate`, `npm run db:seed`, `npm run build` e `npm start`. A migration `202610270001_ultimate` é aditiva e conserva perfis, links e estatísticas; o teste automatizado confirma o upgrade de um perfil legado em PGlite. PostgreSQL nativo e concorrência entre instâncias ainda precisam de validação própria. Não remova as novas tabelas para voltar ao código anterior.
+Faça backup e valide restauração antes de atualizar um ambiente com dados. Em homologação, rode `npm ci`, `npm run db:migrate`, `npm run db:seed`, `npm run build` e `npm start`. As migrations `202610270001_ultimate` e `202610270002_aurora_blue` são aditivas e conservam perfis, links e estatísticas; o teste automatizado confirma o upgrade de um perfil legado em PGlite. PostgreSQL nativo e concorrência entre instâncias ainda precisam de validação própria. Não remova as novas tabelas para voltar ao código anterior.
 
-Os temas novos são Voltage City (amarelo elétrico, identidade original), Galaxy Purple, Sakura Dream, Ice Crystal, Crimson Shadow, Retro Arcade e Holographic. Os cinco originais foram preservados. `src/lib/themes.ts` contém as paletas e a classificação Free/Pro; `src/lib/customization.ts` contém opções e limites. Nenhum recurso faz fetch de links ou avatares externos.
+Os temas novos são Voltage City (amarelo elétrico, identidade original), Galaxy Purple, Sakura Dream, Ice Crystal, Crimson Shadow, Retro Arcade, Holographic e Aurora Blue. Os cinco originais foram preservados. `src/lib/themes.ts` contém as paletas e a classificação Free/Pro; `src/lib/customization.ts` contém opções e limites. Nenhum recurso faz fetch de links ou avatares externos.
 
 A demo é identificada como local e não cria conta ou assinatura. Escolher um tema na landing abre `/demo?theme=…`; a demo migra as escolhas antigas locais adicionando os campos novos. O aplicativo com banco usa as APIs existentes. A prévia hospedada anterior continua sem estas alterações até um deploy explicitamente autorizado.
+
+O editor usa Web Crypto para IDs também nas prévias HTTP/LAN que não expõem `randomUUID`, sem recorrer a `Math.random`. Isso não substitui HTTPS em produção nem o controle de propriedade no servidor. Recarregar um link `/demo?theme=…` do mesmo tema preserva cores, efeitos e estilos já salvos. O exportador da demo preserva o JavaScript da landing; rotas de login/cadastro na exportação estática direcionam à demonstração identificada, sem simular contas.

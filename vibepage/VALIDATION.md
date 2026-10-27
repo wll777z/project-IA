@@ -1,66 +1,60 @@
-# Validação — VibePage Ultimate
+# Validação — VibePage Ultimate Release
 
-Rodada de 27/10/2026, branch `feature/vibepage-ultimate`, preservando o PR #1 (`17b9d4492889091db24a3ec5090919222c674469`). Node.js 24.22.1, npm 11.9.0. Alterações somente em `vibepage/`. Não houve merge, deploy, serviços contratados ou cobrança.
+Executada em 27/10/2026 na branch `feature/vibepage-ultimate-release`, a partir da main `080141fc0e49a92ab815a8c22f59a2a90ed65da1`. Foram preservadas as implementações dos PRs #1 e #2 e acrescentadas correções e Aurora Blue. Node.js 24.22.1, npm 11.9.0. Mudanças somente dentro de `vibepage/`; sem merge ou deploy nesta rodada.
 
 ## Resultados reais
 
-| Verificação            | Resultado                                                                    |
-| ---------------------- | ---------------------------------------------------------------------------- |
-| Dependências           | Mantidas as versões e o lockfile existentes; nenhuma biblioteca adicionada   |
-| `npm run lint`         | Aprovado, sem erros ou avisos do linter                                      |
-| `npm run typecheck`    | Aprovado, Prisma Client gerado                                               |
-| `npm test`             | **114 testes aprovados em 12 arquivos**                                      |
-| `npm run build`        | Build de produção aprovado; standalone preparado                             |
-| `npm run test:http`    | **39 verificações aprovadas** por HTTP na aplicação standalone               |
-| `npm run format:check` | Prettier aprovado                                                            |
-| `npm audit --json`     | **0 vulnerabilidades conhecidas**, incluindo dependências de desenvolvimento |
+| Comando                | Resultado                                                    |
+| ---------------------- | ------------------------------------------------------------ |
+| `npm run lint`         | Aprovado, sem erros ou avisos do linter                      |
+| `npm run typecheck`    | Aprovado, Prisma Client gerado                               |
+| `npm test`             | **139 testes aprovados em 16 arquivos**                      |
+| `npm run build`        | Build de produção aprovado; standalone preparado             |
+| `npm run test:http`    | **47 verificações aprovadas** na aplicação standalone        |
+| `npm run format:check` | Aprovado                                                     |
+| `npm audit --json`     | **0 vulnerabilidades conhecidas**, incluindo desenvolvimento |
 
-Os avisos esperados de credenciais inválidas/token inválido dos testes Better Auth não indicam falha da suíte. O ambiente npm avisa sobre sua configuração `http-proxy`; não é um erro do aplicativo. ESLint 9 permanece fora de suporte e requer atualização coordenada com os plugins do Next. Nenhuma versão RC foi adotada.
+Nenhuma dependência foi adicionada ou atualizada. Avisos de credenciais/tokens inválidos durante testes Better Auth são esperados. O aviso do ambiente npm sobre `http-proxy` e o fim de suporte do ESLint 9 não são erros do linter; a atualização coordenada do ESLint permanece no checklist.
 
-## Auditoria e regressões
+## Regressões e permissões
 
-A revisão anterior preservada corrigiu URL parcial que lançava `TypeError`, canonicalização HTTPS, condição de corrida entre donos de links, cache de Open Graph e exigência de confirmação de e-mail em produção. O relatório histórico permanece em `docs/LAUNCH_AUDIT.md`.
+Os três testes do novo arquivo `background-permissions.integration.test.ts` foram executados antes da correção e **falharam como esperado**: upload de fundo Free era aceito e a imagem continuava no DTO após expiração. Depois da correção, passaram. Agora a permissão é aplicada antes de processar o upload, novamente dentro da transação, no salvamento, DTO público, preview, renderer e mídia. O arquivo permanece acessível ao dono; o anônimo recebe 404 após a expiração.
 
-Nesta rodada, a inspeção confirmou que títulos de links podiam conter caracteres de controle, incluindo NUL, incompatíveis com o campo texto do PostgreSQL. A validação agora os recusa antes da persistência, com teste de regressão. A suíte passou com 95 testes antes da ampliação funcional e com 114 após as implementações.
+O teste cobre fallback de tema premium, cor de fundo, botões, animação, efeitos, fonte e marca. A cor de destaque permanece liberada no Free, conforme o produto. A suíte continua cobrindo URLs, XSS escapado, propriedade, revisão otimista, colisão de IDs, uploads reais Sharp, MIME/SVG/tamanho, limites atômicos, exportação e cascatas.
 
-O editor bloqueia edição durante save/upload para evitar que um reset de resposta sobrescreva novas edições. Há aviso ao recarregar/fechar com alterações e confirmação ao clicar em links internos; a navegação Voltar do navegador não tem interceptação universal e precisa de aceitação manual. O botão da landing “Experimentar o editor” agora abre `/demo`.
+Foram testados ainda: duas gravações assíncronas com a mesma revisão e um único vencedor; as 13 receitas de tema preservando identidade/links/IDs; palette-only mantendo efeitos; geração UUID v4 quando `randomUUID` não existe; restauração da demo sem sobrescrever estilo já salvo por causa da query de tema; migração de dados locais legados/corrompidos.
 
-## Cartões, temas, efeitos e dados
+## Banco, migrations e autenticação
 
-- Criação, leitura, ordenação e persistência de cartões por Prisma e PGlite reais; IDs alheios recusados e transação sem perfil parcial.
-- Limites Free/Pro, layouts, estilos, efeitos e fonte validados no servidor; tentativas de ativação pelo cliente são rejeitadas.
-- As 12 opções de tema são gravadas por uma conta com entitlement Pro. Os cinco temas originais e a unicidade dos IDs têm teste.
-- URLs ativas/locais, controles em nomes, enumerações, cores inválidas e campos arbitrários recusados. Renderer SSR escapa texto malicioso e só cria âncora externa para URL segura, com isolamento e destino visível.
-- Avatar de cartão enviado pela rota real, normalizado para WebP, privado no rascunho, público após publicação e protegido se a posição ficar fora do limite Free após expiração Pro. Imagens estrangeiras recusadas.
-- Exportação inclui cartões; remoção de cartões libera avatares sem uso; exclusão da conta faz cascata. Pro expirado preserva os cartões no banco, limita a exibição e os mantém no editor para remoção explícita.
-- Gráfico usa dados reais para 7/30 dias, com rótulos correspondentes e tabela acessível. Cliques de cartões não são instrumentados; totais existentes contam links personalizados.
+As **seis migrations** são aplicadas em banco novo nas fixtures. Um teste aplica as quatro originais, cria usuário/perfil/link legado, aplica quinta e sexta na ordem e verifica que dados e defaults foram preservados e Aurora Blue foi registrada como Pro. As migrations antigas não foram editadas.
 
-O CSS contém os efeitos configuráveis e regras de movimento reduzido. A implementação limita partículas a 16 elementos, pausa animações quando o componente sai da tela/aba é ocultada e oferece pausa manual. Esses comportamentos de navegador foram revisados no código, **não medidos em aparelho real**. Testes SSR não verificam layout, animações, foco ou contraste renderizado.
+O banco é PGlite, acessado por Prisma/pg. O teste de saves simultâneos usa duas promessas com a mesma revisão e a conexão da fixture; não equivale a concorrência entre processos em PostgreSQL nativo.
 
-## Banco e migration
+Better Auth e senhas/sessões reais são usados nos testes de cadastro, login, logout, expiração, confirmação e recuperação. Mensagens são capturadas em memória; não foram enviadas para SMTP externo. Segredos das fixtures não são configurações de produção.
 
-A quinta migration (`202610270001_ultimate`) adiciona `GamerCard`, campos de efeitos/fontes e slots limitados de avatar. As quatro migrations anteriores não foram alteradas. A suíte aplica as cinco em banco novo; um teste adicional aplica as quatro antigas, grava usuário/perfil/link legado, executa a quinta e confirma a preservação dos dados e os defaults novos.
+## HTTP de produção — 47 verificações
 
-O banco é PostgreSQL embarcado PGlite, acessado por Prisma/pg. Não há PostgreSQL nativo nem Docker disponíveis neste ambiente. Não foram testados backup/restauração reais, migration em base de produção, conexões nativas concorrentes, carga entre processos ou persistência de um host remoto.
+O smoke inicia o launcher standalone em porta dinâmica com banco isolado. Verifica landing/CSS/headers, `/demo`, redirect de anônimo, cadastro/login, cookie, CSRF, exportação, persistência, rascunho 404, publicação, cartões e bio escapados, URLs e limites Free, Open Graph/no-store/404, visitas e cliques reais, Pro concedido/revogado no banco, Aurora Blue, fundo Pro publicado e posterior omissão/404 ao expirar, logout, exclusão com senha e remoção dos dados.
 
-## HTTP de produção — 39 checks
+## Navegador e responsividade
 
-O smoke inicia `launch.mjs` em porta dinâmica e banco isolado. Confirma landing/CSS, headers, proteção de dashboard/exportação, cadastro/login, sessão, CSRF, salvamento, rascunho 404, publicação e HTML escapado. Também confirma cartões persistidos no HTML, validação de URL de cartão, limites Free, permissão Pro real no banco, tema/efeitos públicos e revogação após expiração. Testa Open Graph/no-store/404, views, redirect para URL armazenada, estatísticas com agregados reais, logout, exclusão com senha e remoção da página/imagem.
+A prévia direta do Next continua incompatível com as flags enviadas pela infraestrutura (`--host`/`--strictPort`). Para QA, foi usada a **exportação estática local** em diretório ignorado de `.next/`, sem registro ou publicação de site e sem alterar o script de desenvolvimento.
 
-## Autenticação, uploads e segurança preservados
+No Chrome da ferramenta, foram conferidos:
 
-A suíte anterior continua verificando Better Auth com senha/sessão reais, enumeração genérica, confirmação de e-mail, reset, token reutilizado/expirado e revogação. Entrega de mensagens é capturada em memória; não há SMTP externo. Permanecem os testes de CSRF, limites atômicos, uploads Sharp/MIME/SVG/tamanho, estágios de imagens, unicidade e revisão otimista.
+- Nome editado, atualizado imediatamente na prévia, salvo e mantido após recarga; o exemplo foi restaurado depois.
+- Criação de cartão em HTTP, preenchimento, reordenação por botões, salvamento e ordem mantida após recarga. O cartão temporário de QA foi removido.
+- O browser reproduziu `crypto.randomUUID is not a function` antes da alternativa Web Crypto; a criação passou após a correção.
+- Separação de Temas/Aparência, Aurora Blue e preview; pausa de efeitos passou de “Pausar” para “Ativar” e aplicou `animations-paused`.
+- Landing exportada com troca de preset refletida no jogo/cartão da demonstração.
+- Editor em iframe de 390 px (375 px de área útil com a barra de rolagem do Chrome). Após estabilização, `scrollWidth` e `clientWidth` eram ambos 375: sem transbordamento horizontal persistente nesse cenário. Seções e controles permaneceram acessíveis na árvore de acessibilidade.
 
-## Prévia, responsividade e acessibilidade: limite real
+Essas verificações não testam contas reais no browser, SMTP, todos os breakpoints, dispositivo físico, emulação completa de celular, contraste em todos os temas, leitor de tela ou desempenho em hardware fraco. As regras CSS de movimento reduzido foram revisadas; não foi alterada a preferência do navegador/sistema para alegar teste de mídia reduzida.
 
-Foi tentado `sites-preview start` no checkout. A infraestrutura inicia o script Next com `--host 0.0.0.0 --port 4173 --strictPort`, opções de outro servidor que o Next recusa (`unknown option '--host'`). O processo terminou antes de uma página navegável. Não alteramos o aplicativo para contornar a infraestrutura.
+## Pendências para homologação e lançamento
 
-Consequentemente **não foi executado teste de navegador, screenshot, breakpoint, leitor de tela ou aparelho físico**. Há CSS responsivo, estados de foco, rótulos, ordenação por botões, semântica de grupos e regras de movimento reduzido; a aceitação visual/mobile permanece pendente em ambiente que execute o Next normalmente. O seletor desktop amplia a prévia dentro do espaço disponível, sem emular um aparelho ou viewport de 1440 px.
+Não há PostgreSQL nativo/Docker, host de produção ou SMTP real configurados neste ambiente. Upgrade em banco real, carga/concorrência nativa, proxy, limites na borda, persistência do host, backups/restauração, monitoramento e entregabilidade precisam de validação do operador.
 
-## Produção e pendências
+Produção pública exige `DATABASE_URL`, origem HTTPS em `BETTER_AUTH_URL`, segredo exclusivo, `REQUIRE_EMAIL_VERIFICATION=true` e SMTP completo. Use `npm start` ou o Dockerfile com `launch.mjs`. Textos legais, controlador/contato, retenção, público menor de idade, moderação e denúncias continuam pendentes. Há proteção ao recarregar/fechar e clicar em links com mudanças não salvas; navegação Voltar não tem interceptação universal.
 
-O aplicativo com contas precisa de host Node.js, PostgreSQL persistente, origem HTTPS, segredo exclusivo, confirmação de e-mail e SMTP completo. A demonstração hospedada anterior não contém automaticamente estas alterações. Não há banco remoto ou entrega real de e-mail configurados.
-
-Proxy confiável, limites de borda, manutenção diária, backups e retenção, monitoramento, canais legais/suporte, regras aplicáveis a menores de idade e moderação/denúncias precisam ser definidos e verificados pelo operador antes de receber usuários. Termos e privacidade continuam rascunhos de desenvolvimento; não é uma declaração de conformidade jurídica.
-
-Consulte [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md). Não há promessa de ausência de todas as falhas nem de prontidão operacional sem essas validações.
+A prévia hospedada anteriormente não foi atualizada nesta tarefa. Consulte [docs/RELEASE_AUDIT.md](docs/RELEASE_AUDIT.md) e [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md). Os resultados anteriores de 61/94/114 testes são históricos, não o resultado desta rodada. Nenhuma auditoria ou teste garante ausência de todas as falhas.

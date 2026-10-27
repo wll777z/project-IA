@@ -1,4 +1,4 @@
-# Checklist de lançamento — VibePage Ultimate
+# Checklist de lançamento — VibePage Ultimate Release
 
 Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lançamento público** nem afirma que a infraestrutura já existe. Sem merge, deploy, contratação ou cobrança.
 
@@ -6,6 +6,9 @@ Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lan�
 
 - [x] Preservar correções de `fix/vibepage-launch-readiness` (PR #1).
 - [x] Corrigir validação de títulos com controles incompatíveis com PostgreSQL.
+- [x] Restringir imagem de fundo a Pro no upload, write, DTO, renderer e mídia; expiração preserva arquivo privado do dono.
+- [x] Catálogo com 13 temas e presets validados, incluindo Aurora Blue, sem remover os cinco originais.
+- [x] Corrigir IDs de links/cartões em HTTP/LAN e preservar customizações da demo ao recarregar o mesmo tema.
 - [x] Persistir cartões, efeitos e fontes com validação no servidor.
 - [x] Aplicar limites Free/Pro, propriedade dos IDs, transação e revisão otimista.
 - [x] Manter dados excedentes ao expirar Pro; limitar somente a exibição pública. No editor, a remoção dos excedentes exige ação explícita antes de salvar.
@@ -15,14 +18,15 @@ Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lan�
 - [x] Testar autenticação, recuperação por callback em memória, CSRF, autorização, uploads, URLs, XSS escapado, publicação e expiração de plano.
 - [x] Executar lint, typecheck, testes, build, smoke HTTP e auditoria de dependências. Evidências em `VALIDATION.md`.
 - [x] Incluir controles acessíveis por teclado, rótulos, reordenação por botões, pausa dos efeitos e `prefers-reduced-motion`.
-- [ ] Revisar em navegador real em 360, 390, 768 e 1440 px, teclado e leitor de tela. A infraestrutura de prévia disponível falhou antes de abrir o Next; não se trata de um teste aprovado.
+- [x] Conferir edição, criação/ordenação de cartão, save/recarga, pausa de efeitos e controles da landing na demo exportada.
+- [ ] Completar revisão em 360, 390, 768 e 1440 px, teclado e leitor de tela. Houve conferência da demo exportada em desktop e frame de 390 px, sem overflow persistente nesse cenário. Isso não cobre todos os breakpoints nem aparelho físico ou leitor de tela.
 - [ ] Validar desempenho de animações em celular de entrada e impacto com 12 cartões/100 links.
 - [ ] Validar navegação Voltar do navegador com alterações pendentes. Há proteção para recarregar/fechar e confirmação ao clicar em links; não há interceptação universal do histórico do navegador.
 
 ## Antes de aplicar em um banco de produção
 
 1. Usar PostgreSQL nativo compatível e um ambiente de homologação independente. Criar uma cópia de segurança, testar restauração em outro banco e confirmar que o operador consegue recuperar o serviço.
-2. Instalar com `npm ci`, gerar o client (`npm run db:generate`), executar `npm run db:migrate` e `npm run db:seed`. A quinta migration adiciona `GamerCard`, campos de aparência e slots de avatares; não remove perfis ou links.
+2. Instalar com `npm ci`, gerar o client (`npm run db:generate`), executar `npm run db:migrate` e `npm run db:seed`. A quinta migration adiciona `GamerCard`, campos de aparência e slots de avatares; a sexta registra Aurora Blue; não remove perfis ou links.
 3. Testar cadastro, confirmação, login, recuperação, upload, edição, publicação, expiração Pro, exportação e exclusão em homologação com PostgreSQL nativo.
 4. Testar concorrência entre processos, carga e os limites compartilhados de autenticação. PGlite não substitui essa validação.
 5. Em rollback do aplicativo, conservar as novas tabelas/colunas. Não apagar dados nem executar migrations destrutivas para voltar ao código anterior.
