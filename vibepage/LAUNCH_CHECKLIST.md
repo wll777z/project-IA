@@ -1,3 +1,20 @@
+# Release freeze — gates atuais
+
+- [x] Conferir GitHub e preservar referência `22ab34d`; cadeia histórica comprovada.
+- [x] PR #8 draft separado: não há rota Pix, chave real, checkout ou ativação por pagamento na candidata.
+- [x] Corrigir divergência reproduzida de origem pública entre build/runtime; manifesto e launcher recusam inconsistência.
+- [x] Dashboard/editor copiam URL canônica fornecida pelo servidor.
+- [x] 208 testes, build e 108 verificações HTTP locais aprovados; 9 verificações adicionais com origem HTTPS sintética.
+- [x] Após o ensaio sintético, reconstruir explicitamente para localhost e repetir o smoke: 108 aprovadas.
+- [ ] Aprovar PostgreSQL nativo, HTTPS/DNS/SMTP, backup/restore e persistência remotos.
+- [ ] Aprovar proxy, monitoramento, cleanup/alertas, políticas e operação de suporte.
+- [ ] Aprovar dispositivos físicos/leitor de tela e jornadas no domínio final.
+- [ ] Revisão e autorização expressa antes de qualquer merge/deploy/beta real.
+
+**GO apenas demo local/sintética; NO-GO beta, público e Pro comercial.** [Checklist completo](docs/RELEASE_FREEZE_CHECKLIST.md) · [Relatório do freeze](docs/RELEASE_FREEZE.md). Nenhum merge ou deploy.
+
+---
+
 # Polimento final da RC1
 
 - [x] Conferir RC1 `2c1735e` e PR #8 no GitHub; PR de Pix permanece draft separado.

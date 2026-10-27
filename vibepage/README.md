@@ -1,5 +1,23 @@
 # VibePage
 
+## Release freeze 3.0
+
+A candidata `release/vibepage-3.0-freeze` parte de `fix/vibepage-final-polish` (`22ab34d`) e preserva toda a cadeia anterior, exceto o experimento Pix explicitamente excluído. Somente ajustes reproduzidos de origem pública/compartilhamento, regressões e documentação. Consulte [RELEASE_FREEZE](docs/RELEASE_FREEZE.md) e o [checklist de homologação](docs/RELEASE_FREEZE_CHECKLIST.md).
+
+O launcher agora **recusa** um build cuja origem pública diverge de `BETTER_AUTH_URL` no runtime. Configure o domínio final no build e no runtime; não edite o manifesto gerado e não inicie `server.js` diretamente. Para verificar esse contrato localmente, sem dev/preview/produção rodando nessa pasta:
+
+```bash
+BETTER_AUTH_URL=https://freeze-origin.example.test npm run build
+npm run test:origin
+# Não publique o build sintético. Reconstrua explicitamente para continuar localmente:
+BETTER_AUTH_URL=http://localhost:3000 npm run build
+npm run test:http
+```
+
+No PowerShell, configure `$env:BETTER_AUTH_URL` antes de cada build. `test:origin` usa HTTP loopback/PGlite; não valida TLS, DNS ou SMTP externos. O domínio `.example.test` existe apenas como fixture, nunca como domínio de produção.
+
+Decisão: **GO demo local/sintética; NO-GO beta real, lançamento público e Pro comercial** até cumprir os gates externos. Nenhum merge ou deploy foi executado. `/pro/pix` permanece ausente; PR #8 continua separado e não aprovado para incorporação.
+
 ## Polimento final da candidata
 
 A branch `fix/vibepage-final-polish` parte da RC1 completa (`2c1735e`). Ajusta navegação mobile/página ativa, orientação inicial, mensagens de publicação/indisponibilidade e SEO. Rotas preservadas; sem novas funcionalidades grandes ou mudanças em cobrança. PR #8 examinado e mantido separado: `/pro/pix` não está nesta candidata e Pro continua indisponível para compra. Evidência e decisões em [FINAL_POLISH_REVIEW](docs/FINAL_POLISH_REVIEW.md).

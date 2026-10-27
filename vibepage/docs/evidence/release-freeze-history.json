@@ -1,0 +1,130 @@
+{
+  "date": "2026-10-27",
+  "repository": "wll777z/project-IA",
+  "reference": "22ab34d753694a4568f6ae38f2933878eaa313d0",
+  "branches": [
+    {
+      "branch": "main",
+      "sha": "080141fc0e49a92ab815a8c22f59a2a90ed65da1",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "fix/vibepage-launch-readiness",
+      "sha": "17b9d4492889091db24a3ec5090919222c674469",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "feature/vibepage-ultimate",
+      "sha": "609395d756c2beff5a664d5f66f013d9d67a7cef",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "feature/vibepage-ultimate-release",
+      "sha": "e8cb1f688224f349b7165488829d4af20e386f21",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "feature/vibepage-next-level",
+      "sha": "07d1e8cec4be202033136f32cd32919ffa527a6a",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "audit/vibepage-final-release",
+      "sha": "7d9758fb112206bcd4fe706c8bef6f9ba612953c",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "release/vibepage-3.0-rc1",
+      "sha": "2c1735e147db24dde78156309c10dbd9c1d2cc4a",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "fix/vibepage-final-polish",
+      "sha": "22ab34d753694a4568f6ae38f2933878eaa313d0",
+      "ancestorOfFinalPolish": true
+    },
+    {
+      "branch": "feature/vibepage-pro-2-launch",
+      "sha": "40644e773a4ec2dc83d7bd64ffc06bafd9b8ae83",
+      "ancestorOfFinalPolish": false
+    },
+    {
+      "branch": "feature/vibepage-pix-manual-info",
+      "sha": "3331953e7b86c7a371d5b5aea21862c071765d4d",
+      "ancestorOfFinalPolish": false
+    }
+  ],
+  "protectedFiles": [
+    {
+      "path": "src/lib/themes.ts",
+      "sha256": "c1215799c309eb2b59baa419bce27629c3679d864bb7e5dfd5b1e404f49a0f23",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "src/lib/customization.ts",
+      "sha256": "3cbc98f7e1c974ee78666a7cf0571dd96a305ad988a88b8e1c3c9accbc963d49",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "src/lib/studio-schema.ts",
+      "sha256": "e316168312b91b55e6f50b264270d74fec3a875b92c002de690aa8250b17fe8b",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "src/components/gamer-card-editor.tsx",
+      "sha256": "c134cf56acece0541d4fff78bb58f18f31e4c36be7732692880e22608b07941e",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/schema.prisma",
+      "sha256": "05db5577a944cbb44df5080cf62939b57b26712718e33e30ae597660d67ddf9c",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610270003_next_level/migration.sql",
+      "sha256": "05c5846eaa6b8d928387fd5708fa660537a1149ace2f0bc9de086f315aaac899",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610260001_init/migration.sql",
+      "sha256": "3125de4092e93106eb3b6326b9b040555767d271e8449346e36b6d784e3bbe05",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610260004_staged_uploads/migration.sql",
+      "sha256": "5f484b61adec77e28051e3551c0e02fb4dbc329105a8031d8fb8aeeefb76063a",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610260002_profiles/migration.sql",
+      "sha256": "a9c1cbcbf7ff2f2bbc711d2b755564bf21a96812bf0794517edcde103ff9c726",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610270001_ultimate/migration.sql",
+      "sha256": "9686b11bbd80e158b124200cd3555d5bd8cbe4ae0c4c0a3e57a1eb7a42be493c",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610270002_aurora_blue/migration.sql",
+      "sha256": "433f268a22d1240a80080cd2987728ecfd95276bee03cea414c2df1fe1c16f3b",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610260003_analytics/migration.sql",
+      "sha256": "ff10397155b5676cb02fb60947a82403ceec06ecce0153bcf517f65a6b6201e2",
+      "unchangedFromPolish": true
+    },
+    {
+      "path": "prisma/migrations/202610270004_release_operations/migration.sql",
+      "sha256": "6120f8b2af94c7d2a762129f75dcef1eee1116cc02ae66bbb254ab5af9ca92a7",
+      "unchangedFromPolish": true
+    }
+  ],
+  "excludedPR": 8,
+  "notes": [
+    "PR #4 nao ancestral: alteracao de CTA /demo ja presente; nao ha outros recursos nesse diff.",
+    "PR #8 nao ancestral: draft Pix excluido por decisao explicita; nenhuma chave real foi usada.",
+    "Ancestralidade preserva commits, mas nao substitui aceite funcional externo."
+  ]
+}

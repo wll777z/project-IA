@@ -1,0 +1,50 @@
+{
+  "date": "2026-10-27",
+  "reference": "22ab34d753694a4568f6ae38f2933878eaa313d0",
+  "environment": "Node 24, Next standalone, Prisma/PGlite isolado; HTTP loopback, sem TLS/SMTP externos",
+  "commands": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "npm test": {
+      "passed": 208,
+      "files": 27
+    },
+    "build": "passed",
+    "test:http": {
+      "passed": 108
+    },
+    "test:origin": {
+      "passed": 9,
+      "publicOrigin": "https://freeze-origin.example.test",
+      "transport": "HTTP loopback"
+    },
+    "format:check": "passed"
+  },
+  "reproductionBeforeFix": {
+    "runtimeOrigin": "https://freeze-origin.example.test",
+    "httpStatus": 200,
+    "canonical": "http://localhost:3000"
+  },
+  "originChecks": [
+    "launcher recusa origem pública divergente antes de servir HTTP",
+    "landing usa a origem HTTPS de build em canonical e Open Graph",
+    "sitemap usa a origem pública sem enumerar perfis",
+    "robots anuncia sitemap na mesma origem HTTPS",
+    "perfil e imagem OG usam a origem pública runtime",
+    "QR servido por HTTP local contém a URL HTTPS canônica",
+    "VibeCard contém QR da origem pública correta",
+    "chave sintética configurada permanece inacessível e Pix continua 404",
+    "HTML e metadados públicos não vazam URLs de loopback"
+  ],
+  "localBuildAfterContract": {
+    "version": 1,
+    "origin": "http://localhost:3000"
+  },
+  "externalTestsPerformed": [],
+  "decisions": {
+    "demoLocal": "GO",
+    "betaReal": "NO-GO",
+    "publicLaunch": "NO-GO",
+    "proCommercial": "NO-GO"
+  }
+}
