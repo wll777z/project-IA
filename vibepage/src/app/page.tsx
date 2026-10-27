@@ -1,3 +1,17 @@
+import type { Metadata } from "next";
+import { appOrigin } from "@/lib/site-origin";
+export const metadata: Metadata = {
+  alternates: { canonical: appOrigin() + "/" },
+  openGraph: {
+    title: "VibePage — Seu universo, em um link.",
+    description:
+      "Seu perfil, links e comunidades em uma página com a sua identidade.",
+    url: appOrigin() + "/",
+    siteName: "VibePage",
+    locale: "pt_BR",
+    type: "website",
+  },
+};
 import Link from "next/link";
 import {
   ArrowRight,

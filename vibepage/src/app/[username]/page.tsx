@@ -17,15 +17,16 @@ export async function generateMetadata({
       robots: { index: false, follow: false },
     };
   const url = `${appOrigin()}/${data.profile.username}`;
+  const description =
+    data.profile.bio ||
+    `Conheça o universo de ${data.profile.displayName} no VibePage.`;
   return {
     title: data.profile.displayName,
-    description:
-      data.profile.bio ||
-      `Conheça o universo de ${data.profile.displayName} no VibePage.`,
+    description,
     alternates: { canonical: url },
     openGraph: {
       title: `${data.profile.displayName} · VibePage`,
-      description: data.profile.bio,
+      description,
       url,
       type: "profile",
       images: [`${url}/opengraph-image`],
@@ -33,7 +34,7 @@ export async function generateMetadata({
     twitter: {
       card: "summary_large_image",
       title: data.profile.displayName,
-      description: data.profile.bio,
+      description,
       images: [`${url}/opengraph-image`],
     },
   };

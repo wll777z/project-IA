@@ -1,3 +1,5 @@
+x-public-build-origin: &publicBuildOrigin
+  BETTER_AUTH_URL: ${BETTER_AUTH_URL:?Defina origem HTTPS para metadados}
 x-runtime: &runtime
   NODE_ENV: production
   DATABASE_URL: postgresql://vibepage:${POSTGRES_PASSWORD:?Defina a senha URL-safe do banco}@db:5432/vibepage?schema=public
@@ -19,7 +21,7 @@ x-runtime: &runtime
   LEGAL_AGE_NOTICE: ${LEGAL_AGE_NOTICE:-}
 services:
   preflight:
-    build: { context: ., target: builder }
+    build: { context: ., target: builder, args: *publicBuildOrigin }
     environment:
       <<: *runtime
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina a senha do banco}
@@ -48,12 +50,12 @@ services:
       timeout: 5s
       retries: 20
   migrate:
-    build: { context: ., target: builder }
+    build: { context: ., target: builder, args: *publicBuildOrigin }
     environment: *runtime
     depends_on: { db: { condition: service_healthy } }
     command: [sh, -c, "npm run db:migrate && npm run db:seed"]
   web:
-    build: { context: ., target: runner }
+    build: { context: ., target: runner, args: *publicBuildOrigin }
     restart: unless-stopped
     environment:
       <<: *runtime
@@ -78,7 +80,7 @@ services:
     depends_on: [web]
   admin-bootstrap:
     profiles: [admin]
-    build: { context: ., target: builder }
+    build: { context: ., target: builder, args: *publicBuildOrigin }
     environment:
       <<: *runtime
       ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-}
@@ -89,7 +91,7 @@ services:
     command: [npm, run, "admin:bootstrap"]
   cleanup:
     profiles: [maintenance]
-    build: { context: ., target: builder }
+    build: { context: ., target: builder, args: *publicBuildOrigin }
     environment:
       DATABASE_URL: postgresql://vibepage:${POSTGRES_PASSWORD:?Defina a senha do banco}@db:5432/vibepage?schema=public
     depends_on: { db: { condition: service_healthy } }

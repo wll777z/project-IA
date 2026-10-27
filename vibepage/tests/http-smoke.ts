@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import { mkdir, writeFile } from "node:fs/promises";
 import jsQR from "jsqr";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
@@ -59,6 +60,10 @@ async function request(
     redirect: "manual",
   });
 }
+async function snapshot(name: string, html: string) {
+  await mkdir(".next/polish-snapshots", { recursive: true });
+  await writeFile(`.next/polish-snapshots/${name}.html`, html);
+}
 function check(ok: unknown, label: string) {
   assert(ok, label);
   console.log("PASS", label);
@@ -86,7 +91,46 @@ try {
     (await request("/api/account/export")).status === 401,
     "exportação exige sessão",
   );
+  check(
+    (await request("/api/account/export")).headers.get("x-robots-tag") ===
+      "noindex, nofollow",
+    "APIs respondem com X-Robots-Tag noindex",
+  );
   const landingHTML = await landing.text();
+  const sitemapResponse = await request("/sitemap.xml");
+  const sitemapXML = await sitemapResponse.text();
+  const canonical = landingHTML.match(/<link rel="canonical" href="([^"]+)"/);
+  check(
+    sitemapResponse.status === 200 &&
+      canonical &&
+      sitemapXML.includes(`<loc>${new URL(canonical[1]).href}</loc>`) &&
+      (sitemapXML.match(/<loc>/g) || []).length === 1,
+    "sitemap curado coincide com canonical e não enumera perfis ou dados privados",
+  );
+  const robotsText = await (await request("/robots.txt")).text();
+  check(
+    robotsText.includes(
+      `Sitemap: ${new URL(canonical![1]).origin}/sitemap.xml`,
+    ) && robotsText.includes("Disallow: /redefinir-senha"),
+    "robots anuncia sitemap e exclui fluxos de conta",
+  );
+  for (const path of [
+    "/login",
+    "/cadastro",
+    "/recuperar-senha",
+    "/redefinir-senha",
+    "/demo/pro",
+  ]) {
+    const html = await (await request(path)).text();
+    check(
+      /<meta name="robots" content="noindex, nofollow"/.test(html),
+      `${path} possui noindex explícito`,
+    );
+  }
+  check(
+    (await request("/pro/pix")).status === 404,
+    "PR #8 não foi incorporado: vendas Pix continuam indisponíveis nesta candidata",
+  );
   const css = landingHTML.match(/href="([^\"]+\.css[^\"]*)"/);
   check(
     css && (await fetch(origin + css[1])).status === 200,
@@ -128,9 +172,18 @@ try {
       ?.split(";")[0] || "";
   check(cookie.length > 0, "sessão recebida por cookie");
   const dashboard = await request("/dashboard");
+  const dashboardHTML = await dashboard.text();
+  await snapshot("first-access", dashboardHTML);
+  const firstEditorHTML = await (await request("/dashboard/editor")).text();
+  await snapshot("editor", firstEditorHTML);
   check(
-    dashboard.status === 200 &&
-      (await dashboard.text()).includes("HTTP Player"),
+    dashboardHTML.includes("Seu perfil em poucos passos.") &&
+      dashboardHTML.includes("NÃO CRIADO") &&
+      !dashboardHTML.includes("Copiar link do perfil"),
+    "primeiro acesso orienta sem compartilhar perfil inexistente",
+  );
+  check(
+    dashboard.status === 200 && dashboardHTML.includes("HTTP Player"),
     "área autenticada renderiza o dono",
   );
   const { emptyProfile } = await import("../src/lib/profiles");
@@ -238,10 +291,35 @@ try {
       .status === 404,
     "rascunho não gera imagem de compartilhamento",
   );
+  const draftDashboard = await (await request("/dashboard")).text();
+  const draftShare = await (await request("/dashboard/compartilhar")).text();
+  await snapshot("draft", draftDashboard);
+  check(
+    draftDashboard.includes("RASCUNHO") &&
+      !draftDashboard.includes("Copiar link do perfil") &&
+      draftShare.includes("Publique antes de compartilhar."),
+    "rascunho não oferece compartilhamento público no dashboard ou central",
+  );
   saved = await request("/api/profile", "PUT", { ...profile, published: true });
   check(saved.status === 200, "perfil pode ser publicado");
   const publicPage = await request("/http_player", "GET", undefined, "");
   const publicHTML = await publicPage.text();
+  check(
+    publicHTML.includes(`<link rel="canonical" href="${origin}/http_player"`) &&
+      publicHTML.includes(`content="${origin}/http_player"`),
+    "perfil publicado usa canonical e Open Graph da origem real",
+  );
+  const publishedDashboard = await (await request("/dashboard")).text();
+  const publishedShare = await (
+    await request("/dashboard/compartilhar")
+  ).text();
+  await snapshot("published", publishedDashboard);
+  await snapshot("share", publishedShare);
+  check(
+    publishedDashboard.includes("Copiar link do perfil") &&
+      publishedShare.includes("Central de compartilhamento."),
+    "perfil publicado libera os acessos de compartilhamento",
+  );
   check(
     publicPage.status === 200 && publicHTML.includes("Meu universo de teste."),
     "perfil público renderiza dados persistidos",
@@ -563,6 +641,31 @@ try {
       .status === 404,
     "moderação retira acesso anônimo à mídia",
   );
+  const unavailableDashboard = await (await request("/dashboard")).text();
+  const unavailableEditor = await (await request("/dashboard/editor")).text();
+  const unavailableShare = await (
+    await request("/dashboard/compartilhar")
+  ).text();
+  await snapshot("unavailable", unavailableDashboard);
+  await snapshot("unavailable-editor", unavailableEditor);
+  await snapshot("unavailable-share", unavailableShare);
+  check(
+    unavailableDashboard.includes("INDISPONÍVEL") &&
+      !unavailableDashboard.includes("Copiar link do perfil") &&
+      unavailableShare.includes("indisponível ao público") &&
+      !unavailableShare.includes("/api/qr/http_player") &&
+      !unavailableEditor.includes("Abrir página salva"),
+    "suspensão é compreensível ao dono e não oferece compartilhamento quebrado",
+  );
+  const unavailablePublic = await (
+    await request("/http_player", "GET", undefined, "")
+  ).text();
+  check(
+    unavailablePublic.includes("Esta página não está disponível.") &&
+      unavailablePublic.includes('name="robots" content="noindex"') &&
+      !unavailablePublic.includes("Teste HTTP de ocultação"),
+    "página indisponível não revela moderação e inclui noindex",
+  );
   const ownerState = (await (await request("/api/profile")).json()).profile;
   check(
     (await request("/api/profile", "PUT", { ...ownerState, published: true }))
@@ -607,6 +710,14 @@ try {
     !expiredHTML.includes("Conquista pessoal") &&
       expiredHTML.includes("studio-layout-classic"),
     "expiração oculta blocos e aplica layout Free",
+  );
+  const expiredDashboard = await (await request("/dashboard")).text();
+  await snapshot("expired", expiredDashboard);
+  check(
+    expiredDashboard.includes(
+      "Pro expirado; seus dados privados foram preservados.",
+    ),
+    "dono recebe orientação clara após expiração do Pro",
   );
   check(
     (await request("/api/stats/export")).status === 403,

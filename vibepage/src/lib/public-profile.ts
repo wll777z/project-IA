@@ -94,6 +94,4 @@ export const getPublicProfile = cache(async (username: string) => {
   }
   return { profile: effective, pro };
 });
-export function appOrigin() {
-  return new URL(process.env.BETTER_AUTH_URL || "http://localhost:3000").origin;
-}
+export { appOrigin } from "@/lib/site-origin";

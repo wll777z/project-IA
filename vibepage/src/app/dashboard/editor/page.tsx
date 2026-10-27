@@ -1,3 +1,5 @@
+import { getOwnedAvailability } from "@/lib/profile-availability";
+import { UnavailableProfile } from "@/components/profile-availability";
 import { editableAppearance } from "@/lib/appearance";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -10,9 +12,10 @@ export const metadata = { title: "Editor de perfil" };
 export default async function Editor() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
-  const [profile, entitlement] = await Promise.all([
+  const [profile, entitlement, availability] = await Promise.all([
     getOwnedProfile(session.user.id),
     db.entitlement.findUnique({ where: { userId: session.user.id } }),
+    getOwnedAvailability(session.user.id),
   ]);
   return (
     <>
@@ -30,6 +33,14 @@ export default async function Editor() {
         Este editor altera a aparência padrão. Uma temporada ativa pode mudar a
         apresentação pública até o fim do agendamento.
       </p>
+      {availability === "unavailable" && <UnavailableProfile />}
+      {!profile && (
+        <p className="analytics-note">
+          Comece pelo username em Perfil e pelo primeiro destino em Links. Salve
+          seu rascunho; quando estiver pronto, marque Perfil público e salve
+          para compartilhar.
+        </p>
+      )}
       <ProfileEditor
         initial={editableAppearance(
           profile ?? emptyProfile(session.user.name),
@@ -37,6 +48,7 @@ export default async function Editor() {
           true,
         )}
         pro={isPro(entitlement)}
+        unavailable={availability === "unavailable"}
       />
     </>
   );

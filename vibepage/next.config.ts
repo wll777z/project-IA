@@ -7,6 +7,10 @@ const nextConfig: NextConfig = {
   experimental: { turbopackFileSystemCacheForBuild: false },
   async headers() {
     return [
+      ...["/api/:path*", "/go/:path*"].map((source) => ({
+        source,
+        headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+      })),
       {
         source: "/(.*)",
         headers: [
