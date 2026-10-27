@@ -1,3 +1,9 @@
+import { editableAppearance } from "@/lib/appearance";
+import {
+  gamerCardSchema,
+  gamerCardDTO,
+  type GamerCardInput,
+} from "@/lib/validation";
 import { cache } from "react";
 import { db } from "@/lib/db";
 import {
@@ -13,6 +19,7 @@ export const getPublicProfile = cache(async (username: string) => {
   const profile = await db.profile.findUnique({
     where: { username: parsed.data },
     include: {
+      gamerCards: { orderBy: { position: "asc" } },
       links: { orderBy: { position: "asc" } },
       user: { select: { entitlement: true } },
     },
@@ -24,6 +31,18 @@ export const getPublicProfile = cache(async (username: string) => {
     theme.premium && !pro ? findTheme("midnight-purple") : theme;
   // Explicit public DTO: never send email, userId, billing or session data.
   const data: ProfileInput = {
+    backgroundEffect:
+      profile.backgroundEffect as ProfileInput["backgroundEffect"],
+    avatarEffect: profile.avatarEffect as ProfileInput["avatarEffect"],
+    buttonEffect: profile.buttonEffect as ProfileInput["buttonEffect"],
+    entranceEffect: profile.entranceEffect as ProfileInput["entranceEffect"],
+    fontFamily: profile.fontFamily as ProfileInput["fontFamily"],
+    gamerCards: profile.gamerCards.flatMap((card) => {
+      const parsed = gamerCardSchema.safeParse(
+        gamerCardDTO(card as GamerCardInput),
+      );
+      return parsed.success ? [parsed.data] : [];
+    }),
     username: profile.username,
     displayName: profile.displayName,
     bio: profile.bio,
@@ -46,7 +65,7 @@ export const getPublicProfile = cache(async (username: string) => {
         : [];
     }),
   };
-  return { profile: data, pro };
+  return { profile: editableAppearance(data, pro), pro };
 });
 export function appOrigin() {
   return new URL(process.env.BETTER_AUTH_URL || "http://localhost:3000").origin;

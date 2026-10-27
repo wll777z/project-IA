@@ -99,6 +99,12 @@ model Profile {
   published       Boolean       @default(false)
   themeId         String        @default("midnight-purple")
   theme           Theme         @relation(fields: [themeId], references: [id], onDelete: Restrict)
+  backgroundEffect String @default("none")
+  avatarEffect String @default("none")
+  buttonEffect String @default("none")
+  entranceEffect String @default("fade")
+  fontFamily String @default("modern")
+  gamerCards GamerCard[]
   links           ProfileLink[]
   views           PageView[]
   createdAt       DateTime      @default(now())
@@ -170,4 +176,26 @@ model LinkClick {
 
   @@id([linkId, day])
   @@index([day])
+}
+
+model GamerCard {
+  id String @id
+  profileId String
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  game String
+  displayName String @db.VarChar(60)
+  handle String @default("") @db.VarChar(60)
+  detail String @default("") @db.VarChar(100)
+  edition String @default("")
+  url String @default("") @db.VarChar(2048)
+  avatarKey String?
+  color String @default("#a78bfa") @db.VarChar(7)
+  style String @default("minimal")
+  layout String @default("compact")
+  icon String @default("gamepad")
+  glow Boolean @default(false)
+  animated Boolean @default(false)
+  position Int
+
+  @@unique([profileId, position])
 }
