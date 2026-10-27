@@ -9,7 +9,12 @@ try {
   if (error.code !== "ENOENT") throw error;
 }
 
-for (const file of ["launch.mjs", "production-env.mjs", "build-origin.mjs"])
+for (const file of [
+  "launch.mjs",
+  "production-env.mjs",
+  "build-origin.mjs",
+  "healthcheck.mjs",
+])
   await cp(`scripts/${file}`, `.next/standalone/${file}`);
 
 const manifest = readBuildOrigin({

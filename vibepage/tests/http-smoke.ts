@@ -82,6 +82,28 @@ try {
       await new Promise((r) => setTimeout(r, 150));
     }
   }
+  const ready = await request("/api/health");
+  check(
+    ready.status === 200 &&
+      (await ready.json()).status === "ok" &&
+      ready.headers.get("cache-control") === "no-store",
+    "readiness interno consulta banco sem expor detalhes",
+  );
+  check(
+    (await request("/api/health", "POST", {})).status === 405,
+    "readiness não aceita alterações por POST",
+  );
+  const containerProbe = spawn(
+    process.execPath,
+    [".next/standalone/healthcheck.mjs"],
+    { env: { ...process.env, PORT: String(port) }, stdio: "ignore" },
+  );
+  check(
+    (await new Promise<number | null>((resolve) =>
+      containerProbe.once("exit", resolve),
+    )) === 0,
+    "probe empacotado do container reconhece prontidão real",
+  );
   const landing = await request("/");
   check(landing.status === 200, "landing responde HTTP 200");
   check(
@@ -679,6 +701,8 @@ try {
     "administrador confirmado acessa fila privada",
   );
   const moderationHTML = await (await request("/dashboard/moderacao")).text();
+  await snapshot("moderation", moderationHTML);
+  await snapshot("support", await (await request("/suporte")).text());
   check(
     moderationHTML.includes("&lt;img") &&
       !moderationHTML.includes("<img src=x"),

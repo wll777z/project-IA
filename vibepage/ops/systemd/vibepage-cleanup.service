@@ -1,0 +1,12 @@
+# Template only: operator must adapt and install on the authorized Docker host.
+[Unit]
+Description=VibePage expired-record cleanup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/vibepage
+ExecStart=/usr/bin/docker compose --env-file /etc/vibepage/staging.env -f /srv/vibepage/compose.staging.yaml run --rm cleanup
+TimeoutStartSec=300
+NoNewPrivileges=true

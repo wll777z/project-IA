@@ -8,3 +8,10 @@ coverage/
 *.tsbuildinfo
 *.log
 !.env.staging.example
+
+# Operational backups must remain private and outside source control.
+/backups/
+*.backup
+*.dump
+*.age
+*.dump.gpg

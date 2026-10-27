@@ -77,7 +77,7 @@ services:
         staging_caddy_data:/data,
         staging_caddy_config:/config,
       ]
-    depends_on: [web]
+    depends_on: { web: { condition: service_healthy } }
   admin-bootstrap:
     profiles: [admin]
     build: { context: ., target: builder, args: *publicBuildOrigin }

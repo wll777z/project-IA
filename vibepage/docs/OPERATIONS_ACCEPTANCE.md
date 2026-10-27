@@ -1,3 +1,5 @@
+> Procedimento atualizado para a candidata posterior ao freeze. Gates objetivos em [PRODUCTION_GO_LIVE](PRODUCTION_GO_LIVE.md); backup sem credenciais em argumentos em [BACKUP_RECOVERY](BACKUP_RECOVERY.md). Exemplos históricos abaixo exigem configuração privada e não foram executados contra banco real.
+
 # Aceitação operacional — executar apenas em homologação autorizada
 
 Nenhum comando desta seção foi executado contra infraestrutura real nesta auditoria. Não há host Node/HTTPS, PostgreSQL nativo, SMTP, backup ou monitoramento fornecidos. Não preencher contatos, credenciais, RPO/RTO, retenção ou condições comerciais com dados inventados.
@@ -11,15 +13,11 @@ O operador deve registrar ambiente, responsável técnico, controlador/contatos,
 1. Provisionar PostgreSQL nativo persistente em homologação isolada, com credenciais próprias, TLS quando remoto e privilégio mínimo. Nunca usar o banco real como fixture de testes.
 2. Fazer backup anterior ao upgrade e validar restauração em OUTRO banco vazio. Exemplos para o operador, não executados aqui:
 
-```bash
-pg_dump --format=custom --file=vibepage-staging.backup "$VIBEPAGE_STAGING_DATABASE_URL"
-pg_restore --list vibepage-staging.backup
-pg_restore --no-owner --no-privileges --dbname="$VIBEPAGE_RESTORE_DATABASE_URL" vibepage-staging.backup
-```
+Use os comandos de [BACKUP_RECOVERY.md](BACKUP_RECOVERY.md), com serviços/arquivos de senha privados, criptografia e guarda de destino vazio. Não passar URL com senha nos argumentos de processos.
 
 Conferir explicitamente que as duas URLs são de homologação e que a restauração aponta para banco vazio separado. Não usar `--clean` ou apagar o banco original. Guardar o arquivo criptografado, com acesso restrito; não enviar ao Git. Definir retenção, RPO/RTO e tratamento de exclusões nos backups.
 
-3. No clone candidato com dependências de desenvolvimento: `npm ci`, `npm run db:generate`, `npm run db:migrate`, `npm run db:seed`. Rodar uma vez em banco vazio e uma vez na cópia de uma versão anterior. Comparar contagens/IDs de usuários, perfis, links, cartões, uploads, coleções e métricas, não só o status do comando. Registrar versão do servidor e sete checksums em `evidence/migrations.sha256`.
+3. No clone candidato com dependências de desenvolvimento: `npm ci`, `npm run db:generate`, `npm run db:migrate`, `npm run db:seed`. Rodar uma vez em banco vazio e uma vez na cópia de uma versão anterior. Comparar contagens/IDs de usuários, perfis, links, cartões, uploads, coleções e métricas, não só o status do comando. Registrar versão do servidor e oito checksums em `evidence/production-migrations.sha256`.
 4. Conferir FK/cascatas, unicidade, índices e queries via catálogos nativos; testar duas conexões/processos concorrentes com a mesma revisão, username/IDs concorrentes, limites e sobreposição de temporadas. Testes PGlite não substituem esta etapa.
 5. Com conta sintética autorizada, confirmar downgrade/save/reconcessão Pro sem apagar arquivos ou cartões legados; Free continua exibindo só três cartões e recursos permitidos.
 
@@ -39,15 +37,15 @@ Repetir em Safari/iOS e Chrome/Android reais, teclado/leitor de tela e movimento
 
 ## Limpeza, alertas e recuperação
 
-Agendar `npm run db:cleanup` com credencial restrita; conferir execução e falha, sem registrar segredos. Ele remove sessões/verificações e rate limits expirados, não define retenção geral de perfis/métricas/backups. O operador deve aprovar essa política.
+Agendar `npm run db:cleanup` com credencial restrita; conferir execução e falha, sem registrar segredos. Ele remove casos de suporte/eventos, sessões/verificações e rate limits expirados, não define retenção geral de perfis/métricas/backups. O operador deve aprovar essa política.
 
 Monitorar HTTP/latência/5xx/429, conexão/pool/armazenamento PostgreSQL, crescimento dos uploads, erros de e-mail e término da limpeza. Monitorar banco independentemente: uma landing estática 200 não prova que as APIs estão saudáveis. Definir destinatário de alertas, escalonamento e teste de recuperação; não registrar cookies, tokens, senhas, corpos de formulário ou conteúdo privado.
 
-Rollback: conservar as sete migrations/tabelas; não executar migration reversa destrutiva. Usar artefato anterior aprovado e compatível com o schema, validar origem/segredos e rodar os checks de aceitação. Voltar ao commit de referência reintroduz a perda de configuração no save Free; se esse rollback for indispensável, o operador deve suspender gravações afetadas até aplicar correção para frente. Registrar decisão e preservar o backup; não restaurar backup antigo sobre dados novos sem avaliar perda de dados e autorização.
+Rollback: conservar as oito migrations/tabelas; não executar migration reversa destrutiva. Usar artefato anterior aprovado e compatível com o schema, validar origem/segredos e rodar os checks de aceitação. Voltar ao commit de referência reintroduz a perda de configuração no save Free; se esse rollback for indispensável, o operador deve suspender gravações afetadas até aplicar correção para frente. Registrar decisão e preservar o backup; não restaurar backup antigo sobre dados novos sem avaliar perda de dados e autorização.
 
 ## Denúncias e moderação — estrutura operacional pendente
 
-Não há endpoint de denúncias nem console administrativo de revisão nesta versão. Não inserir link falso ou inventar e-mail. Antes do beta com público, definir um canal funcional e responsáveis; antes de abrir cadastros amplos, validar capacidade de triagem e retirada. Para cada caso, usar este registro técnico (sem dados pessoais desnecessários):
+A candidata atual já possui `/suporte`, API de intake e `/dashboard/moderacao`; a auditoria histórica anterior à RC1 ainda não os possuía. Não recriar esses recursos nem inventar contatos. Antes do beta com público, definir um canal funcional e responsáveis; antes de abrir cadastros amplos, validar capacidade de triagem e retirada. Para cada caso, usar este registro técnico (sem dados pessoais desnecessários):
 
 ```text
 ID do caso:

@@ -30,7 +30,7 @@ for (const page of pages) {
   await writeFile(resolve(target, "index.html"), clean);
 }
 const links = [];
-for (const width of [360, 390, 768, 1440]) {
+for (const width of [360, 390, 768, 1024, 1440]) {
   for (const page of pages) {
     const filename = `qa-${width}-${page}.html`;
     await writeFile(

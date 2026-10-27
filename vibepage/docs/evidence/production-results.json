@@ -1,0 +1,168 @@
+{
+  "date": "2026-10-27",
+  "base": "3e166f26b0faf885872790bae812379fc6b74da3",
+  "branch": "release/vibepage-3.0-production-ready",
+  "environment": "Node 24 / Prisma / PGlite isolated, standalone HTTP loopback, Chrome desktop; not real PostgreSQL or SMTP",
+  "commands": {
+    "lint": "passed",
+    "typecheck": "passed",
+    "tests": {
+      "passed": 214,
+      "files": 30
+    },
+    "build": "passed",
+    "test:http": 111,
+    "test:origin": 9,
+    "npm audit": {
+      "vulnerabilities": 0
+    },
+    "format:check": "passed"
+  },
+  "snapshots": {
+    "pages": 12,
+    "widths": [360, 390, 768, 1024, 1440],
+    "scenarios": 60,
+    "overflow": 0,
+    "labelTriageFindings": 0
+  },
+  "protectedFeatures": [
+    {
+      "path": "prisma/schema.prisma",
+      "sha256": "05db5577a944cbb44df5080cf62939b57b26712718e33e30ae597660d67ddf9c",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/auth.ts",
+      "sha256": "2cffc034e5f3019d805e68c1779564f1a0d2e0147a2f1669746111e6a88bcc10",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/profiles.ts",
+      "sha256": "7ca0760bb3c09dfdc66b6abac9b3e48f2f863a92893ecab7e33f973cee904bc8",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/public-profile.ts",
+      "sha256": "03f93707140a353d1386b4402ee3f78fda8e2584a596be511d636c51b779b17f",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/appearance-store.ts",
+      "sha256": "0e5de2295883b50a2f249d1fb7626350e6fe03c93e8b5a1d2702cda8fb86907e",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/sharing.tsx",
+      "sha256": "1c6cacefd5d0b0a7cecfc9d54676fb75f0ccf5f0c1f2940d4997dac28c50dd1d",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/analytics-advanced.ts",
+      "sha256": "1ca377df2ad7da42eff0ff4d623737f0ef793bf53eca11a9484e5303eaf7689c",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/administrators.ts",
+      "sha256": "6bb6e63683b909d29774089432b4e56e474ca672c116efb02406ea67171f14cf",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/support.ts",
+      "sha256": "d36be5dc71da596234e6d7e353c839af6c45a2489cf18785d6ad27d09c7f70fa",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/themes.ts",
+      "sha256": "c1215799c309eb2b59baa419bce27629c3679d864bb7e5dfd5b1e404f49a0f23",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/lib/customization.ts",
+      "sha256": "3cbc98f7e1c974ee78666a7cf0571dd96a305ad988a88b8e1c3c9accbc963d49",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/components/profile-editor.tsx",
+      "sha256": "d9e6c98b0d0a1fe450cd0ca4ea709dd4c7c6d8f33f5585fd2e7f34cab322c4db",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/components/profile-view.tsx",
+      "sha256": "65fc16e7ba0d519b41c88a73ce454cdb8e014d168f99ec2a54a94ac0d3651543",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/components/gamer-card-editor.tsx",
+      "sha256": "c134cf56acece0541d4fff78bb58f18f31e4c36be7732692880e22608b07941e",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/components/appearance-manager.tsx",
+      "sha256": "576908383fde48f2f918b08292ede972733de1fac6bfdd84b108d4a4a78cda25",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/components/studio-editor.tsx",
+      "sha256": "eef7285e5cc6a19c51b750fb1f05e70703fafe4686567ca07ed8fd36ebe87aef",
+      "unchangedFromFreeze": true
+    },
+    {
+      "path": "src/components/advanced-analytics.tsx",
+      "sha256": "37d9b598556a2bf55e92968ae1f8db76a4668f6cf72fb06a1c7ada2ceb82e5d4",
+      "unchangedFromFreeze": true
+    }
+  ],
+  "migrationsUnchanged": 8,
+  "localBuildManifest": {
+    "version": 1,
+    "origin": "http://localhost:3000"
+  },
+  "externalTestsNotPerformed": [
+    "native PostgreSQL",
+    "Docker/Caddy",
+    "native backup/restore",
+    "external SMTP and HTTPS/DNS",
+    "systemd installation and alert delivery",
+    "physical iOS/Android and screen readers",
+    "real-user p75 Web Vitals / mobile-network load"
+  ],
+  "changedFiles": [
+    "vibepage/.dockerignore",
+    "vibepage/.gitignore",
+    "vibepage/Dockerfile",
+    "vibepage/LAUNCH_CHECKLIST.md",
+    "vibepage/README.md",
+    "vibepage/VALIDATION.md",
+    "vibepage/compose.staging.yaml",
+    "vibepage/docs/BACKUP_RECOVERY.md",
+    "vibepage/docs/OPERATIONS_ACCEPTANCE.md",
+    "vibepage/docs/PRODUCTION_GO_LIVE.md",
+    "vibepage/docs/PRODUCTION_RELEASE_REVIEW.md",
+    "vibepage/docs/STAGING_RUNBOOK.md",
+    "vibepage/docs/evidence/production-demo-metrics.json",
+    "vibepage/docs/evidence/production-demo.jpg",
+    "vibepage/docs/evidence/production-layouts.json",
+    "vibepage/docs/evidence/production-migrations.sha256",
+    "vibepage/docs/evidence/production-performance.json",
+    "vibepage/docs/evidence/production-results.json",
+    "vibepage/ops/Caddyfile.staging",
+    "vibepage/ops/assert-empty-restore.sql",
+    "vibepage/ops/native-postgres-acceptance.sql",
+    "vibepage/ops/systemd/vibepage-cleanup.service",
+    "vibepage/ops/systemd/vibepage-cleanup.timer",
+    "vibepage/scripts/healthcheck.mjs",
+    "vibepage/scripts/prepare-polish-qa.mjs",
+    "vibepage/scripts/prepare-production-qa.mjs",
+    "vibepage/scripts/prepare-release-qa.mjs",
+    "vibepage/scripts/prepare-standalone.mjs",
+    "vibepage/src/app/api/health/route.ts",
+    "vibepage/src/lib/database-options.ts",
+    "vibepage/src/lib/db.ts",
+    "vibepage/src/lib/mail.ts",
+    "vibepage/tests/http-smoke.ts",
+    "vibepage/tests/mail.test.ts",
+    "vibepage/tests/operations.test.ts",
+    "vibepage/tests/readiness.integration.test.ts",
+    "vibepage/tests/release-performance.ts"
+  ]
+}

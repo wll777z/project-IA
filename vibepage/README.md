@@ -1,5 +1,13 @@
 # VibePage
 
+## Candidata para homologação de produção
+
+`release/vibepage-3.0-production-ready` parte do freeze `3e166f2` e preserva os recursos existentes, sem pagamentos nem mudanças de design. A entrega adiciona limites de espera no banco/SMTP, erros de e-mail sanitizados, prontidão interna do container, SQL de aceite somente leitura e modelos de manutenção. Não foi publicada nem homologada em infraestrutura externa.
+
+Use [PRODUCTION_GO_LIVE](docs/PRODUCTION_GO_LIVE.md) como checklist de aceite, [PRODUCTION_RELEASE_REVIEW](docs/PRODUCTION_RELEASE_REVIEW.md) para riscos/evidências e [BACKUP_RECOVERY](docs/BACKUP_RECOVERY.md) para backups criptografados e restore isolado. Os timers são exemplos não instalados. O proxy fornecido bloqueia `/api/health` para clientes externos; o probe do container consulta o banco. Em outro host/proxy, manter a origem e esse endpoint restritos.
+
+Estado: demo local apta; demonstração pública condicionada ao artefato correto e autorização; **NO-GO beta real, lançamento público e Pro comercial** até os gates externos. Testes locais não aprovam PostgreSQL nativo, SMTP/TLS, backups ou dispositivos físicos.
+
 ## Release freeze 3.0
 
 A candidata `release/vibepage-3.0-freeze` parte de `fix/vibepage-final-polish` (`22ab34d`) e preserva toda a cadeia anterior, exceto o experimento Pix explicitamente excluído. Somente ajustes reproduzidos de origem pública/compartilhamento, regressões e documentação. Consulte [RELEASE_FREEZE](docs/RELEASE_FREEZE.md) e o [checklist de homologação](docs/RELEASE_FREEZE_CHECKLIST.md).
