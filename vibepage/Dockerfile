@@ -16,4 +16,4 @@ COPY --from=builder --chown=app:app /app/.next/standalone ./
 COPY --from=builder --chown=app:app /app/.next/static ./.next/static
 USER app
 EXPOSE 3000
-CMD ["node", "server.js"]
+CMD ["node", "launch.mjs"]

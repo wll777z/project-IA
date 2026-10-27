@@ -30,6 +30,7 @@ export default async function Editor() {
         initial={editableAppearance(
           profile ?? emptyProfile(session.user.name),
           isPro(entitlement),
+          true,
         )}
         pro={isPro(entitlement)}
       />

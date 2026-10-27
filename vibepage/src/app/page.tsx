@@ -10,6 +10,8 @@ import {
   Sparkles,
   Zap,
 } from "lucide-react";
+import { UltimateShowcase } from "@/components/ultimate-showcase";
+import { themes } from "@/lib/themes";
 import { Brand } from "@/components/brand";
 import { ProfileDemo } from "@/components/profile-demo";
 export default function Home() {
@@ -19,6 +21,7 @@ export default function Home() {
         <Brand />
         <nav className="desktop-nav" aria-label="Principal">
           <a href="#como-funciona">Como funciona</a>
+          <a href="#cartoes">Cartões gamer</a>
           <a href="#temas">Temas</a>
           <a href="#planos">Planos</a>
         </nav>
@@ -53,9 +56,9 @@ export default function Home() {
               <Link className="button" href="/cadastro">
                 Criar meu perfil grátis <ArrowRight size={18} />
               </Link>
-              <a className="text-button" href="#temas">
+              <Link className="text-button" href="/demo">
                 Experimentar o editor <ArrowUpRight size={16} />
-              </a>
+              </Link>
             </div>
             <div className="hero-note">
               <span className="mini-avatars">
@@ -133,6 +136,7 @@ export default function Home() {
             })}
           </div>
         </section>
+        <UltimateShowcase />
         <section id="temas" className="section theme-section">
           <div className="shell">
             <div className="section-heading">
@@ -143,31 +147,35 @@ export default function Home() {
               <span className="outline-pill">Prévia dos temas</span>
             </div>
             <div className="themes-grid">
-              {[
-                [
-                  "midnight",
-                  "Midnight Purple",
-                  "O clássico, com outra energia.",
-                ],
-                ["cyber", "Cyber Neon", "Seu próximo level."],
-                ["minimal", "Minimal Black", "Só o que importa."],
-                ["pink", "Pink Dream", "Sonhe em outras cores."],
-                ["ice", "Ice Blue", "Calma de outro universo."],
-              ].map(([id, title, copy]) => (
-                <article key={id} className="theme-item">
-                  <div className={`theme-preview ${id}`}>
-                    <div className="theme-orb" />
-                    <div className="tiny-avatar" />
-                    <div className="tiny-name" />
-                    <div className="tiny-bio" />
-                    <div className="tiny-link" />
-                    <div className="tiny-link" />
-                    <div className="tiny-link" />
-                  </div>
-                  <h3>{title}</h3>
-                  <p>{copy}</p>
-                </article>
-              ))}
+              {themes.map(
+                ({
+                  id,
+                  name: title,
+                  description: copy,
+                  className,
+                  premium,
+                }) => (
+                  <article key={id} className="theme-item">
+                    <div className={`theme-preview ${className}`}>
+                      <div className="theme-orb" />
+                      <div className="tiny-avatar" />
+                      <div className="tiny-name" />
+                      <div className="tiny-bio" />
+                      <div className="tiny-link" />
+                      <div className="tiny-link" />
+                      <div className="tiny-link" />
+                    </div>
+                    <h3>
+                      {title}{" "}
+                      {premium && <span className="theme-pro">PRO</span>}
+                    </h3>
+                    <p>{copy}</p>
+                    <Link className="theme-try" href={`/demo?theme=${id}`}>
+                      Testar tema ↗
+                    </Link>
+                  </article>
+                ),
+              )}
             </div>
           </div>
         </section>
@@ -187,7 +195,7 @@ export default function Home() {
               <ul>
                 {[
                   "Um perfil só seu",
-                  "Links para seu universo",
+                  "Até 100 links e 3 cartões gamer",
                   "Temas gratuitos",
                   "Seu username disponível",
                   "Marca discreta VibePage",
@@ -213,7 +221,8 @@ export default function Home() {
               <ul>
                 {[
                   "Tudo do plano Free",
-                  "Temas e animações premium",
+                  "12 cartões e 6 estilos visuais",
+                  "Temas e efeitos exclusivos",
                   "Estatísticas detalhadas",
                   "Remoção da marca",
                   "Personalização avançada",
@@ -225,7 +234,8 @@ export default function Home() {
                 ))}
               </ul>
               <p className="coming-soon">
-                Em desenvolvimento · sem cobrança nesta versão
+                Acesso Pro apenas por concessão administrativa. Sem checkout ou
+                cobrança.
               </p>
             </article>
           </div>

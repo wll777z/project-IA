@@ -1,3 +1,5 @@
+import { isPro } from "@/lib/entitlements";
+import { FREE_CARD_LIMIT } from "@/lib/customization";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 export const runtime = "nodejs";
@@ -13,11 +15,25 @@ export async function GET(
     where: {
       userId: upload.userId,
       published: true,
-      OR: [{ avatarKey: id }, { backgroundKey: id }],
+      OR: [
+        { avatarKey: id },
+        { backgroundKey: id },
+        { gamerCards: { some: { avatarKey: id } } },
+      ],
     },
-    select: { id: true },
+    select: {
+      avatarKey: true,
+      backgroundKey: true,
+      gamerCards: { where: { avatarKey: id }, select: { position: true } },
+      user: { select: { entitlement: true } },
+    },
   });
-  if (!published) {
+  const isPublic =
+    published &&
+    (published.avatarKey === id ||
+      isPro(published.user.entitlement) ||
+      published.gamerCards.some((c) => c.position < FREE_CARD_LIMIT));
+  if (!isPublic) {
     const session = await auth.api.getSession({ headers: request.headers });
     if (session?.user.id !== upload.userId)
       return new Response(null, { status: 404 });

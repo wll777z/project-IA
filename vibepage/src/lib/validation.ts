@@ -1,8 +1,20 @@
 import { z } from "zod";
+import { themes } from "@/lib/themes";
+import {
+  games,
+  cardStyles,
+  backgroundEffects,
+  avatarEffects,
+  buttonEffects,
+  entranceEffects,
+  fonts,
+} from "@/lib/customization";
 export const credentialsSchema = z.object({
   email: z
-    .email("Informe um e-mail válido.")
+    .string()
+    .trim()
     .max(254)
+    .pipe(z.email("Informe um e-mail válido."))
     .transform((v) => v.trim().toLowerCase()),
   password: z
     .string()
@@ -10,7 +22,12 @@ export const credentialsSchema = z.object({
     .max(128, "Use até 128 caracteres."),
 });
 export const registrationSchema = credentialsSchema.extend({
-  name: z.string().trim().min(2, "Informe seu nome.").max(60),
+  name: z
+    .string()
+    .trim()
+    .min(2, "Informe seu nome.")
+    .max(60)
+    .refine((v) => !/[\u0000-\u001f\u007f]/.test(v), "Nome inválido."),
 });
 export const reservedUsernames = new Set([
   "api",
@@ -46,38 +63,89 @@ export const usernameSchema = z
   .refine((v) => !reservedUsernames.has(v), "Esse username é reservado.");
 // Never fetch user-provided links on the server.
 export const safeLinkSchema = z
-  .url()
+  .string()
   .max(2048)
   .refine((value) => {
-    const url = new URL(value);
-    const host = url.hostname.toLowerCase();
-    return (
-      url.protocol === "https:" &&
-      !url.username &&
-      !url.password &&
-      !url.port &&
-      host.includes(".") &&
-      !host.endsWith(".local") &&
-      !host.endsWith(".localhost") &&
-      !host.endsWith(".internal") &&
-      !/^[\d.]+$/.test(host) &&
-      !host.includes(":") &&
-      !host.startsWith("[")
-    );
-  }, "Use um link HTTPS público, sem credenciais.");
+    // Refinements must be total: the preview validates partially typed URLs too.
+    if (/[\u0000-\u0020\u007f]/.test(value) || value.includes("\\"))
+      return false;
+    try {
+      const url = new URL(value);
+      const host = url.hostname.toLowerCase().replace(/\.+$/, "");
+      return (
+        url.protocol === "https:" &&
+        !url.username &&
+        !url.password &&
+        !url.port &&
+        host.includes(".") &&
+        !host.endsWith(".local") &&
+        !host.endsWith(".localhost") &&
+        !host.endsWith(".internal") &&
+        !/^[\d.]+$/.test(host) &&
+        !host.includes(":") &&
+        !host.startsWith("[")
+      );
+    } catch {
+      return false;
+    }
+  }, "Use um link HTTPS público, sem credenciais.")
+  .transform((value) => new URL(value).href);
+
+const shortText = (length: number) =>
+  z
+    .string()
+    .trim()
+    .max(length)
+    .refine((v) => !/[\u0000-\u001f\u007f]/.test(v), "Texto inválido.");
+export const gamerCardSchema = z
+  .object({
+    id: z.uuid(),
+    game: z.enum(games),
+    displayName: shortText(60).min(1, "Informe o nome do cartão."),
+    handle: shortText(60),
+    detail: shortText(100),
+    edition: z.enum(["", "java", "bedrock"]),
+    url: z.union([z.literal(""), safeLinkSchema]),
+    avatarKey: z.uuid().nullable(),
+    color: z.string().regex(/^#[a-fA-F0-9]{6}$/),
+    style: z.enum(cardStyles),
+    layout: z.enum(["compact", "banner"]),
+    icon: z.enum(["gamepad", "swords", "blocks", "sparkles", "headset"]),
+    glow: z.boolean(),
+    animated: z.boolean(),
+  })
+  .strict();
+export function gamerCardDTO(card: GamerCardInput): GamerCardInput {
+  return Object.fromEntries(
+    Object.keys(gamerCardSchema.shape).map((key) => [
+      key,
+      card[key as keyof GamerCardInput],
+    ]),
+  ) as GamerCardInput;
+}
+export type GamerCardInput = z.infer<typeof gamerCardSchema>;
 
 export const profileSchema = z
   .object({
     username: usernameSchema,
-    displayName: z.string().trim().min(1, "Informe seu nome público.").max(60),
-    bio: z.string().trim().max(240, "A bio pode ter até 240 caracteres."),
-    themeId: z.enum([
-      "midnight-purple",
-      "cyber-neon",
-      "minimal-black",
-      "pink-dream",
-      "ice-blue",
-    ]),
+    displayName: z
+      .string()
+      .trim()
+      .min(1, "Informe seu nome público.")
+      .max(60)
+      .refine(
+        (v) => !/[\u0000-\u001f\u007f]/.test(v),
+        "Nome público inválido.",
+      ),
+    bio: z
+      .string()
+      .trim()
+      .max(240, "A bio pode ter até 240 caracteres.")
+      .refine(
+        (v) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(v),
+        "Biografia inválida.",
+      ),
+    themeId: z.enum(themes.map((theme) => theme.id)),
     accentColor: z.string().regex(/^#[a-fA-F0-9]{6}$/, "Cor inválida."),
     backgroundColor: z.string().regex(/^#[a-fA-F0-9]{6}$/),
     buttonStyle: z.enum(["soft", "outline", "pill"]),
@@ -87,12 +155,32 @@ export const profileSchema = z
     avatarKey: z.uuid().nullable(),
     backgroundKey: z.uuid().nullable(),
     revision: z.number().int().nonnegative(),
+    backgroundEffect: z.enum(backgroundEffects),
+    avatarEffect: z.enum(avatarEffects),
+    buttonEffect: z.enum(buttonEffects),
+    entranceEffect: z.enum(entranceEffects),
+    fontFamily: z.enum(fonts),
+    gamerCards: z
+      .array(gamerCardSchema)
+      .max(12)
+      .refine(
+        (v) => new Set(v.map((c) => c.id)).size === v.length,
+        "Cartões duplicados.",
+      ),
     links: z
       .array(
         z
           .object({
             id: z.uuid(),
-            title: z.string().trim().min(1, "Dê um título ao link.").max(80),
+            title: z
+              .string()
+              .trim()
+              .min(1, "Dê um título ao link.")
+              .max(80)
+              .refine(
+                (value) => !/[\u0000-\u001f\u007f]/.test(value),
+                "Título inválido.",
+              ),
             url: safeLinkSchema,
           })
           .strict(),

@@ -8,7 +8,13 @@ import { z } from "zod";
 import { ArrowRight } from "lucide-react";
 import { credentialsSchema, registrationSchema } from "@/lib/validation";
 import { authClient } from "@/lib/auth-client";
-export function AuthForm({ mode }: { mode: "login" | "register" }) {
+export function AuthForm({
+  mode,
+  emailVerificationRequired = false,
+}: {
+  mode: "login" | "register";
+  emailVerificationRequired?: boolean;
+}) {
   const router = useRouter();
   const [message, setMessage] = useState("");
   const signup = mode === "register";
@@ -38,7 +44,9 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
                   ? result.error.status === 429
                     ? "Muitas tentativas. Aguarde um minuto."
                     : "Não foi possível concluir. Confira os dados e tente novamente."
-                  : "Se os dados forem válidos, sua conta está pronta. Entre com seu e-mail e senha para continuar.",
+                  : emailVerificationRequired
+                    ? "Se os dados forem válidos, confira seu e-mail para confirmar a conta. Depois, entre para continuar."
+                    : "Se os dados forem válidos, sua conta está pronta. Entre com seu e-mail e senha para continuar.",
               );
             } else {
               const result = await authClient.signIn.email({
@@ -49,7 +57,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
                 setMessage(
                   result.error.status === 429
                     ? "Muitas tentativas. Aguarde um minuto."
-                    : "E-mail ou senha inválidos.",
+                    : "E-mail ou senha inválidos, ou confirmação de e-mail pendente.",
                 );
               else {
                 router.push("/dashboard");

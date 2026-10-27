@@ -54,6 +54,11 @@ export default async function Dashboard() {
           <small>Sem cobrança nesta versão</small>
         </article>
       </div>
+      <div className="dashboard-loadout">
+        <span>SEU LOADOUT</span>
+        <strong>{profile?.gamerCards.length ?? 0} cartões gamer</strong>
+        <Link href="/dashboard/editor">Personalizar cartões e efeitos ↗</Link>
+      </div>
       <div className="dashboard-grid">
         <section>
           <div className="workspace-card">

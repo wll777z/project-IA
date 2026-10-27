@@ -9,7 +9,7 @@ export async function GET(request: Request) {
         name: true,
         email: true,
         createdAt: true,
-        profile: { include: { links: true, views: true } },
+        profile: { include: { links: true, views: true, gamerCards: true } },
         entitlement: { select: { plan: true, expiresAt: true } },
         uploads: {
           select: {

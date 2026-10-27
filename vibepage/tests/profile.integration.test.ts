@@ -253,6 +253,36 @@ it("limita o corpo da autenticação antes de processá-lo", async () => {
   );
   expect(result.status).toBe(413);
 });
+it("permite corrigir links legados que a nova validação recusa", async () => {
+  const user = await fixture.db.user.findUniqueOrThrow({
+    where: { email: "owner@example.com" },
+  });
+  const profile = await fixture.db.profile.findUniqueOrThrow({
+    where: { userId: user.id },
+  });
+  const link = await fixture.db.profileLink.findFirstOrThrow({
+    where: { profileId: profile.id },
+  });
+  await fixture.db.profileLink.update({
+    where: { id: link.id },
+    data: { url: "https://old.local." },
+  });
+  const loaded = await services.getOwnedProfile(user.id);
+  expect(loaded?.links.some((l) => l.url === "https://old.local.")).toBe(true);
+  expect((await route.PUT(request(loaded))).status).toBe(400);
+  const corrected = {
+    ...loaded!,
+    links: loaded!.links.map((l) => ({
+      ...l,
+      url: "HTTPS://EXAMPLE.COM/repaired",
+    })),
+  };
+  const response = await route.PUT(request(corrected));
+  expect(response.status).toBe(200);
+  expect((await response.json()).profile.links[0].url).toBe(
+    "https://example.com/repaired",
+  );
+});
 it("remove links e uploads ao excluir o dono", async () => {
   const user = await fixture.db.user.findUniqueOrThrow({
     where: { email: "owner@example.com" },

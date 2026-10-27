@@ -10,30 +10,23 @@ await mkdir(target, { recursive: true });
 await rm(join(target, "_next"), { recursive: true, force: true });
 await cp(".next/static", join(target, "_next/static"), { recursive: true });
 for (const name of ["index", "demo", "privacidade", "termos"]) {
-  let html = await readFile(`.next/server/app/${name}.html`, "utf8");
-  if (name !== "demo") {
-    html = html
-      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "")
-      .replace(/<link\b[^>]*as="script"[^>]*\/?\s*>/g, "");
-    html = html.replace(
-      /(class="profile-scene[^"]*"[^>]*style=")[^"]*"/g,
-      '$1opacity:1;transform:none"',
-    );
-    html = html
-      .replaceAll('href="/login"', 'href="/demo/"')
-      .replaceAll('href="/cadastro"', 'href="/demo/"')
-      .replaceAll('href="/demo"', 'href="/demo/"');
-    html = html.replace(
-      "<body>",
-      '<body><div style="text-align:center;padding:10px 20px;background:#1e142d;color:#cfb8e5;font:12px/1.7 Arial,sans-serif">Demonstração do VibePage · <a style="text-decoration:underline" href="/demo/">Experimente o editor</a> · Contas reais dependem do ambiente PostgreSQL.</div>',
-    );
-  }
+  const html = await readFile(`.next/server/app/${name}.html`, "utf8");
+  // Preserve hydration for the interactive landing showcase and editor.
+  // Rewriting React's server HTML causes hydration mismatches; preview-only
+  // auth destinations are handled by standalone static redirect documents below.
   const output =
     name === "index"
       ? join(target, "index.html")
       : join(target, name, "index.html");
   await mkdir(resolve(output, ".."), { recursive: true });
   await writeFile(output, html);
+}
+for (const route of ["cadastro", "login"]) {
+  await mkdir(join(target, route), { recursive: true });
+  await writeFile(
+    join(target, route, "index.html"),
+    `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="0;url=/demo/"><title>Experimente o VibePage</title></head><body style="background:#0b0910;color:#eee;font-family:system-ui;padding:30px"><h1>Prévia do VibePage</h1><p>Contas reais não estão disponíveis nesta demonstração.</p><a style="color:#c4a1ff" href="/demo/">Abrir editor interativo</a></body></html>`,
+  );
 }
 console.log(
   "Landing e demonstração interativa exportadas. Nenhum backend ou segredo incluído.",
