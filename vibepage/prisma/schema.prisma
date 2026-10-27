@@ -13,18 +13,20 @@ enum Plan {
 }
 
 model User {
-  id            String       @id
+  id            String               @id
   name          String
-  email         String       @unique
-  emailVerified Boolean      @default(false)
+  email         String               @unique
+  emailVerified Boolean              @default(false)
   image         String?
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
   sessions      Session[]
   accounts      Account[]
   profile       Profile?
   entitlement   Entitlement?
   uploads       Upload[]
+  appearances   SavedAppearance[]
+  schedules     AppearanceSchedule[]
 }
 
 model Session {
@@ -82,33 +84,37 @@ model RateLimit {
 }
 
 model Profile {
-  id               String        @id @default(cuid())
-  userId           String        @unique
-  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  username         String        @unique @db.VarChar(24)
-  displayName      String        @db.VarChar(60)
-  bio              String        @default("") @db.VarChar(240)
-  avatarKey        String?
-  backgroundKey    String?
-  accentColor      String        @default("#a78bfa") @db.VarChar(7)
-  revision         Int           @default(0)
-  backgroundColor  String        @default("#100c1b") @db.VarChar(7)
-  buttonStyle      String        @default("soft")
-  animation        String        @default("none")
-  hideBranding     Boolean       @default(false)
-  published        Boolean       @default(false)
-  themeId          String        @default("midnight-purple")
-  theme            Theme         @relation(fields: [themeId], references: [id], onDelete: Restrict)
-  backgroundEffect String        @default("none")
-  avatarEffect     String        @default("none")
-  buttonEffect     String        @default("none")
-  entranceEffect   String        @default("fade")
-  fontFamily       String        @default("modern")
-  gamerCards       GamerCard[]
-  links            ProfileLink[]
-  views            PageView[]
-  createdAt        DateTime      @default(now())
-  updatedAt        DateTime      @updatedAt
+  id                 String         @id @default(cuid())
+  userId             String         @unique
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username           String         @unique @db.VarChar(24)
+  displayName        String         @db.VarChar(60)
+  bio                String         @default("") @db.VarChar(240)
+  avatarKey          String?
+  backgroundKey      String?
+  accentColor        String         @default("#a78bfa") @db.VarChar(7)
+  revision           Int            @default(0)
+  backgroundColor    String         @default("#100c1b") @db.VarChar(7)
+  buttonStyle        String         @default("soft")
+  animation          String         @default("none")
+  hideBranding       Boolean        @default(false)
+  published          Boolean        @default(false)
+  themeId            String         @default("midnight-purple")
+  theme              Theme          @relation(fields: [themeId], references: [id], onDelete: Restrict)
+  backgroundEffect   String         @default("none")
+  avatarEffect       String         @default("none")
+  buttonEffect       String         @default("none")
+  entranceEffect     String         @default("fade")
+  fontFamily         String         @default("modern")
+  studio             Json           @default("{\"layout\":\"classic\",\"columns\":1,\"width\":\"standard\",\"spacing\":\"normal\",\"cardColumns\":1,\"order\":[\"identity\",\"gamerCards\",\"links\",\"blocks\"],\"hidden\":[],\"widths\":{\"identity\":2,\"gamerCards\":2,\"links\":2,\"blocks\":2}}")
+  previousAppearance Json?
+  vibeCardStyle      String         @default("minimal")
+  blocks             ProfileBlock[]
+  gamerCards         GamerCard[]
+  links              ProfileLink[]
+  views              PageView[]
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
 }
 
 model ProfileLink {
@@ -179,23 +185,71 @@ model LinkClick {
 }
 
 model GamerCard {
-  id          String  @id
+  id          String      @id
   profileId   String
-  profile     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profile     Profile     @relation(fields: [profileId], references: [id], onDelete: Cascade)
   game        String
-  displayName String  @db.VarChar(60)
-  handle      String  @default("") @db.VarChar(60)
-  detail      String  @default("") @db.VarChar(100)
-  edition     String  @default("")
-  url         String  @default("") @db.VarChar(2048)
+  displayName String      @db.VarChar(60)
+  handle      String      @default("") @db.VarChar(60)
+  detail      String      @default("") @db.VarChar(100)
+  edition     String      @default("")
+  url         String      @default("") @db.VarChar(2048)
   avatarKey   String?
-  color       String  @default("#a78bfa") @db.VarChar(7)
-  style       String  @default("minimal")
-  layout      String  @default("compact")
-  icon        String  @default("gamepad")
-  glow        Boolean @default(false)
-  animated    Boolean @default(false)
+  color       String      @default("#a78bfa") @db.VarChar(7)
+  style       String      @default("minimal")
+  layout      String      @default("compact")
+  icon        String      @default("gamepad")
+  glow        Boolean     @default(false)
+  animated    Boolean     @default(false)
   position    Int
+  clicks      CardClick[]
 
   @@unique([profileId, position])
+}
+
+model ProfileBlock {
+  id        String  @id
+  profileId String
+  profile   Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  payload   Json
+  position  Int
+
+  @@unique([profileId, position])
+}
+
+model SavedAppearance {
+  id        String               @id
+  userId    String
+  user      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String               @db.VarChar(60)
+  config    Json
+  revision  Int                  @default(0)
+  createdAt DateTime             @default(now())
+  schedules AppearanceSchedule[]
+
+  @@index([userId, createdAt])
+}
+
+model AppearanceSchedule {
+  id           String          @id
+  userId       String
+  user         User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appearanceId String
+  appearance   SavedAppearance @relation(fields: [appearanceId], references: [id], onDelete: Cascade)
+  startsAt     DateTime        @db.Timestamptz(3)
+  endsAt       DateTime        @db.Timestamptz(3)
+  timeZone     String          @db.VarChar(80)
+  createdAt    DateTime        @default(now())
+
+  @@index([userId, startsAt, endsAt])
+}
+
+model CardClick {
+  cardId String
+  card   GamerCard @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  day    DateTime  @db.Date
+  count  Int       @default(0)
+
+  @@id([cardId, day])
+  @@index([day])
 }

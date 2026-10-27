@@ -1,0 +1,13 @@
+ALTER TABLE "Profile" ADD COLUMN studio JSONB NOT NULL DEFAULT '{"layout": "classic", "columns": 1, "width": "standard", "spacing": "normal", "cardColumns": 1, "order": ["identity", "gamerCards", "links", "blocks"], "hidden": [], "widths": {"identity": 2, "gamerCards": 2, "links": 2, "blocks": 2}}', ADD COLUMN "previousAppearance" JSONB, ADD COLUMN "vibeCardStyle" TEXT NOT NULL DEFAULT 'minimal' CHECK ("vibeCardStyle" IN ('neon','holographic','minimal','galaxy','retro'));
+CREATE TABLE "ProfileBlock"(id TEXT PRIMARY KEY,"profileId" TEXT NOT NULL REFERENCES "Profile"(id) ON DELETE CASCADE ON UPDATE CASCADE,payload JSONB NOT NULL CHECK (jsonb_typeof(payload)='object' AND length(payload::text)<=32768 AND id=payload->>'id'),position INTEGER NOT NULL);
+CREATE UNIQUE INDEX "ProfileBlock_profileId_position_key" ON "ProfileBlock"("profileId",position);
+CREATE TABLE "SavedAppearance"(id TEXT PRIMARY KEY,"userId" TEXT NOT NULL REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE,name VARCHAR(60) NOT NULL,config JSONB NOT NULL,revision INTEGER NOT NULL DEFAULT 0 CHECK(revision>=0),"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP);
+CREATE INDEX "SavedAppearance_userId_createdAt_idx" ON "SavedAppearance"("userId","createdAt");
+CREATE TABLE "AppearanceSchedule"(id TEXT PRIMARY KEY,"userId" TEXT NOT NULL REFERENCES "User"(id) ON DELETE CASCADE ON UPDATE CASCADE,"appearanceId" TEXT NOT NULL REFERENCES "SavedAppearance"(id) ON DELETE CASCADE ON UPDATE CASCADE,"startsAt" TIMESTAMPTZ(3) NOT NULL,"endsAt" TIMESTAMPTZ(3) NOT NULL,"timeZone" VARCHAR(80) NOT NULL,"createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,CHECK("endsAt">"startsAt"));
+CREATE INDEX "AppearanceSchedule_userId_startsAt_endsAt_idx" ON "AppearanceSchedule"("userId","startsAt","endsAt");
+CREATE TABLE "CardClick"("cardId" TEXT NOT NULL REFERENCES "GamerCard"(id) ON DELETE CASCADE ON UPDATE CASCADE,day DATE NOT NULL,count INTEGER NOT NULL DEFAULT 0 CHECK(count>=0),PRIMARY KEY("cardId",day));
+CREATE INDEX "CardClick_day_idx" ON "CardClick"(day);
+ALTER TABLE "Upload" DROP CONSTRAINT "Upload_safe_media";
+ALTER TABLE "Upload" ADD CONSTRAINT "Upload_safe_media" CHECK(kind IN ('avatar','background','gamer-avatar','gallery') AND "mimeType"='image/webp' AND octet_length(content)<=1048576 AND width>0 AND height>0);
+ALTER TABLE "Upload" DROP CONSTRAINT "Upload_slot_check";
+ALTER TABLE "Upload" ADD CONSTRAINT "Upload_slot_check" CHECK((kind IN ('avatar','background') AND slot IN(0,1)) OR (kind='gamer-avatar' AND slot>=0 AND slot<20) OR (kind='gallery' AND slot>=0 AND slot<18));

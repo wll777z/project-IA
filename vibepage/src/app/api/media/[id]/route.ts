@@ -1,5 +1,4 @@
-import { isPro } from "@/lib/entitlements";
-import { FREE_CARD_LIMIT } from "@/lib/customization";
+import { getPublicProfile } from "@/lib/public-profile";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 export const runtime = "nodejs";
@@ -11,28 +10,20 @@ export async function GET(
   if (!/^[0-9a-f-]{36}$/i.test(id)) return new Response(null, { status: 404 });
   const upload = await db.upload.findUnique({ where: { id } });
   if (!upload) return new Response(null, { status: 404 });
-  const published = await db.profile.findFirst({
-    where: {
-      userId: upload.userId,
-      published: true,
-      OR: [
-        { avatarKey: id },
-        { backgroundKey: id },
-        { gamerCards: { some: { avatarKey: id } } },
-      ],
-    },
-    select: {
-      avatarKey: true,
-      backgroundKey: true,
-      gamerCards: { where: { avatarKey: id }, select: { position: true } },
-      user: { select: { entitlement: true } },
-    },
+  const ownerProfile = await db.profile.findUnique({
+    where: { userId: upload.userId },
+    select: { username: true },
   });
+  const visible = ownerProfile
+    ? await getPublicProfile(ownerProfile.username)
+    : null;
+  const profile = visible?.profile;
   const isPublic =
-    published &&
-    (published.avatarKey === id ||
-      isPro(published.user.entitlement) ||
-      published.gamerCards.some((c) => c.position < FREE_CARD_LIMIT));
+    !!profile &&
+    (profile.avatarKey === id ||
+      profile.backgroundKey === id ||
+      profile.gamerCards.some((c) => c.avatarKey === id) ||
+      profile.blocks.some((b) => b.imageKeys.includes(id)));
   if (!isPublic) {
     const session = await auth.api.getSession({ headers: request.headers });
     if (session?.user.id !== upload.userId)

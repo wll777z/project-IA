@@ -1,7 +1,11 @@
+import { defaultStudio, studioSchema } from "@/lib/studio-schema";
 import { defaultEffects } from "@/lib/customization";
 import type { ProfileInput } from "@/lib/validation";
 export const demoProfile: ProfileInput = {
   ...defaultEffects,
+  studio: studioSchema.parse(defaultStudio),
+  blocks: [],
+  vibeCardStyle: "minimal",
   username: "wendell",
   displayName: "wendell",
   bio: "Entre um game e uma ideia nova.\nEsse é o meu universo. 🪐",

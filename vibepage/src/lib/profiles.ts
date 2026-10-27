@@ -1,6 +1,10 @@
+import type { Prisma } from "@/generated/prisma/client";
+import { isDeepStrictEqual } from "node:util";
+import { studioSchema, defaultStudio } from "@/lib/studio-schema";
 import { db } from "@/lib/db";
 import {
   profileSchema,
+  blockSchema,
   gamerCardDTO,
   type GamerCardInput,
   type ProfileInput,
@@ -10,12 +14,16 @@ import { isPro } from "@/lib/entitlements";
 import { findTheme } from "@/lib/themes";
 import { HttpError } from "@/lib/http";
 export const profileInclude = {
+  blocks: { orderBy: { position: "asc" as const } },
   gamerCards: { orderBy: { position: "asc" as const } },
   links: { orderBy: { position: "asc" as const } },
 };
 export function emptyProfile(name = ""): ProfileInput {
   return {
     ...defaultEffects,
+    studio: studioSchema.parse(defaultStudio),
+    blocks: [],
+    vibeCardStyle: "minimal",
     gamerCards: [],
     username: "",
     displayName: name,
@@ -39,9 +47,15 @@ export async function getOwnedProfile(userId: string) {
     include: profileInclude,
   });
   if (!profile) return null;
-  // Preserve legacy invalid values so owners can open the editor and fix them.
-  // All new writes still go through profileSchema; renderers validate links.
+  return ownedProfileDTO(profile);
+}
+export function ownedProfileDTO(
+  profile: Prisma.ProfileGetPayload<{ include: typeof profileInclude }>,
+): ProfileInput {
   return {
+    studio: studioSchema.parse(profile.studio),
+    blocks: profile.blocks.map((b) => blockSchema.parse(b.payload)),
+    vibeCardStyle: profile.vibeCardStyle as ProfileInput["vibeCardStyle"],
     backgroundEffect:
       profile.backgroundEffect as ProfileInput["backgroundEffect"],
     avatarEffect: profile.avatarEffect as ProfileInput["avatarEffect"],
@@ -68,7 +82,20 @@ export async function getOwnedProfile(userId: string) {
   };
 }
 export async function saveProfile(userId: string, body: unknown) {
-  const data = profileSchema.parse(body);
+  const incoming =
+    body && typeof body === "object" && !Array.isArray(body)
+      ? (body as Record<string, unknown>)
+      : null;
+  const data = profileSchema.parse(
+    incoming
+      ? {
+          studio: studioSchema.parse(defaultStudio),
+          blocks: [],
+          vibeCardStyle: "minimal",
+          ...incoming,
+        }
+      : body,
+  );
   return db.$transaction(
     async (tx) => {
       // Serialize saves for the same owner; compare revision to reject stale tabs.
@@ -77,6 +104,36 @@ export async function saveProfile(userId: string, body: unknown) {
         where: { userId },
       });
       const pro = isPro(entitlement);
+      const current = await tx.profile.findUnique({
+        where: { userId },
+        include: profileInclude,
+      });
+      const storedStudio = current
+        ? studioSchema.parse(current.studio)
+        : studioSchema.parse(defaultStudio);
+      const storedBlocks =
+        current?.blocks.map((b) => blockSchema.parse(b.payload)) ?? [];
+      // Older clients may submit identity/links without Studio metadata. Never
+      // erase newer private configuration merely because a field was omitted.
+      if (!Object.hasOwn(incoming ?? {}, "studio")) data.studio = storedStudio;
+      if (!Object.hasOwn(incoming ?? {}, "blocks")) data.blocks = storedBlocks;
+      if (!Object.hasOwn(incoming ?? {}, "vibeCardStyle"))
+        data.vibeCardStyle =
+          (current?.vibeCardStyle as ProfileInput["vibeCardStyle"]) ??
+          "minimal";
+      if (
+        !pro &&
+        ((!isDeepStrictEqual(data.studio, storedStudio) &&
+          !isDeepStrictEqual(data.studio, studioSchema.parse(defaultStudio))) ||
+          (data.blocks.length > 0 &&
+            !isDeepStrictEqual(data.blocks, storedBlocks)) ||
+          (data.vibeCardStyle !== "minimal" &&
+            data.vibeCardStyle !== current?.vibeCardStyle))
+      )
+        throw new HttpError(
+          403,
+          "O Profile Studio e os blocos precisam do plano Pro.",
+        );
       const theme = findTheme(data.themeId);
       if (
         !pro &&
@@ -101,7 +158,6 @@ export async function saveProfile(userId: string, body: unknown) {
           data.backgroundColor !== theme.background)
       )
         throw new HttpError(403, "Essa personalização precisa do plano Pro.");
-      const current = await tx.profile.findUnique({ where: { userId } });
       if (data.revision !== (current?.revision ?? 0))
         throw new HttpError(
           409,
@@ -111,6 +167,7 @@ export async function saveProfile(userId: string, body: unknown) {
         data.avatarKey,
         data.backgroundKey,
         ...data.gamerCards.map((c) => c.avatarKey),
+        ...data.blocks.flatMap((b) => b.imageKeys),
       ].filter((k): k is string => !!k);
       const uploads = await tx.upload.findMany({
         where: { userId, id: { in: keys } },
@@ -134,6 +191,30 @@ export async function saveProfile(userId: string, body: unknown) {
         )
       )
         throw new HttpError(403, "Use apenas imagens enviadas pela sua conta.");
+      if (
+        pro &&
+        data.blocks.some(
+          (b) =>
+            b.imageKeys.some(
+              (id) => !uploads.some((u) => u.id === id && u.kind === "gallery"),
+            ) ||
+            (b.cardId && !data.gamerCards.some((c) => c.id === b.cardId)),
+        )
+      )
+        throw new HttpError(
+          403,
+          "Bloco referencia imagem ou cartão que não pertence ao perfil.",
+        );
+      if (
+        pro &&
+        (await tx.profileBlock.findFirst({
+          where: {
+            id: { in: data.blocks.map((b) => b.id) },
+            ...(current ? { profileId: { not: current.id } } : {}),
+          },
+        }))
+      )
+        throw new HttpError(403, "Um dos blocos não pertence ao seu perfil.");
       const foreign = await tx.profileLink.findFirst({
         where: {
           id: { in: data.links.map((l) => l.id) },
@@ -155,14 +236,28 @@ export async function saveProfile(userId: string, body: unknown) {
       });
       if (foreignCard)
         throw new HttpError(403, "Um dos cartões não pertence ao seu perfil.");
-      const { links, gamerCards, revision, ...fields } = data;
+      const {
+        links,
+        gamerCards,
+        blocks,
+        studio,
+        vibeCardStyle,
+        revision,
+        ...fields
+      } = data;
+      const studioFields = pro ? { studio, vibeCardStyle } : {};
       const profile = current
         ? await tx.profile.update({
             where: { id: current.id },
-            data: { ...fields, revision: { increment: 1 } },
+            data: { ...fields, ...studioFields, revision: { increment: 1 } },
           })
         : await tx.profile.create({
-            data: { ...fields, userId, revision: revision + 1 },
+            data: {
+              ...fields,
+              ...studioFields,
+              userId,
+              revision: revision + 1,
+            },
           });
       await tx.profileLink.deleteMany({
         where: { profileId: profile.id, id: { notIn: links.map((l) => l.id) } },
@@ -215,7 +310,51 @@ export async function saveProfile(userId: string, body: unknown) {
           },
         },
       });
-      return { ...data, revision: profile.revision };
+      if (pro) {
+        await tx.profileBlock.deleteMany({
+          where: {
+            profileId: profile.id,
+            id: { notIn: blocks.map((b) => b.id) },
+          },
+        });
+        await tx.profileBlock.updateMany({
+          where: { profileId: profile.id },
+          data: { position: { increment: 1000 } },
+        });
+        for (const [position, block] of blocks.entries()) {
+          const owned = await tx.profileBlock.updateMany({
+            where: { id: block.id, profileId: profile.id },
+            data: { payload: block, position },
+          });
+          if (!owned.count)
+            await tx.profileBlock.create({
+              data: {
+                id: block.id,
+                profileId: profile.id,
+                payload: block,
+                position,
+              },
+            });
+        }
+      }
+      if (pro)
+        await tx.upload.deleteMany({
+          where: {
+            userId,
+            kind: "gallery",
+            id: { notIn: blocks.flatMap((b) => b.imageKeys) },
+          },
+        });
+      return {
+        ...data,
+        studio: pro ? studio : storedStudio,
+        blocks: pro ? blocks : storedBlocks,
+        vibeCardStyle: pro
+          ? vibeCardStyle
+          : ((current?.vibeCardStyle as ProfileInput["vibeCardStyle"]) ??
+            "minimal"),
+        revision: profile.revision,
+      };
     },
     { timeout: 15000 },
   );
