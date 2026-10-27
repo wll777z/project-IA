@@ -1,3 +1,26 @@
+# Candidata 3.0.0-rc.1 — validação de 27/10/2026
+
+Resultados reais desta candidata, sobre a auditoria `7d9758f`:
+
+| Verificação                                   | Resultado                         |
+| --------------------------------------------- | --------------------------------- |
+| `npm run lint`                                | Aprovado                          |
+| `npm run typecheck`                           | Aprovado; Prisma gerado           |
+| `npm test`                                    | 198 testes, 25 arquivos aprovados |
+| `npm run build`                               | Aprovado; Next standalone         |
+| `npm run test:http`                           | 80 verificações aprovadas         |
+| Exportação estática para diretório temporário | Aprovada; sem publicação          |
+
+`npm run format` e `npm run format:check` executados com estilo aprovado. `npm audit` reportou **0 vulnerabilidades**. Parse YAML estrutural aprovado (sete serviços; somente proxy publica portas); não é execução Docker/Caddy.
+
+Os testes usam PGlite isolado. Cobrem manutenção dos dados legados na oitava migration, papéis administrativos, confirmação obrigatória, CSRF, acesso à fila, XSS escapado, revisões concorrentes, suspensão/restauração, negação de mídia/QR/VibeCard, impossibilidade de o dono contornar suspensão, retenção/limpeza e exclusão de contatos. O ciclo HTTP inclui cadastro/login/perfil/publicação/compartilhamento, downgrade e exclusão com fixtures. E-mails são interceptados nos testes; nenhuma entrega SMTP real foi validada.
+
+Não executados: Docker/Caddy real, PostgreSQL nativo vazio/upgrade, backup/restore, DNS/HTTPS externo, SMTP externo, dispositivos iOS/Android ou beta com pessoas reais. Não há host conectado. Os avisos de depreciação do driver pg em fixtures continuam; não foram tratados como falha nem como validação de produção.
+
+A evidência histórica abaixo continua válida para seu commit; não representa novo ensaio mobile/performance desta candidata. Decisão atual: **NO-GO beta, público e comercialização Pro**. Veja [RELEASE_CANDIDATE](docs/RELEASE_CANDIDATE.md).
+
+---
+
 # Validação — auditoria final de lançamento
 
 27/10/2026. Base GitHub `feature/vibepage-next-level` em `07d1e8cec4be202033136f32cd32919ffa527a6a`; branch `audit/vibepage-final-release`. Apenas `vibepage/`; sem merge/deploy ou alteração de dados/credenciais reais. Relatório e decisão atuais: [docs/FINAL_RELEASE_REVIEW.md](docs/FINAL_RELEASE_REVIEW.md).

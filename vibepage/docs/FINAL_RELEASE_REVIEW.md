@@ -1,3 +1,5 @@
+> Registro da auditoria no commit `7d9758f`. A candidata posterior e o tratamento do canal de denúncias estão em [RELEASE_CANDIDATE.md](RELEASE_CANDIDATE.md). Achados operacionais sem infraestrutura continuam pendentes; nenhuma decisão GO para usuários reais foi concedida.
+
 # Revisão final de lançamento — VibePage 3.0
 
 27/10/2026. Escopo: somente `vibepage/` em `wll777z/project-IA`. Base conferida pelo GitHub: `feature/vibepage-next-level`, `07d1e8cec4be202033136f32cd32919ffa527a6a`. Branch: `audit/vibepage-final-release`. Sem merge, deploy, serviços pagos, alteração de credenciais ou dados reais. Fixtures novas são isoladas e sintéticas.

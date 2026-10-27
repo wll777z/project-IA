@@ -1,6 +1,14 @@
 # VibePage
 
-## VibePage 3.0 — Next Level
+## Candidata 3.0.0-rc.1 — estabilização para lançamento
+
+A candidata `release/vibepage-3.0-rc1` parte da auditoria `7d9758fb112206bcd4fe706c8bef6f9ba612953c` e contém toda a cadeia Ultimate → Next Level → auditoria, sem merge automático. Não adiciona temas, cartões, layouts ou efeitos. Consulte [RELEASE_CANDIDATE](docs/RELEASE_CANDIDATE.md) e [STAGING_RUNBOOK](docs/STAGING_RUNBOOK.md).
+
+Nesta etapa: canal `/suporte`, fila `/dashboard/moderacao`, suspensão administrativa aplicada também a mídia/QR/VibeCard, bootstrap seguro de administrador, oitava migration aditiva e configuração de homologação PostgreSQL/Node/Caddy/SMTP. O canal só recebe solicitações com dados legais completos e administrador confirmado. Configuração não equivale a infraestrutura funcionando.
+
+**NO-GO para beta real, lançamento público e venda Pro** até cumprir os gates operacionais. Testes locais: 198 testes e 80 verificações HTTP em PGlite; sem aprovação de PostgreSQL nativo ou SMTP externo. O administrador não foi criado em ambiente real. Senhas exigem 12–128 caracteres; nenhum segredo foi incluído no Git.
+
+## Funcionalidades existentes — Next Level
 
 A branch `feature/vibepage-next-level` parte de `feature/vibepage-ultimate-release` (`e8cb1f6`), a versão mais completa conferida. Preserva os 13 temas, cartões gamer, efeitos, autenticação e correções existentes. O inventário e a comparação de branches estão em [docs/NEXT_LEVEL_INVENTORY.md](docs/NEXT_LEVEL_INVENTORY.md). Mudanças somente dentro de `vibepage/`; sem merge ou deploy nesta entrega.
 
@@ -128,12 +136,12 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 
 - Senhas scrypt e sessões no banco, cookies HttpOnly/SameSite e Secure com HTTPS. Recuperação revoga sessões anteriores. Cadastro duplicado não revela existência da conta; login usa erro genérico. Produção pública exige confirmação de e-mail.
 - Validação no servidor e no formulário; payload de autenticação limitado a 16 KB e perfil a 64 KB. Não há HTML ou JavaScript arbitrário. React escapa os textos.
-- URLs somente HTTPS público, sem credenciais, IPs literais/locais ou portas alternativas. O redirecionamento usa somente o destino armazenado, não uma URL recebida na query. Não fazemos fetch de URLs de usuários. A validação sintática não detecta phishing em domínios públicos; moderação e denúncias serão necessárias para lançamento amplo.
+- URLs somente HTTPS público, sem credenciais, IPs literais/locais ou portas alternativas. O redirecionamento usa somente o destino armazenado, não uma URL recebida na query. Não fazemos fetch de URLs de usuários. A validação sintática não detecta phishing em domínios públicos; o canal de denúncias desta candidata exige configuração legal e revisão operacional antes do lançamento amplo.
 - Todos os writes autenticados verificam a origem exata. Rate limits ficam no banco e resistem a requisições concorrentes. Limites: login 5/min, cadastro e recuperação 3/min, gravação de perfil 30/min, upload 8/min, views 60/min, cliques compartilhados 90/min, coleções 20/min, agenda 15/min, QR 30/min, VibeCard 12/min e CSV 10/min.
 - Sem `AUTH_IP_HEADER`, os limites públicos são compartilhados por endpoint para não confiar em cabeçalhos falsificados. Em produção configure somente um cabeçalho sobrescrito pelo proxy e impeça acesso direto à origem. O limitador da biblioteca pode manter IP temporariamente para segurança; os limites do aplicativo usam HMAC. Nada disso é usado como analytics individual.
 - Imagens permitidas: PNG, JPEG e WebP estáticos. SVG/GIF e dados incompatíveis com o MIME são recusados. No máximo quatro imagens de perfil (ativa e rascunho por tipo) vinte avatares de cartões e dezoito imagens de galeria Pro normalizados de até 1 MB cada. Avatares de cartões sem uso são liberados ao salvar o perfil; a exclusão da conta remove todos. Imagens não publicadas exigem sessão do dono; exclusão de conta elimina os arquivos do banco.
 - Os números são aproximações, não visitantes únicos. Cada aba tenta registrar uma visita diária por perfil usando sessionStorage. Limites, bloqueadores e bots alteram a contagem. Cliques contam apenas os links personalizados que passam por `/go/`; cartões gamer publicados usam `/go/card/:id` e possuem contagem separada a partir desta versão. Links dos blocos não são rastreados. Excluir um link/cartão remove suas contagens individuais em cascata; não há reconstrução histórica de elementos removidos. Cliques são totais; não são garantia de pessoa real ou conversão. Dados diários ficam em UTC.
-- Execute `npm run db:cleanup` diariamente para remover sessões, tokens e limites expirados. Não criamos agendamento externo.
+- Execute `npm run db:cleanup` diariamente para remover sessões, tokens, limites e solicitações de suporte expirados. Não criamos agendamento externo.
 - Imagens de compartilhamento usam `no-store` e retornam 404 para rascunhos e contas removidas. Cópias já baixadas ou armazenadas por terceiros não podem ser revogadas pelo site. `Referrer-Policy: no-referrer` impede que URLs de confirmação/recuperação sejam enviadas como Referer.
 - CSP restringe recursos ao próprio site e impede frames e objetos embutidos. Scripts/styles inline necessários ao Next permanecem permitidos; CSP com nonce é um endurecimento futuro.
 - Termos e privacidade ainda precisam de identificação do controlador, contato, política de backups e definições para público menor de idade antes de lançamento real.
@@ -150,7 +158,7 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 | `src/app/api/`                               | Perfil, uploads, mídia, views, stats e exportação                              |
 | `src/components/`                            | Componentes do editor, perfil, formulários e gráfico acessível                 |
 | `src/lib/`                                   | Validação, regras de acesso, permissões, limites, perfis, temas e estatísticas |
-| `prisma/`                                    | Schema, sete migrations SQL, índices, checks e seed                            |
+| `prisma/`                                    | Schema, oito migrations SQL, índices, checks e seed                            |
 | `tests/`                                     | Suítes e smoke HTTP com banco isolado                                          |
 | `scripts/`                                   | Setup, manutenção, permissões administrativas e exportação da demo             |
 | `compose.yaml`, `Dockerfile`, `.env.example` | Execução local e preparação para hospedagem                                    |

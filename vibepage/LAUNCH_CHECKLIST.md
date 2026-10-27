@@ -1,3 +1,30 @@
+# Gates da candidata 3.0.0-rc.1
+
+27/10/2026. Escopo restrito a lançamento, sem novas funcionalidades visuais.
+
+- [x] Candidata criada sobre auditoria mais recente, preservando ancestrais; sem merge de PRs.
+- [x] Suporte/denúncias e fila administrativa reais no código, com autorização, revisão e retirada/restauração.
+- [x] Dados legais configuráveis sem inventar responsável/contato/políticas; intake fechado por padrão.
+- [x] Bootstrap administrador sem senha em argumentos/Git, mínimo 12 e confirmação de e-mail obrigatória.
+- [x] Migration 8 aditiva testada em PGlite; sete SQL anteriores preservados.
+- [x] Preparar Compose de homologação com PostgreSQL persistente, Node, Caddy HTTPS e SMTP obrigatório.
+- [x] Testes locais 198/80 HTTP, lint, typecheck e build executados.
+- [ ] Conectar hospedagem autorizada e fornecer domínio/SMTP/segredos no ambiente privado.
+- [ ] Validar Compose, HTTPS real, IP do proxy e bloqueio da origem; configuração preparada não significa aprovado.
+- [ ] Validar migrations em PostgreSQL nativo, concorrência, backup e restauração com dados sintéticos.
+- [ ] Confirmar entrega SMTP e jornada completa no domínio real, incluindo reset, downgrade e exclusão.
+- [ ] Criar administrador com nova senha de pelo menos 12 caracteres e confirmar e-mail; telefone é contato privado, não SMS.
+- [ ] Definir responsável legal, contato público, idade, retenção/backups, rotina de suporte/denúncias, escala e prazos.
+- [ ] Executar limpeza diariamente, monitoramento/alertas e recuperação/rollback.
+- [ ] Aceitar celular físico, teclado, leitores de tela, downloads e compartilhamento.
+- [ ] Aprovação expressa dos gates e lista de convidados antes de abrir beta fechado.
+
+**NO-GO beta/público/Pro comercial.** Não publicar nem incorporar PRs automaticamente. [Runbook](docs/STAGING_RUNBOOK.md).
+
+---
+
+## Histórico da auditoria anterior
+
 # Checklist de lançamento — VibePage 3.0 Next Level
 
 Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lançamento público** nem afirma que a infraestrutura já existe. Sem merge, deploy, contratação ou cobrança.
