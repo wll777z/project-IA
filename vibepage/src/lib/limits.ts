@@ -22,7 +22,7 @@ export async function consumeLimit(
   if (rows[0].count > max)
     throw new HttpError(429, "Muitas tentativas. Aguarde um minuto.");
 }
-export function clientIdentity(request: Request) {
+export function clientIdentity(request: Pick<Request, "headers">) {
   const trusted = process.env.AUTH_IP_HEADER;
   return trusted
     ? request.headers.get(trusted)?.split(",").at(-1)?.trim() || "shared"
