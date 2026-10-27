@@ -1,3 +1,9 @@
+import { getOwnedAvailability } from "@/lib/profile-availability";
+import {
+  availabilityLabels,
+  UnavailableProfile,
+  FirstSteps,
+} from "@/components/profile-availability";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -11,13 +17,14 @@ import { ArrowUpRight, Palette, Eye, Link2, Sparkles } from "lucide-react";
 export default async function Dashboard() {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
-  const [profile, entitlement, views] = await Promise.all([
+  const [profile, entitlement, views, availability] = await Promise.all([
     getOwnedProfile(session.user.id),
     db.entitlement.findUnique({ where: { userId: session.user.id } }),
     db.pageView.aggregate({
       where: { profile: { userId: session.user.id } },
       _sum: { count: true },
     }),
+    getOwnedAvailability(session.user.id),
   ]);
   return (
     <>
@@ -51,9 +58,21 @@ export default async function Dashboard() {
           <Sparkles size={19} />
           <span>SEU PLANO</span>
           <strong>{isPro(entitlement) ? "Pro" : "Free"}</strong>
-          <small>Sem cobrança nesta versão</small>
+          <small>
+            {entitlement?.plan === "PRO" && !isPro(entitlement)
+              ? "Pro expirado; seus dados privados foram preservados."
+              : "Pro ainda não disponível para compra"}
+          </small>
         </article>
       </div>
+      {availability === "unavailable" ? (
+        <UnavailableProfile />
+      ) : availability !== "published" || !profile?.links.length ? (
+        <FirstSteps
+          hasUsername={!!profile?.username}
+          hasLinks={!!profile?.links.length}
+        />
+      ) : null}
       <div className="dashboard-loadout">
         <span>SEU LOADOUT</span>
         <strong>{profile?.gamerCards.length ?? 0} cartões gamer</strong>
@@ -83,25 +102,28 @@ export default async function Dashboard() {
                   : "Seu universo começa com um link."}
               </h2>
               <span className="outline-pill">
-                {profile?.published ? "PUBLICADO" : "RASCUNHO"}
+                {availabilityLabels[availability]}
               </span>
             </div>
             <p>
-              {profile?.published
+              {availability === "published"
                 ? "Compartilhe sua página com suas comunidades."
-                : "Adicione seus links, escolha uma atmosfera e publique quando estiver pronto."}
+                : availability === "unavailable"
+                  ? "Sua prévia continua privada. Consulte a orientação de disponibilidade acima."
+                  : "Salve seu rascunho no editor. A página só fica visível após marcar Perfil público e salvar."}
             </p>
-            {profile ? (
+            {profile && availability === "published" ? (
               <ShareLink username={profile.username} />
             ) : (
               <Link
                 className="button button-secondary"
                 href="/dashboard/editor"
               >
-                Criar meu perfil <ArrowUpRight size={17} />
+                {profile ? "Continuar editando" : "Criar meu perfil"}{" "}
+                <ArrowUpRight size={17} />
               </Link>
             )}
-            {profile?.published && (
+            {profile && availability === "published" && (
               <Link
                 className="text-button mt-5"
                 href={`/${profile.username}`}

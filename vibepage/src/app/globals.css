@@ -3880,3 +3880,94 @@ a.gamer-card:focus-visible,
   color: #eee;
   padding: 12px;
 }
+
+/* Final polish: current location and a compact native mobile menu. */
+.app-sidebar nav a {
+  min-height: 44px;
+}
+.app-sidebar nav a[aria-current="page"] {
+  color: #f5edff;
+  background: #a78bfa22;
+  box-shadow: inset 3px 0 #a78bfa;
+}
+.dashboard-nav-mobile {
+  display: none;
+}
+.first-steps ol {
+  padding-left: 22px;
+  color: #c9bfd9;
+  line-height: 1.7;
+}
+.first-steps li + li {
+  margin-top: 8px;
+}
+@media (max-width: 850px) {
+  .app-sidebar nav.dashboard-nav-desktop {
+    display: none;
+  }
+  .app-layout {
+    grid-template-rows: auto 1fr;
+  }
+  .dashboard-nav-mobile {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+  .dashboard-nav-mobile summary > span {
+    font-size: 12px;
+    color: inherit;
+    font-weight: 400;
+  }
+  .dashboard-nav-mobile summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    min-height: 48px;
+    padding: 10px 12px;
+    border: 1px solid #a78bfa40;
+    border-radius: 9px;
+    color: #b9adc9;
+    cursor: pointer;
+    font-size: 12px;
+    list-style: none;
+  }
+  .dashboard-nav-mobile summary::-webkit-details-marker {
+    display: none;
+  }
+  .dashboard-nav-mobile summary strong {
+    display: block;
+    color: #eee5fc;
+    font-size: 14px;
+    margin-top: 2px;
+  }
+  .dashboard-nav-mobile summary:focus-visible {
+    outline: 3px solid #cbb4ed;
+    outline-offset: 2px;
+  }
+  .dashboard-nav-mobile[open] summary {
+    margin-bottom: 10px;
+  }
+  .dashboard-nav-mobile[open] summary > svg {
+    transform: rotate(180deg);
+  }
+  .app-sidebar .dashboard-nav-mobile nav a {
+    flex-direction: row;
+    min-height: 48px;
+    font-size: 12px;
+    gap: 8px;
+    overflow-wrap: anywhere;
+  }
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,4 +1,6 @@
 "use client";
+import { UnavailableProfile } from "@/components/profile-availability";
+
 /* eslint-disable @next/next/no-img-element -- Locally generated PNG from the published public profile only. */
 import { useState } from "react";
 import Link from "next/link";
@@ -9,16 +11,19 @@ export function ShareCenter({
   profile,
   pro,
   url,
+  unavailable = false,
 }: {
   profile: ProfileInput | null;
   pro: boolean;
   url: string;
+  unavailable?: boolean;
 }) {
   const [style, setStyle] = useState(profile?.vibeCardStyle ?? "minimal"),
     [revision, setRevision] = useState(profile?.revision ?? 0),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
-  if (!profile?.published)
+  if (unavailable) return <UnavailableProfile />;
+  if (!profile?.published || !url)
     return (
       <section className="workspace-card">
         <h1>Publique antes de compartilhar.</h1>

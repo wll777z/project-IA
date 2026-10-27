@@ -112,11 +112,19 @@ export default async function Stats() {
           </Link>
         </section>
       )}
+      {stats.pro && (
+        <p>
+          <Link className="text-button" href="/dashboard/analytics">
+            Ver comparação, cartões e exportação no Analytics Pro →
+          </Link>
+        </p>
+      )}
       <p className="analytics-note">
-        Cartões gamer abrem links diretamente e não entram nas contagens de
-        cliques. Os números são aproximados. Bloqueadores, bots e limites contra
-        abuso podem afetar as contagens. Totais diários são armazenados sem IP,
-        localização ou identificação dos visitantes.
+        Os totais desta página se referem aos links personalizados. Cliques em
+        cartões gamer aparecem separadamente no Analytics Pro. Os números são
+        aproximados. Bloqueadores, bots e limites contra abuso podem afetar as
+        contagens. Totais diários são armazenados sem IP, localização ou
+        identificação dos visitantes.
       </p>
     </>
   );

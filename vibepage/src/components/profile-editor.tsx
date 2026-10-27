@@ -56,10 +56,12 @@ export function ProfileEditor({
   initial,
   pro,
   demo = false,
+  unavailable = false,
 }: {
   initial: ProfileInput;
   pro: boolean;
   demo?: boolean;
+  unavailable?: boolean;
 }) {
   const router = useRouter();
   const controlsRef = useRef<HTMLFieldSetElement>(null);
@@ -722,9 +724,10 @@ export function ProfileEditor({
           {tab === "settings" && (
             <div className="editor-fields">
               <h2>Seu perfil, sob seu controle.</h2>
-              {!demo && initial.username && (
-                <ShareLink username={initial.username} />
-              )}
+              {!demo &&
+                !unavailable &&
+                initial.published &&
+                initial.username && <ShareLink username={initial.username} />}
               <p>
                 A publicação é aplicada ao salvar. Desmarque Perfil público
                 abaixo para retirar a página do ar.
@@ -903,9 +906,11 @@ export function ProfileEditor({
           <p>
             {demo
               ? "Demonstração local: nenhuma página será publicada."
-              : profile.published
-                ? "Ao salvar, seu perfil ficará visível pelo link."
-                : "Rascunho: apenas você pode ver."}
+              : unavailable
+                ? "Seu perfil permanece indisponível ao público, mesmo após salvar."
+                : profile.published
+                  ? "Ao salvar, seu perfil ficará visível pelo link."
+                  : "Rascunho: apenas você pode ver."}
           </p>
         </div>
       </fieldset>
@@ -956,7 +961,7 @@ export function ProfileEditor({
           />
         </div>
         <p>As alterações aparecem aqui antes de salvar.</p>
-        {!demo && initial.published && initial.username && (
+        {!demo && !unavailable && initial.published && initial.username && (
           <Link
             href={`/${initial.username}`}
             className="text-button"

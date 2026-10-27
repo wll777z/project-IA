@@ -23,6 +23,9 @@ export function ShareLink({ username }: { username: string }) {
         {status === "Copiado!" ? <Check size={16} /> : <Copy size={16} />}{" "}
         {status || "Copiar link"}
       </button>
+      <span className="sr-only" role="status">
+        {status}
+      </span>
     </div>
   );
 }
