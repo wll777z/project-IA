@@ -1,4 +1,6 @@
 "use client";
+import { loadDemo } from "@/lib/demo-state";
+import { clientId } from "@/lib/client-id";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -33,6 +35,7 @@ import {
   buttonEffects,
   entranceEffects,
 } from "@/lib/customization";
+import { applyTheme } from "@/lib/appearance";
 import { ShareLink } from "@/components/share-link";
 import { profileSchema, type ProfileInput } from "@/lib/validation";
 import { themes } from "@/lib/themes";
@@ -47,6 +50,7 @@ export function ProfileEditor({
   demo?: boolean;
 }) {
   const router = useRouter();
+  const [applyRecipe, setApplyRecipe] = useState(true);
   const [tab, setTab] = useState("identity");
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState("");
@@ -72,32 +76,12 @@ export function ProfileEditor({
   useEffect(() => {
     if (!demo) return;
     try {
-      const saved = localStorage.getItem("vibepage:demo");
-      let base = initial;
-      if (saved) {
-        const legacy: unknown = JSON.parse(saved);
-        const parsed = profileSchema.safeParse(
-          typeof legacy === "object" &&
-            legacy !== null &&
-            !Array.isArray(legacy)
-            ? { ...defaultEffects, gamerCards: [], ...legacy }
-            : legacy,
-        );
-        if (parsed.success) base = parsed.data;
-      }
-      const requested = themes.find(
-        (theme) =>
-          theme.id === new URLSearchParams(window.location.search).get("theme"),
-      );
       reset(
-        requested
-          ? {
-              ...base,
-              themeId: requested.id,
-              accentColor: requested.accent,
-              backgroundColor: requested.background,
-            }
-          : base,
+        loadDemo(
+          initial,
+          localStorage.getItem("vibepage:demo"),
+          new URLSearchParams(window.location.search).get("theme"),
+        ),
       );
     } catch {}
   }, [demo, reset, initial]);
@@ -232,6 +216,7 @@ export function ProfileEditor({
             ["identity", UserRound, "Perfil"],
             ["links", Link2, "Links"],
             ["cards", Gamepad2, "Cartões"],
+            ["themes", Palette, "Temas"],
             ["style", Palette, "Aparência"],
             ["effects", Sparkles, "Efeitos"],
             ["stats", ChartNoAxesCombined, "Estatísticas"],
@@ -276,11 +261,15 @@ export function ProfileEditor({
                 Nome público
                 <input
                   {...register("displayName")}
+                  aria-invalid={!!errors.displayName}
+                  aria-describedby={
+                    errors.displayName ? "profile-name-error" : undefined
+                  }
                   maxLength={60}
                   placeholder="Como você quer aparecer?"
                 />
                 {errors.displayName && (
-                  <span className="field-error">
+                  <span className="field-error" id="profile-name-error">
                     {errors.displayName.message}
                   </span>
                 )}
@@ -291,6 +280,10 @@ export function ProfileEditor({
                   <span>/</span>
                   <input
                     {...register("username")}
+                    aria-invalid={!!errors.username}
+                    aria-describedby={
+                      errors.username ? "profile-username-error" : undefined
+                    }
                     maxLength={24}
                     placeholder="seu_username"
                     autoCapitalize="none"
@@ -301,7 +294,7 @@ export function ProfileEditor({
                   3–24 letras, números ou _. O nome só é reservado ao salvar.
                 </small>
                 {errors.username && (
-                  <span className="field-error">
+                  <span className="field-error" id="profile-username-error">
                     Escolha um username válido e disponível.
                   </span>
                 )}
@@ -310,13 +303,19 @@ export function ProfileEditor({
                 Biografia
                 <textarea
                   {...register("bio")}
+                  aria-invalid={!!errors.bio}
+                  aria-describedby={
+                    errors.bio ? "profile-bio-error" : undefined
+                  }
                   maxLength={240}
                   rows={4}
                   placeholder="O que faz parte da sua vibe?"
                 />
                 <small>{profile.bio?.length || 0}/240</small>
                 {errors.bio && (
-                  <span className="field-error">{errors.bio.message}</span>
+                  <span className="field-error" id="profile-bio-error">
+                    {errors.bio.message}
+                  </span>
                 )}
               </label>
               <div className="upload-grid">
@@ -324,14 +323,16 @@ export function ProfileEditor({
                   <div className="upload-box" key={kind}>
                     <Upload size={19} />
                     <strong>
-                      {kind === "avatar" ? "Avatar" : "Imagem de fundo"}
+                      {kind === "avatar" ? "Avatar" : "Imagem de fundo · Pro"}
                     </strong>
                     <label className="upload-label">
                       {uploading === kind ? "Enviando…" : "Escolher imagem"}
                       <input
                         type="file"
                         accept="image/png,image/jpeg,image/webp"
-                        disabled={!!uploading || demo}
+                        disabled={
+                          !!uploading || demo || (kind === "background" && !pro)
+                        }
                         onChange={(e) => {
                           void upload(kind, e.target.files?.[0]);
                           e.currentTarget.value = "";
@@ -341,7 +342,9 @@ export function ProfileEditor({
                     <small>
                       {demo
                         ? "Uploads disponíveis no aplicativo com conta."
-                        : "JPG, PNG ou WebP · até 4 MB"}
+                        : kind === "background" && !pro
+                          ? "Disponível no plano Pro."
+                          : "JPG, PNG ou WebP · até 4 MB"}
                     </small>
                     {(kind === "avatar"
                       ? profile.avatarKey
@@ -448,9 +451,7 @@ export function ProfileEditor({
                 className="button button-secondary"
                 type="button"
                 disabled={fields.length >= 100}
-                onClick={() =>
-                  append({ id: crypto.randomUUID(), title: "", url: "" })
-                }
+                onClick={() => append({ id: clientId(), title: "", url: "" })}
               >
                 <Plus size={17} /> Adicionar link
               </button>
@@ -628,27 +629,53 @@ export function ProfileEditor({
               )}
             </div>
           )}
-          {tab === "style" && (
+          {tab === "themes" && (
             <div className="editor-fields">
               <div>
                 <p className="kicker">ESCOLHA SUA ATMOSFERA</p>
                 <h2>O seu estilo começa aqui.</h2>
               </div>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={applyRecipe}
+                  onChange={(event) => setApplyRecipe(event.target.checked)}
+                />{" "}
+                Aplicar também fonte, botões, cartões e efeitos do tema
+              </label>
+              <p className="panel-description">
+                Desmarque para trocar apenas a paleta e preservar suas escolhas
+                de efeitos.
+              </p>
               <div className="theme-picker">
                 {themes.map((theme) => (
                   <button
                     className={profile.themeId === theme.id ? "selected" : ""}
+                    aria-pressed={profile.themeId === theme.id}
                     key={theme.id}
                     type="button"
                     disabled={theme.premium && !pro}
                     onClick={() => {
-                      setValue("themeId", theme.id, { shouldDirty: true });
-                      setValue("accentColor", theme.accent, {
-                        shouldDirty: true,
-                      });
-                      setValue("backgroundColor", theme.background, {
-                        shouldDirty: true,
-                      });
+                      const selected = applyTheme(
+                        profile,
+                        theme.id,
+                        applyRecipe,
+                      );
+                      for (const key of [
+                        "themeId",
+                        "accentColor",
+                        "backgroundColor",
+                        "fontFamily",
+                        "buttonStyle",
+                        "backgroundEffect",
+                        "avatarEffect",
+                        "buttonEffect",
+                        "entranceEffect",
+                        "gamerCards",
+                      ] as const)
+                        setValue(key, selected[key] as never, {
+                          shouldDirty: true,
+                        });
                     }}
                   >
                     <span className={`theme-swatch ${theme.className}`}>
@@ -663,6 +690,14 @@ export function ProfileEditor({
                     )}
                   </button>
                 ))}
+              </div>
+            </div>
+          )}
+          {tab === "style" && (
+            <div className="editor-fields">
+              <div>
+                <p className="kicker">AJUSTES DA SUA VIBE</p>
+                <h2>Detalhes que fazem diferença.</h2>
               </div>
               <label>
                 Tipografia

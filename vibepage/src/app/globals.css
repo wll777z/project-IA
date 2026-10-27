@@ -3256,3 +3256,33 @@ a.gamer-card:focus-visible,
     grid-template-columns: minmax(320px, 1fr) minmax(400px, 1.25fr);
   }
 }
+.theme-swatch.aurora-blue,
+.theme-preview.aurora-blue {
+  background: linear-gradient(
+    135deg,
+    #0a1b35 10%,
+    #204f68 40%,
+    #3c937d 65%,
+    #162541 90%
+  );
+}
+.theme-aurora-blue .public-aurora {
+  background: linear-gradient(
+    135deg,
+    transparent 15%,
+    #65efce24 35%,
+    #7098ff1c 52%,
+    transparent 75%
+  );
+  filter: blur(18px);
+}
+.theme-aurora-blue .public-links > a {
+  border-radius: 18px;
+  background: linear-gradient(110deg, #91f2df15, #99b7ff0b);
+  border-color: #91f2df45;
+  box-shadow: inset 0 1px #fff2;
+}
+.theme-aurora-blue .gamer-card {
+  border-color: color-mix(in srgb, var(--card-color) 40%, #88dff3);
+  box-shadow: inset 0 1px #c5fff421;
+}

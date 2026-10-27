@@ -29,7 +29,7 @@ it("links externos seguros têm isolamento e destino visível", () => {
   expect(html).not.toContain("online");
 });
 it("temas têm IDs únicos e preservam os cinco originais", () => {
-  expect(new Set(themes.map((t) => t.id)).size).toBe(12);
+  expect(new Set(themes.map((t) => t.id)).size).toBe(13);
   expect(themes.slice(0, 5).map((t) => t.id)).toEqual([
     "midnight-purple",
     "cyber-neon",

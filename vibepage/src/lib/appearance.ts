@@ -1,6 +1,6 @@
 import { defaultEffects, FREE_CARD_LIMIT } from "@/lib/customization";
 import type { ProfileInput } from "@/lib/validation";
-import { findTheme } from "@/lib/themes";
+import { findTheme, themeRecipes, type ThemeId } from "@/lib/themes";
 export function editableAppearance(
   profile: ProfileInput,
   pro: boolean,
@@ -28,5 +28,29 @@ export function editableAppearance(
     buttonStyle: "soft",
     animation: "none",
     hideBranding: false,
+  };
+}
+
+export function applyTheme(
+  profile: ProfileInput,
+  id: ThemeId,
+  complete = true,
+): ProfileInput {
+  const theme = findTheme(id);
+  const palette = {
+    ...profile,
+    themeId: theme.id,
+    accentColor: theme.accent,
+    backgroundColor: theme.background,
+  };
+  if (!complete) return palette;
+  const { cardStyle, ...appearance } = themeRecipes[id];
+  return {
+    ...palette,
+    ...appearance,
+    gamerCards: profile.gamerCards.map((card) => ({
+      ...card,
+      style: cardStyle,
+    })),
   };
 }

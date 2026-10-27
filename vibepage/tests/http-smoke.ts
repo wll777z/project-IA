@@ -1,3 +1,4 @@
+import sharp from "sharp";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import assert from "node:assert/strict";
@@ -82,6 +83,14 @@ try {
     css && (await fetch(origin + css[1])).status === 200,
     "CSS de produção é servido",
   );
+  check(
+    landingHTML.includes('href="/demo"'),
+    "landing oferece acesso à rota funcional da demo",
+  );
+  check(
+    (await request("/demo")).status === 200,
+    "demonstração com editor responde HTTP 200",
+  );
   const privatePage = await request("/dashboard");
   if (privatePage.status >= 500) console.log(output.slice(-3000));
   check(
@@ -146,6 +155,21 @@ try {
       },
     ],
   };
+  const backgroundImage = await sharp({
+    create: { width: 24, height: 24, channels: 3, background: "#91f2df" },
+  })
+    .png()
+    .toBuffer();
+  const uploadBackground = () =>
+    fetch(origin + "/api/uploads/background", {
+      method: "POST",
+      headers: { origin, cookie, "content-type": "image/png" },
+      body: new Uint8Array(backgroundImage),
+    });
+  check(
+    (await uploadBackground()).status === 403,
+    "upload de fundo é restrito ao Pro no servidor",
+  );
   const csrf = await fetch(origin + "/api/profile", {
     method: "PUT",
     headers: {
@@ -274,11 +298,18 @@ try {
   await fixture.db.entitlement.create({
     data: { userId: user.id, plan: "PRO" },
   });
+  const backgroundUpload = await uploadBackground();
+  check(
+    backgroundUpload.status === 200,
+    "Pro envia imagem de fundo pela rota real",
+  );
+  const backgroundKey = (await backgroundUpload.json()).key;
   profile = loaded.profile;
   const premium = await request("/api/profile", "PUT", {
     ...profile,
-    themeId: "galaxy-purple",
-    backgroundColor: "#100924",
+    themeId: "aurora-blue",
+    backgroundKey,
+    backgroundColor: "#091627",
     backgroundEffect: "stars",
     avatarEffect: "ring",
     buttonEffect: "shine",
@@ -289,9 +320,18 @@ try {
     await request("/http_player", "GET", undefined, "")
   ).text();
   check(
-    premiumHTML.includes("theme-galaxy-purple") &&
+    premiumHTML.includes("theme-aurora-blue") &&
       premiumHTML.includes("bg-effect-stars"),
     "renderer público aplica aparência Pro persistida",
+  );
+  check(
+    premiumHTML.includes(`/api/media/${backgroundKey}`),
+    "renderer Pro inclui fundo publicado",
+  );
+  check(
+    (await request(`/api/media/${backgroundKey}`, "GET", undefined, ""))
+      .status === 200,
+    "imagem de fundo Pro é pública enquanto permitido",
   );
   const detailed = await (await request("/api/stats")).json();
   check(
@@ -309,6 +349,15 @@ try {
     expiredHTML.includes("theme-midnight-purple") &&
       expiredHTML.includes("bg-effect-none"),
     "expiração revoga personalização Pro no servidor",
+  );
+  check(
+    !expiredHTML.includes(`/api/media/${backgroundKey}`),
+    "expiração omite imagem de fundo do HTML público",
+  );
+  check(
+    (await request(`/api/media/${backgroundKey}`, "GET", undefined, ""))
+      .status === 404,
+    "expiração bloqueia acesso anônimo à imagem de fundo",
   );
   check(
     (await request("/api/auth/sign-out", "POST", {})).status === 200,

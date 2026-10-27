@@ -311,6 +311,31 @@ it("normaliza avatar de cartão, protege rascunho e inclui dados na exportação
     ).status,
   ).toBe(404);
 });
+it("duas gravações do mesmo revision não misturam cartões nem sobrescrevem a vencedora", async () => {
+  const first = {
+    ...profiles.emptyProfile("Concurrent"),
+    username: "concurrent_cards",
+    gamerCards: [card({ displayName: "First" })],
+  };
+  const second = { ...first, gamerCards: [card({ displayName: "Second" })] };
+  const results = await Promise.allSettled([
+    profiles.saveProfile("other", first),
+    profiles.saveProfile("other", second),
+  ]);
+  expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
+  const failed = results.find(
+    (r) => r.status === "rejected",
+  ) as PromiseRejectedResult;
+  expect(failed.reason.status).toBe(409);
+  const loaded = (await profiles.getOwnedProfile("other"))!;
+  expect(loaded.revision).toBe(1);
+  expect(loaded.gamerCards).toHaveLength(1);
+  const winner = results.find(
+    (r) => r.status === "fulfilled",
+  ) as PromiseFulfilledResult<import("../src/lib/validation").ProfileInput>;
+  expect(loaded.gamerCards).toEqual(winner.value.gamerCards);
+  await fixture.db.profile.delete({ where: { userId: "other" } });
+});
 it("rascunho não expõe cartões e exclusão faz cascata", async () => {
   await fixture.db.profile.update({
     where: { userId: "owner" },

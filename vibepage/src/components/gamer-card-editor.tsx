@@ -1,4 +1,5 @@
 "use client";
+import { clientId } from "@/lib/client-id";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { ArrowDown, ArrowUp, Plus, Trash2, Upload } from "lucide-react";
 import {
@@ -236,7 +237,7 @@ export function GamerCardEditor({
         disabled={fields.length >= limit}
         onClick={() =>
           append({
-            id: crypto.randomUUID(),
+            id: clientId(),
             game: "roblox",
             displayName: "",
             handle: "",
