@@ -122,7 +122,15 @@ export const profileSchema = z
         z
           .object({
             id: z.uuid(),
-            title: z.string().trim().min(1, "Dê um título ao link.").max(80),
+            title: z
+              .string()
+              .trim()
+              .min(1, "Dê um título ao link.")
+              .max(80)
+              .refine(
+                (value) => !/[\u0000-\u001f\u007f]/.test(value),
+                "Título inválido.",
+              ),
             url: safeLinkSchema,
           })
           .strict(),

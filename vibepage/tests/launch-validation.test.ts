@@ -49,3 +49,10 @@ it("canonicaliza protocolo/host antes do CHECK HTTPS no banco", () => {
     "https://example.com/profile",
   );
 });
+
+it("recusa controles em títulos antes de escrever no PostgreSQL", () => {
+  const title = profileSchema.shape.links.element.shape.title;
+  expect(title.safeParse("canal\0nome").success).toBe(false);
+  expect(title.safeParse("canal\nextra").success).toBe(false);
+  expect(title.safeParse("Meu canal 🎮").success).toBe(true);
+});
