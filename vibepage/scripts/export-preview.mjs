@@ -9,7 +9,7 @@ const target = resolve(destination, "dist");
 await mkdir(target, { recursive: true });
 await rm(join(target, "_next"), { recursive: true, force: true });
 await cp(".next/static", join(target, "_next/static"), { recursive: true });
-for (const name of ["index", "demo", "privacidade", "termos"]) {
+for (const name of ["index", "demo", "demo/pro", "privacidade", "termos"]) {
   const html = await readFile(`.next/server/app/${name}.html`, "utf8");
   // Preserve hydration for the interactive landing showcase and editor.
   // Rewriting React's server HTML causes hydration mismatches; preview-only

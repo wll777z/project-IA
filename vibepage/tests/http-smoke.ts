@@ -1,4 +1,5 @@
 import sharp from "sharp";
+import jsQR from "jsqr";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import assert from "node:assert/strict";
@@ -260,6 +261,27 @@ try {
     dataExport.profile.gamerCards.length === 1,
     "exportação inclui cartões gamer",
   );
+  check(
+    (await request("/api/qr/http_player")).status === 200,
+    "QR está disponível para perfil publicado",
+  );
+  check(
+    (await request("/api/vibecard/http_player")).status === 200,
+    "Free gera VibeCard Minimal sem assinatura fictícia",
+  );
+  check(
+    (
+      await request("/api/appearances", "POST", {
+        action: "create",
+        name: "No Free",
+      })
+    ).status === 403,
+    "Free não cria coleções pela API",
+  );
+  check(
+    (await request("/api/stats/advanced")).status === 403,
+    "Free não consulta analytics avançado",
+  );
   const og = await request(
     "/http_player/opengraph-image",
     "GET",
@@ -338,6 +360,119 @@ try {
     detailed.pro && detailed.days.length === 30 && detailed.totalClicks === 1,
     "estatísticas Pro usam agregados reais",
   );
+  const studioProfile = (await (await request("/api/profile")).json()).profile;
+  const studioSaved = await request("/api/profile", "PUT", {
+    ...studioProfile,
+    studio: {
+      ...studioProfile.studio,
+      layout: "dashboard",
+      columns: 2,
+      width: "wide",
+    },
+    blocks: [
+      {
+        id: randomUUID(),
+        kind: "achievement",
+        title: "Conquista pessoal",
+        description: "Informada pelo usuário",
+        icon: "sparkles",
+        url: "",
+        imageKeys: [],
+        items: [],
+        game: "Minecraft",
+        date: "2026-10-27",
+        cardId: null,
+        hidden: false,
+        width: 2,
+      },
+    ],
+  });
+  check(
+    studioSaved.status === 200,
+    "Studio e conquista são persistidos pela API real",
+  );
+  const studioHTML = await (
+    await request("/http_player", "GET", undefined, "")
+  ).text();
+  check(
+    studioHTML.includes("studio-layout-dashboard") &&
+      studioHTML.includes("Conquista pessoal") &&
+      studioHTML.includes("sem verificação oficial"),
+    "composição pública exibe layout e conquista autodeclarada",
+  );
+  const collection = await request("/api/appearances", "POST", {
+    action: "create",
+    name: "HTTP collection",
+  });
+  check(collection.status === 200, "coleção salva personalização real");
+  const item = await collection.json();
+  const agenda = await request("/api/schedules", "POST", {
+    action: "create",
+    appearanceId: item.id,
+    startsAt: new Date(Date.now() + 60000).toISOString(),
+    endsAt: new Date(Date.now() + 3600000).toISOString(),
+    timeZone: "America/Sao_Paulo",
+  });
+  check(agenda.status === 200, "agenda sazonal grava instantes e fuso");
+  const state = await (await request("/api/appearances")).json();
+  const applied = await request("/api/appearances", "POST", {
+    action: "apply",
+    id: item.id,
+    profileRevision: state.profile.revision,
+  });
+  check(
+    applied.status === 200,
+    "coleção pode ser aplicada sem substituir conteúdo",
+  );
+  const qrResponse = await request("/api/qr/http_player");
+  const qrBytes = Buffer.from(await qrResponse.arrayBuffer());
+  const qrRaw = await sharp(qrBytes)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  check(
+    jsQR(new Uint8ClampedArray(qrRaw.data), qrRaw.info.width, qrRaw.info.height)
+      ?.data ===
+      origin + "/http_player",
+    "QR decodifica para URL canônica da instância real",
+  );
+  const cardResponse = await request("/api/vibecard/http_player?style=galaxy");
+  const cardBytes = Buffer.from(await cardResponse.arrayBuffer());
+  check(
+    cardResponse.status === 200 &&
+      (await sharp(cardBytes).metadata()).width === 1280,
+    "VibeCard Pro gera PNG na rota de produção",
+  );
+  check(
+    (
+      await request(
+        `/go/card/${profile.gamerCards[0].id}`,
+        "GET",
+        undefined,
+        "",
+      )
+    ).headers.get("location") === "https://www.roblox.com/",
+    "clique de cartão usa destino salvo e é rastreável",
+  );
+  const advanced = await (await request("/api/stats/advanced?period=7")).json();
+  check(
+    advanced.days.length === 90 && advanced.weekly.cardClicks === 1,
+    "analytics avançado registra somente cliques reais de cartões",
+  );
+  const csv = await request("/api/stats/export");
+  check(
+    csv.status === 200 && csv.headers.get("content-type")?.includes("text/csv"),
+    "CSV autenticado é exportado",
+  );
+  for (const path of [
+    "/dashboard/aparencias",
+    "/dashboard/compartilhar",
+    "/dashboard/analytics",
+  ])
+    check(
+      (await request(path)).status === 200,
+      `nova área autenticada renderiza ${path}`,
+    );
   await fixture.db.entitlement.update({
     where: { userId: user.id },
     data: { expiresAt: new Date(0) },
@@ -358,6 +493,19 @@ try {
     (await request(`/api/media/${backgroundKey}`, "GET", undefined, ""))
       .status === 404,
     "expiração bloqueia acesso anônimo à imagem de fundo",
+  );
+  check(
+    !expiredHTML.includes("Conquista pessoal") &&
+      expiredHTML.includes("studio-layout-classic"),
+    "expiração oculta blocos e aplica layout Free",
+  );
+  check(
+    (await request("/api/stats/export")).status === 403,
+    "expiração revoga CSV Pro no backend",
+  );
+  check(
+    (await (await request("/api/appearances")).json()).items.length === 1,
+    "downgrade preserva coleção privada",
   );
   check(
     (await request("/api/auth/sign-out", "POST", {})).status === 200,

@@ -1,4 +1,5 @@
 "use client";
+import { StudioEditor } from "@/components/studio-editor";
 import { loadDemo } from "@/lib/demo-state";
 import { clientId } from "@/lib/client-id";
 import { useEffect, useState } from "react";
@@ -50,6 +51,7 @@ export function ProfileEditor({
   demo?: boolean;
 }) {
   const router = useRouter();
+  const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [applyRecipe, setApplyRecipe] = useState(true);
   const [tab, setTab] = useState("identity");
   const [status, setStatus] = useState("");
@@ -117,6 +119,33 @@ export function ProfileEditor({
       document.removeEventListener("click", navigate, true);
     };
   }, [isDirty]);
+  async function uploadGallery(file: File, index: number) {
+    if (file.size > 4 * 1024 * 1024) {
+      setStatus("Use uma imagem de até 4 MB.");
+      return;
+    }
+    setUploading("gallery");
+    setStatus("");
+    try {
+      const response = await fetch("/api/uploads/gallery", {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+      setValue(
+        `blocks.${index}.imageKeys`,
+        [...form.getValues(`blocks.${index}.imageKeys`), result.key],
+        { shouldDirty: true },
+      );
+      setStatus("Imagem enviada. Salve o perfil para publicar.");
+    } catch (e) {
+      setStatus(e instanceof Error ? e.message : "Falha no upload.");
+    } finally {
+      setUploading("");
+    }
+  }
   async function uploadCard(file: File, index: number) {
     if (file.size > 4 * 1024 * 1024) {
       setStatus("Use uma imagem de até 4 MB.");
@@ -216,6 +245,7 @@ export function ProfileEditor({
             ["identity", UserRound, "Perfil"],
             ["links", Link2, "Links"],
             ["cards", Gamepad2, "Cartões"],
+            ["studio", Palette, "Studio 3.0"],
             ["themes", Palette, "Temas"],
             ["style", Palette, "Aparência"],
             ["effects", Sparkles, "Efeitos"],
@@ -237,6 +267,9 @@ export function ProfileEditor({
                   (errors.username || errors.displayName || errors.bio) && (
                     <span className="tab-error">!</span>
                   )}
+                {id === "studio" && (errors.blocks || errors.studio) && (
+                  <span className="tab-error">!</span>
+                )}
                 {id === "cards" && errors.gamerCards && (
                   <span className="tab-error">!</span>
                 )}
@@ -457,12 +490,22 @@ export function ProfileEditor({
               </button>
             </div>
           )}
+          {tab === "studio" && (
+            <StudioEditor
+              form={form}
+              profile={profile}
+              pro={pro}
+              demo={demo}
+              uploadGallery={uploadGallery}
+            />
+          )}
           {tab === "cards" && (
             <GamerCardEditor
               form={form}
               pro={pro}
               demo={demo}
               upload={uploadCard}
+              onSelect={setSelectedCard}
             />
           )}
           {tab === "effects" && (
@@ -833,6 +876,7 @@ export function ProfileEditor({
             }}
             preview
             pro={pro}
+            selectedCardId={selectedCard}
           />
         </div>
         <p>As alterações aparecem aqui antes de salvar.</p>

@@ -16,10 +16,12 @@ export function GamerCardEditor({
   pro,
   demo,
   upload,
+  onSelect,
 }: {
   form: UseFormReturn<ProfileInput>;
   pro: boolean;
   demo: boolean;
+  onSelect?: (id: string) => void;
   upload: (file: File, index: number) => Promise<void>;
 }) {
   const {
@@ -52,7 +54,11 @@ export function GamerCardEditor({
         </p>
       )}
       {fields.map((field, index) => (
-        <div className="link-edit-card gamer-edit-card" key={field.fieldKey}>
+        <div
+          className="link-edit-card gamer-edit-card"
+          onFocusCapture={() => onSelect?.(field.id)}
+          key={field.fieldKey}
+        >
           <div className="link-edit-heading">
             <span>CARTÃO {String(index + 1).padStart(2, "0")}</span>
             <div>

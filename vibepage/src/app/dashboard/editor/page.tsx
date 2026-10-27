@@ -26,6 +26,10 @@ export default async function Editor() {
           {isPro(entitlement) ? "PRO" : "FREE"}
         </span>
       </div>
+      <p className="analytics-note">
+        Este editor altera a aparência padrão. Uma temporada ativa pode mudar a
+        apresentação pública até o fim do agendamento.
+      </p>
       <ProfileEditor
         initial={editableAppearance(
           profile ?? emptyProfile(session.user.name),
