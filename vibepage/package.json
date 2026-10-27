@@ -20,7 +20,8 @@
     "test:http": "node --import tsx tests/http-smoke.ts",
     "setup": "node scripts/setup.mjs",
     "admin:bootstrap": "node --env-file-if-exists=.env.admin.local --import tsx scripts/bootstrap-admin.ts",
-    "staging:check": "node scripts/check-staging.mjs"
+    "staging:check": "node scripts/check-staging.mjs",
+    "test:origin": "node --import tsx tests/public-origin-http.ts"
   },
   "keywords": [],
   "author": "",
