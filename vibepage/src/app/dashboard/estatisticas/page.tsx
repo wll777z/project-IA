@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getStats } from "@/lib/analytics";
-import { StatsChart } from "@/components/stats-chart";
+import { StatsPeriod } from "@/components/stats-period";
 import { Eye, MousePointer2, Link2, LockKeyhole } from "lucide-react";
 export const metadata = { title: "Estatísticas" };
 export default async function Stats() {
@@ -38,7 +38,9 @@ export default async function Stats() {
           <span>CLIQUES TOTAIS</span>
           <strong>{"totalClicks" in stats ? stats.totalClicks : "Pro"}</strong>
           <small>
-            {stats.pro ? "Interações registradas" : "Disponível no plano Pro"}
+            {stats.pro
+              ? "Cliques nos links personalizados"
+              : "Disponível no plano Pro"}
           </small>
         </article>
       </div>
@@ -46,7 +48,7 @@ export default async function Stats() {
         <>
           <section className="workspace-card">
             <h2>O ritmo do seu universo</h2>
-            <StatsChart days={stats.days} />
+            <StatsPeriod days={stats.days} />
             <details className="stats-data">
               <summary>
                 Ver dados em tabela <span>+</span>
@@ -111,8 +113,9 @@ export default async function Stats() {
         </section>
       )}
       <p className="analytics-note">
-        Os números são aproximados. Bloqueadores, bots e limites contra abuso
-        podem afetar as contagens. Totais diários são armazenados sem IP,
+        Cartões gamer abrem links diretamente e não entram nas contagens de
+        cliques. Os números são aproximados. Bloqueadores, bots e limites contra
+        abuso podem afetar as contagens. Totais diários são armazenados sem IP,
         localização ou identificação dos visitantes.
       </p>
     </>

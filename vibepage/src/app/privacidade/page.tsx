@@ -15,8 +15,10 @@ export default function Privacy() {
       </p>
       <h2>Estatísticas e arquivos</h2>
       <p>
-        Perfis publicados tornam visíveis o nome público, username, bio, links e
-        imagens que você escolheu. Recebemos imagens PNG, JPEG ou WebP,
+        Perfis publicados tornam visíveis o nome público, username, bio, links,
+        cartões gamer e imagens que você escolheu. Os dados de jogos e
+        comunidades dos cartões são informados por você; não consultamos status
+        online ou contas externas. Recebemos imagens PNG, JPEG ou WebP,
         normalizamos para WebP e removemos metadados. Visitas e cliques são
         armazenados em totais diários, sem identificação individual, localização
         ou IP na base de estatísticas. Contadores não representam visitantes
@@ -32,17 +34,18 @@ export default function Privacy() {
       <p>
         Usamos cookies essenciais de sessão. Se houver envio de e-mail
         configurado, o serviço receberá seu endereço para entregar mensagens de
-        recuperação de senha. Não há envio de marketing nesta versão.
+        confirmação de conta e recuperação de senha. Não há envio de marketing
+        nesta versão.
       </p>
       <h2>Controle e exclusão</h2>
       <p>
         Você pode excluir permanentemente sua conta na área autenticada,
-        confirmando sua senha. A exclusão remove perfil, imagens, links,
-        estatísticas, credenciais, sessões e tokens associados no banco ativo.
-        Na área da conta você também pode exportar seus dados em JSON. Limites
-        de acesso guardam chaves temporárias que podem conter IP e endpoint
-        quando há proxy configurado e devem ser removidos regularmente pela
-        tarefa de manutenção. Eventuais backups exigirão uma política de
+        confirmando sua senha. A exclusão remove perfil, imagens, links, cartões
+        gamer, estatísticas, credenciais, sessões e tokens associados no banco
+        ativo. Na área da conta você também pode exportar seus dados em JSON.
+        Limites de acesso guardam chaves temporárias que podem conter IP e
+        endpoint quando há proxy configurado e devem ser removidos regularmente
+        pela tarefa de manutenção. Eventuais backups exigirão uma política de
         retenção antes do lançamento.
       </p>
       <h2>Antes do lançamento público</h2>

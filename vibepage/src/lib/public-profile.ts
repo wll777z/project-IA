@@ -1,6 +1,16 @@
+import { editableAppearance } from "@/lib/appearance";
+import {
+  gamerCardSchema,
+  gamerCardDTO,
+  type GamerCardInput,
+} from "@/lib/validation";
 import { cache } from "react";
 import { db } from "@/lib/db";
-import { usernameSchema, type ProfileInput } from "@/lib/validation";
+import {
+  usernameSchema,
+  safeLinkSchema,
+  type ProfileInput,
+} from "@/lib/validation";
 import { findTheme } from "@/lib/themes";
 import { isPro } from "@/lib/entitlements";
 export const getPublicProfile = cache(async (username: string) => {
@@ -9,6 +19,7 @@ export const getPublicProfile = cache(async (username: string) => {
   const profile = await db.profile.findUnique({
     where: { username: parsed.data },
     include: {
+      gamerCards: { orderBy: { position: "asc" } },
       links: { orderBy: { position: "asc" } },
       user: { select: { entitlement: true } },
     },
@@ -20,6 +31,18 @@ export const getPublicProfile = cache(async (username: string) => {
     theme.premium && !pro ? findTheme("midnight-purple") : theme;
   // Explicit public DTO: never send email, userId, billing or session data.
   const data: ProfileInput = {
+    backgroundEffect:
+      profile.backgroundEffect as ProfileInput["backgroundEffect"],
+    avatarEffect: profile.avatarEffect as ProfileInput["avatarEffect"],
+    buttonEffect: profile.buttonEffect as ProfileInput["buttonEffect"],
+    entranceEffect: profile.entranceEffect as ProfileInput["entranceEffect"],
+    fontFamily: profile.fontFamily as ProfileInput["fontFamily"],
+    gamerCards: profile.gamerCards.flatMap((card) => {
+      const parsed = gamerCardSchema.safeParse(
+        gamerCardDTO(card as GamerCardInput),
+      );
+      return parsed.success ? [parsed.data] : [];
+    }),
     username: profile.username,
     displayName: profile.displayName,
     bio: profile.bio,
@@ -35,9 +58,14 @@ export const getPublicProfile = cache(async (username: string) => {
     avatarKey: profile.avatarKey,
     backgroundKey: profile.backgroundKey,
     revision: profile.revision,
-    links: profile.links.map((l) => ({ id: l.id, title: l.title, url: l.url })),
+    links: profile.links.flatMap((l) => {
+      const parsed = safeLinkSchema.safeParse(l.url);
+      return parsed.success
+        ? [{ id: l.id, title: l.title, url: parsed.data }]
+        : [];
+    }),
   };
-  return { profile: data, pro };
+  return { profile: editableAppearance(data, pro), pro };
 });
 export function appOrigin() {
   return new URL(process.env.BETTER_AUTH_URL || "http://localhost:3000").origin;

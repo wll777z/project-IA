@@ -8,7 +8,7 @@ export function StatsChart({
     days
       .map(
         (d, i) =>
-          `${20 + (i / (days.length - 1)) * 660},${170 - (d[key] / max) * 145}`,
+          `${20 + (i / Math.max(1, days.length - 1)) * 660},${170 - (d[key] / max) * 145}`,
       )
       .join(" ");
   return (
@@ -16,12 +16,12 @@ export function StatsChart({
       <div className="chart-legend">
         <span>● Visualizações</span>
         <span>● Cliques</span>
-        <small>Últimos 30 dias · UTC</small>
+        <small>Últimos {days.length} dias · UTC</small>
       </div>
       <svg
         viewBox="0 0 700 210"
         role="img"
-        aria-label="Visualizações e cliques nos últimos 30 dias"
+        aria-label={`Visualizações e cliques nos últimos ${days.length} dias`}
       >
         <title>Visitas e cliques diários</title>
         {[25, 75, 125, 175].map((y) => (
@@ -39,12 +39,14 @@ export function StatsChart({
           stroke="#83dbd0"
           strokeWidth="2"
         />
-        {[0, 14, 29].map((i) => (
+        {[0, Math.floor((days.length - 1) / 2), days.length - 1].map((i) => (
           <text
             key={i}
-            x={20 + (i / 29) * 660}
+            x={20 + (i / Math.max(1, days.length - 1)) * 660}
             y="200"
-            textAnchor={i === 0 ? "start" : i === 29 ? "end" : "middle"}
+            textAnchor={
+              i === 0 ? "start" : i === days.length - 1 ? "end" : "middle"
+            }
             fontSize="10"
             fill="#8e7d9f"
           >

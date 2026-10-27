@@ -20,6 +20,11 @@ export async function requireUser(request: Request, mutation = false) {
   if (mutation) requireOrigin(request);
   const session = await auth.api.getSession({ headers: request.headers });
   if (!session) throw new HttpError(401, "Entre na sua conta para continuar.");
+  if (
+    process.env.REQUIRE_EMAIL_VERIFICATION === "true" &&
+    !session.user.emailVerified
+  )
+    throw new HttpError(403, "Confirme seu e-mail antes de continuar.");
   return session.user;
 }
 export async function readLimited(request: Request, limit: number) {
@@ -46,7 +51,10 @@ export async function readLimited(request: Request, limit: number) {
   return Buffer.concat(chunks);
 }
 export async function readJSON(request: Request) {
-  if (!request.headers.get("content-type")?.startsWith("application/json"))
+  if (
+    request.headers.get("content-type")?.split(";")[0].trim().toLowerCase() !==
+    "application/json"
+  )
     throw new HttpError(415, "Use JSON.");
   try {
     return JSON.parse((await readLimited(request, 64 * 1024)).toString("utf8"));
@@ -64,7 +72,7 @@ export function apiError(error: unknown) {
   if (error instanceof ZodError)
     return Response.json(
       { error: error.issues[0]?.message || "Confira os dados." },
-      { status: 400 },
+      { status: 400, headers: { "Cache-Control": "no-store" } },
     );
   if (
     error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -72,7 +80,7 @@ export function apiError(error: unknown) {
   )
     return Response.json(
       { error: "Esse username já está em uso. Escolha outro." },
-      { status: 409 },
+      { status: 409, headers: { "Cache-Control": "no-store" } },
     );
   console.error(
     "Falha interna na API",
@@ -80,6 +88,6 @@ export function apiError(error: unknown) {
   );
   return Response.json(
     { error: "Não foi possível concluir. Tente novamente." },
-    { status: 500 },
+    { status: 500, headers: { "Cache-Control": "no-store" } },
   );
 }

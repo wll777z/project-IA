@@ -20,6 +20,16 @@ export async function setupDB() {
   process.env.BETTER_AUTH_URL = "http://localhost:3000";
   process.env.BETTER_AUTH_SECRET =
     "integration-only-key-never-use-in-production-12345";
+  // Never inherit a real mail provider or public signup policy in isolated tests.
+  process.env.REQUIRE_EMAIL_VERIFICATION = "false";
+  for (const key of [
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_FROM",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+  ])
+    delete process.env[key];
   const { db } = await import("../src/lib/db");
   return {
     db,

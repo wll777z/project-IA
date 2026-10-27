@@ -11,16 +11,34 @@ export async function POST(
   try {
     const user = await requireUser(request, true);
     const { kind } = await params;
-    if (kind !== "avatar" && kind !== "background")
+    if (kind !== "avatar" && kind !== "background" && kind !== "gamer-avatar")
       throw new HttpError(400, "Tipo de imagem inválido.");
     await consumeLimit(user.id, "upload", 8);
     const image = await processImage(
       await readLimited(request, MAX_UPLOAD),
       request.headers.get("content-type") || "",
-      kind,
+      kind === "gamer-avatar" ? "avatar" : kind,
     );
     const upload = await db.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM "User" WHERE id=${user.id} FOR UPDATE`;
+      if (kind === "gamer-avatar") {
+        const used = await tx.upload.findMany({
+          where: { userId: user.id, kind },
+          select: { slot: true },
+        });
+        const slot = Array.from({ length: 20 }, (_, i) => i).find(
+          (i) => !used.some((u) => u.slot === i),
+        );
+        if (slot === undefined)
+          throw new HttpError(
+            413,
+            "Limite de imagens dos cartões. Salve o perfil para liberar as imagens sem uso.",
+          );
+        return tx.upload.create({
+          data: { id: randomUUID(), userId: user.id, kind, slot, ...image },
+          select: { id: true },
+        });
+      }
       const profile = await tx.profile.findUnique({
         where: { userId: user.id },
         select: { avatarKey: true, backgroundKey: true },

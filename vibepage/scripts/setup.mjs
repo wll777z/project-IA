@@ -1,5 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
-import { randomBytes } from "node:crypto";
+import { ensureLocalSecret } from "./local-env.mjs";
 import { spawn } from "node:child_process";
 let env;
 try {
@@ -7,11 +7,7 @@ try {
 } catch {
   env = await readFile(".env.example", "utf8");
 }
-if (!/^BETTER_AUTH_SECRET=["']?[^"'\r\n]{32,}/m.test(env))
-  env = env.replace(
-    /^BETTER_AUTH_SECRET=.*$/m,
-    `BETTER_AUTH_SECRET="${randomBytes(40).toString("base64url")}"`,
-  );
+env = ensureLocalSecret(env);
 await writeFile(".env", env, { mode: 0o600 });
 function run(command, args) {
   return new Promise((resolve, reject) => {

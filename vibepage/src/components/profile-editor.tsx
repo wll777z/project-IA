@@ -18,7 +18,22 @@ import {
   Palette,
   Link2,
   UserRound,
+  Gamepad2,
+  Sparkles,
+  Settings2,
+  ChartNoAxesCombined,
+  Monitor,
+  Smartphone,
 } from "lucide-react";
+import { GamerCardEditor } from "@/components/gamer-card-editor";
+import {
+  defaultEffects,
+  backgroundEffects,
+  avatarEffects,
+  buttonEffects,
+  entranceEffects,
+} from "@/lib/customization";
+import { ShareLink } from "@/components/share-link";
 import { profileSchema, type ProfileInput } from "@/lib/validation";
 import { themes } from "@/lib/themes";
 import { ProfileView } from "@/components/profile-view";
@@ -35,18 +50,19 @@ export function ProfileEditor({
   const [tab, setTab] = useState("identity");
   const [status, setStatus] = useState("");
   const [uploading, setUploading] = useState("");
+  const [viewport, setViewport] = useState("mobile");
+  const form = useForm<ProfileInput>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: initial,
+  });
   const {
     register,
     control,
     handleSubmit,
     setValue,
     reset,
-    getValues,
     formState: { errors, isSubmitting, isDirty },
-  } = useForm<ProfileInput>({
-    resolver: zodResolver(profileSchema),
-    defaultValues: initial,
-  });
+  } = form;
   const { fields, append, remove, move } = useFieldArray({
     control,
     name: "links",
@@ -57,21 +73,91 @@ export function ProfileEditor({
     if (!demo) return;
     try {
       const saved = localStorage.getItem("vibepage:demo");
+      let base = initial;
       if (saved) {
-        const parsed = profileSchema.safeParse(JSON.parse(saved));
-        if (parsed.success) reset(parsed.data);
+        const legacy: unknown = JSON.parse(saved);
+        const parsed = profileSchema.safeParse(
+          typeof legacy === "object" &&
+            legacy !== null &&
+            !Array.isArray(legacy)
+            ? { ...defaultEffects, gamerCards: [], ...legacy }
+            : legacy,
+        );
+        if (parsed.success) base = parsed.data;
       }
+      const requested = themes.find(
+        (theme) =>
+          theme.id === new URLSearchParams(window.location.search).get("theme"),
+      );
+      reset(
+        requested
+          ? {
+              ...base,
+              themeId: requested.id,
+              accentColor: requested.accent,
+              backgroundColor: requested.background,
+            }
+          : base,
+      );
     } catch {}
-  }, [demo, reset]);
+  }, [demo, reset, initial]);
   useEffect(() => {
     function warn(e: BeforeUnloadEvent) {
       if (isDirty) {
         e.preventDefault();
       }
     }
+    function navigate(event: MouseEvent) {
+      const anchor = (event.target as Element)?.closest?.(
+        "a[href]",
+      ) as HTMLAnchorElement | null;
+      if (
+        !isDirty ||
+        !anchor ||
+        anchor.target === "_blank" ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        anchor.getAttribute("href")?.startsWith("#")
+      )
+        return;
+      if (!window.confirm("Você tem alterações não salvas. Sair do editor?")) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    }
+    document.addEventListener("click", navigate, true);
     window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
+    return () => {
+      window.removeEventListener("beforeunload", warn);
+      document.removeEventListener("click", navigate, true);
+    };
   }, [isDirty]);
+  async function uploadCard(file: File, index: number) {
+    if (file.size > 4 * 1024 * 1024) {
+      setStatus("Use uma imagem de até 4 MB.");
+      return;
+    }
+    setUploading("gamer-avatar");
+    setStatus("");
+    try {
+      const response = await fetch("/api/uploads/gamer-avatar", {
+        method: "POST",
+        headers: { "Content-Type": file.type },
+        body: file,
+      });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error);
+      setValue(`gamerCards.${index}.avatarKey`, result.key, {
+        shouldDirty: true,
+      });
+      setStatus("Avatar enviado. Salve para aplicar ao cartão.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Falha no upload.");
+    } finally {
+      setUploading("");
+    }
+  }
   async function upload(kind: "avatar" | "background", file?: File) {
     if (!file || demo) return;
     if (file.size > 4 * 1024 * 1024) {
@@ -137,12 +223,19 @@ export function ProfileEditor({
         () => setStatus("Confira os campos destacados, incluindo os links."),
       )}
     >
-      <div className="editor-controls">
+      <fieldset
+        className="editor-controls"
+        disabled={isSubmitting || !!uploading}
+      >
         <div className="editor-tabs" role="group" aria-label="Seções do editor">
           {[
             ["identity", UserRound, "Perfil"],
             ["links", Link2, "Links"],
-            ["style", Palette, "Estilo"],
+            ["cards", Gamepad2, "Cartões"],
+            ["style", Palette, "Aparência"],
+            ["effects", Sparkles, "Efeitos"],
+            ["stats", ChartNoAxesCombined, "Estatísticas"],
+            ["settings", Settings2, "Configurações"],
           ].map(([id, Icon, label]) => {
             const I = Icon as typeof UserRound;
             return (
@@ -159,6 +252,9 @@ export function ProfileEditor({
                   (errors.username || errors.displayName || errors.bio) && (
                     <span className="tab-error">!</span>
                   )}
+                {id === "cards" && errors.gamerCards && (
+                  <span className="tab-error">!</span>
+                )}
                 {id === "links" && errors.links && (
                   <span className="tab-error">!</span>
                 )}
@@ -360,6 +456,178 @@ export function ProfileEditor({
               </button>
             </div>
           )}
+          {tab === "cards" && (
+            <GamerCardEditor
+              form={form}
+              pro={pro}
+              demo={demo}
+              upload={uploadCard}
+            />
+          )}
+          {tab === "effects" && (
+            <div className="editor-fields">
+              <div>
+                <p className="kicker">FAÇA SUA VIBE SE MOVER</p>
+                <h2>Efeitos com personalidade.</h2>
+                <p className="panel-description">
+                  Todos os efeitos respeitam movimento reduzido e podem ser
+                  pausados no perfil.
+                </p>
+              </div>
+              {!pro && (
+                <p>
+                  Fundos, avatares e botões animados exigem Pro. Fade e entrada
+                  estática são gratuitos.
+                </p>
+              )}
+              <label>
+                Fundo
+                <select {...register("backgroundEffect")} disabled={!pro}>
+                  {backgroundEffects.map((v, i) => (
+                    <option key={v} value={v}>
+                      {
+                        [
+                          "Desativado",
+                          "Partículas luminosas",
+                          "Estrelas",
+                          "Gradiente em movimento",
+                          "Aurora",
+                          "Chuva digital",
+                          "Nebulosa",
+                          "Ondas de luz",
+                          "Parallax suave",
+                        ][i]
+                      }
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Avatar
+                <select {...register("avatarEffect")} disabled={!pro}>
+                  {avatarEffects.map((v, i) => (
+                    <option key={v} value={v}>
+                      {
+                        [
+                          "Desativado",
+                          "Neon pulsante",
+                          "Halo",
+                          "Anel animado",
+                          "Holográfico",
+                          "Destaque no hover",
+                        ][i]
+                      }
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Botões
+                <select {...register("buttonEffect")} disabled={!pro}>
+                  {buttonEffects.map((v, i) => (
+                    <option key={v} value={v}>
+                      {
+                        [
+                          "Desativado",
+                          "Neon glow",
+                          "Hover magnético",
+                          "Gradiente animado",
+                          "Glass",
+                          "Brilho no hover",
+                          "Pressionar",
+                        ][i]
+                      }
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Entrada
+                <select {...register("entranceEffect")}>
+                  {entranceEffects.map((v, i) => (
+                    <option
+                      key={v}
+                      value={v}
+                      disabled={!pro && !["none", "fade"].includes(v)}
+                    >
+                      {
+                        [
+                          "Sem animação",
+                          "Fade in",
+                          "Slide up · Pro",
+                          "Zoom · Pro",
+                          "Sequência · Pro",
+                        ][i]
+                      }
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+          {tab === "stats" && (
+            <div className="editor-fields">
+              <h2>O alcance da sua vibe.</h2>
+              <p>
+                Visitas agregadas, sem rastrear visitantes. As estatísticas usam
+                a página salva.
+              </p>
+              {demo ? (
+                <p>A demonstração não gera métricas.</p>
+              ) : (
+                <Link
+                  className="button button-secondary"
+                  href="/dashboard/estatisticas"
+                >
+                  Abrir estatísticas reais
+                </Link>
+              )}
+            </div>
+          )}
+          {tab === "settings" && (
+            <div className="editor-fields">
+              <h2>Seu perfil, sob seu controle.</h2>
+              {!demo && initial.username && (
+                <ShareLink username={initial.username} />
+              )}
+              <p>
+                A publicação é aplicada ao salvar. Desmarque Perfil público
+                abaixo para retirar a página do ar.
+              </p>
+              <button
+                type="button"
+                className="button button-secondary"
+                onClick={() => {
+                  if (
+                    !window.confirm(
+                      "Redefinir cores, tema, fonte e efeitos? Links, cartões e identidade serão preservados.",
+                    )
+                  )
+                    return;
+                  for (const [key, value] of Object.entries({
+                    ...defaultEffects,
+                    themeId: "midnight-purple",
+                    accentColor: "#a78bfa",
+                    backgroundColor: "#100c1b",
+                    buttonStyle: "soft",
+                    animation: "none",
+                    hideBranding: false,
+                  }))
+                    setValue(key as keyof ProfileInput, value as never, {
+                      shouldDirty: true,
+                    });
+                  setStatus("Aparência redefinida. Salve para aplicar.");
+                }}
+              >
+                Redefinir aparência
+              </button>
+              {!demo && (
+                <Link className="text-button" href="/dashboard/conta">
+                  Privacidade, exportação e exclusão da conta →
+                </Link>
+              )}
+            </div>
+          )}
           {tab === "style" && (
             <div className="editor-fields">
               <div>
@@ -396,6 +664,17 @@ export function ProfileEditor({
                   </button>
                 ))}
               </div>
+              <label>
+                Tipografia
+                <select {...register("fontFamily")} disabled={!pro}>
+                  <option value="modern">Moderna · sistema</option>
+                  <option value="mono">Monoespaçada · Pro</option>
+                  <option value="rounded">Arredondada · Pro</option>
+                </select>
+                <small>
+                  Fontes locais do dispositivo. Sem downloads externos.
+                </small>
+              </label>
               <label className="color-control">
                 Cor de destaque
                 <input type="color" {...register("accentColor")} />
@@ -480,23 +759,49 @@ export function ProfileEditor({
             {isDirty ? "Há alterações não salvas" : "Tudo em dia"}
           </span>
         </div>
-      </div>
-      <aside className="editor-preview">
+      </fieldset>
+      <aside className={`editor-preview preview-${viewport}`}>
         <div className="preview-heading">
           <span>
             <Eye size={14} /> PRÉVIA AO VIVO
           </span>
           <span className="online" />
         </div>
+        <div
+          className="viewport-switch"
+          role="group"
+          aria-label="Tamanho da prévia"
+        >
+          <button
+            type="button"
+            aria-pressed={viewport === "mobile"}
+            onClick={() => setViewport("mobile")}
+          >
+            <Smartphone size={15} />
+            Mobile
+          </button>
+          <button
+            type="button"
+            aria-pressed={viewport === "desktop"}
+            onClick={() => setViewport("desktop")}
+          >
+            <Monitor size={15} />
+            Desktop
+          </button>
+        </div>
         <div className="preview-phone">
           <ProfileView
-            profile={{ ...profile, links: profile.links ?? [] }}
+            profile={{
+              ...profile,
+              links: profile.links ?? [],
+              gamerCards: profile.gamerCards ?? [],
+            }}
             preview
             pro={pro}
           />
         </div>
         <p>As alterações aparecem aqui antes de salvar.</p>
-        {!demo && getValues("published") && initial.username && (
+        {!demo && initial.published && initial.username && (
           <Link
             href={`/${initial.username}`}
             className="text-button"

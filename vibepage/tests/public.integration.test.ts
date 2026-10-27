@@ -98,6 +98,26 @@ it("redireciona somente para o destino salvo e retorna imagem normalizada", asyn
   expect(img.status).toBe(200);
   expect(img.headers.get("content-type")).toBe("image/webp");
 });
+it("não renderiza destinos legados inválidos em perfis públicos", async () => {
+  await fixture.db.profileLink.update({
+    where: { id: linkId },
+    data: { url: "https://legacy.local." },
+  });
+  expect(
+    (await publicService.getPublicProfile("the_player"))?.profile.links,
+  ).toHaveLength(0);
+  expect(
+    (
+      await go.GET(new Request("http://localhost/go"), {
+        params: Promise.resolve({ id: linkId }),
+      })
+    ).status,
+  ).toBe(404);
+  await fixture.db.profileLink.update({
+    where: { id: linkId },
+    data: { url: "https://example.com/channel" },
+  });
+});
 it("despublicação bloqueia links e imagens", async () => {
   await fixture.db.profile.update({
     where: { userId: "owner" },
