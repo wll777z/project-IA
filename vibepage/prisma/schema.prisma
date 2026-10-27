@@ -82,33 +82,33 @@ model RateLimit {
 }
 
 model Profile {
-  id              String        @id @default(cuid())
-  userId          String        @unique
-  user            User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  username        String        @unique @db.VarChar(24)
-  displayName     String        @db.VarChar(60)
-  bio             String        @default("") @db.VarChar(240)
-  avatarKey       String?
-  backgroundKey   String?
-  accentColor     String        @default("#a78bfa") @db.VarChar(7)
-  revision        Int           @default(0)
-  backgroundColor String        @default("#100c1b") @db.VarChar(7)
-  buttonStyle     String        @default("soft")
-  animation       String        @default("none")
-  hideBranding    Boolean       @default(false)
-  published       Boolean       @default(false)
-  themeId         String        @default("midnight-purple")
-  theme           Theme         @relation(fields: [themeId], references: [id], onDelete: Restrict)
-  backgroundEffect String @default("none")
-  avatarEffect String @default("none")
-  buttonEffect String @default("none")
-  entranceEffect String @default("fade")
-  fontFamily String @default("modern")
-  gamerCards GamerCard[]
-  links           ProfileLink[]
-  views           PageView[]
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
+  id               String        @id @default(cuid())
+  userId           String        @unique
+  user             User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username         String        @unique @db.VarChar(24)
+  displayName      String        @db.VarChar(60)
+  bio              String        @default("") @db.VarChar(240)
+  avatarKey        String?
+  backgroundKey    String?
+  accentColor      String        @default("#a78bfa") @db.VarChar(7)
+  revision         Int           @default(0)
+  backgroundColor  String        @default("#100c1b") @db.VarChar(7)
+  buttonStyle      String        @default("soft")
+  animation        String        @default("none")
+  hideBranding     Boolean       @default(false)
+  published        Boolean       @default(false)
+  themeId          String        @default("midnight-purple")
+  theme            Theme         @relation(fields: [themeId], references: [id], onDelete: Restrict)
+  backgroundEffect String        @default("none")
+  avatarEffect     String        @default("none")
+  buttonEffect     String        @default("none")
+  entranceEffect   String        @default("fade")
+  fontFamily       String        @default("modern")
+  gamerCards       GamerCard[]
+  links            ProfileLink[]
+  views            PageView[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
 }
 
 model ProfileLink {
@@ -179,23 +179,23 @@ model LinkClick {
 }
 
 model GamerCard {
-  id String @id
-  profileId String
-  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  game String
-  displayName String @db.VarChar(60)
-  handle String @default("") @db.VarChar(60)
-  detail String @default("") @db.VarChar(100)
-  edition String @default("")
-  url String @default("") @db.VarChar(2048)
-  avatarKey String?
-  color String @default("#a78bfa") @db.VarChar(7)
-  style String @default("minimal")
-  layout String @default("compact")
-  icon String @default("gamepad")
-  glow Boolean @default(false)
-  animated Boolean @default(false)
-  position Int
+  id          String  @id
+  profileId   String
+  profile     Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  game        String
+  displayName String  @db.VarChar(60)
+  handle      String  @default("") @db.VarChar(60)
+  detail      String  @default("") @db.VarChar(100)
+  edition     String  @default("")
+  url         String  @default("") @db.VarChar(2048)
+  avatarKey   String?
+  color       String  @default("#a78bfa") @db.VarChar(7)
+  style       String  @default("minimal")
+  layout      String  @default("compact")
+  icon        String  @default("gamepad")
+  glow        Boolean @default(false)
+  animated    Boolean @default(false)
+  position    Int
 
   @@unique([profileId, position])
 }
