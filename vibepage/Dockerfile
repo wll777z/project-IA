@@ -7,7 +7,8 @@ RUN npm ci
 FROM base AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN BETTER_AUTH_URL=http://localhost:3000 BETTER_AUTH_SECRET=build-only-placeholder-never-use-in-production-123456 npm run build
+ARG BETTER_AUTH_URL=http://localhost:3000
+RUN BETTER_AUTH_URL="$BETTER_AUTH_URL" BETTER_AUTH_SECRET=build-only-placeholder-never-use-in-production-123456 npm run build
 FROM base AS runner
 ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0

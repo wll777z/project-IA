@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { Brand } from "@/components/brand";
-export const metadata = { title: "Recursos Free e Pro" };
+export const metadata = {
+  robots: { index: false, follow: false },
+  title: "Recursos Free e Pro",
+};
 export default function Page() {
   return (
     <main id="main" className="legal-page pro-features">

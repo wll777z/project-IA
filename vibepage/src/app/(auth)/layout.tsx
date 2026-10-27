@@ -1,3 +1,4 @@
+export const metadata = { robots: { index: false, follow: false } };
 import { Brand } from "@/components/brand";
 import { ProfileDemo } from "@/components/profile-demo";
 export default function AuthLayout({

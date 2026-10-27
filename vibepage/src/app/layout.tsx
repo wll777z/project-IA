@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import { appOrigin } from "@/lib/site-origin";
 import "./globals.css";
 export const metadata: Metadata = {
+  metadataBase: new URL(appOrigin()),
   title: {
     default: "VibePage — Seu universo, em um link.",
     template: "%s · VibePage",
