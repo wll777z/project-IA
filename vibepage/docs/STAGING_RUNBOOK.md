@@ -6,7 +6,7 @@ Este documento prepara a operação; não comprova host, TLS, PostgreSQL ou SMTP
 
 ## 1. Preparação privada
 
-Usar a candidata `release/vibepage-3.0-rc1`, Node LTS 24 e PostgreSQL 17. Em host autorizado, dentro de `vibepage/`:
+Usar a candidata revisada `release/vibepage-3.0-production-ready`, a partir do freeze `3e166f2`, Node LTS 24 e PostgreSQL 17. Em host autorizado, dentro de `vibepage/`:
 
 ```bash
 cp .env.staging.example .env.staging
@@ -26,9 +26,9 @@ docker compose --env-file .env.staging -f compose.staging.yaml config --quiet
 docker compose --env-file .env.staging -f compose.staging.yaml up --build -d
 ```
 
-O build recebe a origem pública `BETTER_AUTH_URL` via build arg para canonical, robots e sitemap; runtime deve usar a mesma origem. Mudar domínio exige rebuild; o launcher verifica o manifesto gerado contra a origem runtime e recusa divergências públicas. Não editar o manifesto nem iniciar server.js diretamente. O preflight deve concluir antes do banco; migrations/seed antes de web. Caddy termina HTTPS e exige acesso privado; SMTP é saída de rede, não servidor falso. Somente proxy publica portas 80/443. Não abrir porta 3000/5432 externamente. O IP confiável é sobrescrito pelo proxy; validar que cabeçalho enviado pelo cliente não modifica limite. Volumes preservam banco/certificados. Não executar `down -v`.
+O build recebe a origem pública `BETTER_AUTH_URL` via build arg para canonical, robots e sitemap; runtime deve usar a mesma origem. Mudar domínio exige rebuild; o launcher verifica o manifesto gerado contra a origem runtime e recusa divergências públicas. Não editar o manifesto nem iniciar server.js diretamente. O preflight deve concluir antes do banco; migrations/seed antes de web. Caddy termina HTTPS e exige acesso privado; SMTP é saída de rede, não servidor falso. Somente proxy publica portas 80/443. Ele aguarda o healthcheck do serviço web e bloqueia `/api/health` externamente; o probe interno executa SELECT 1. Estado unhealthy precisa de alerta/recuperação do operador, não implica reinício automático. Não abrir porta 3000/5432 externamente. O IP confiável é sobrescrito pelo proxy; validar que cabeçalho enviado pelo cliente não modifica limite. Volumes preservam banco/certificados. Não executar `down -v`.
 
-O template não agenda backups, cleanup ou alertas. Antes de usuários reais: configurar rotina diária de cleanup, backup criptografado fora do host, monitoramento, operador responsável, RPO/RTO e rollback. Não imprimir configuração completa ou logs com senhas, tokens, cookies ou URLs de confirmação. A falta de logs de acesso no Caddy evita registrar tokens; estabelecer política de logs sanitizados para incidentes.
+O template inclui healthcheck interno e modelo systemd de cleanup, mas não instala timers, agenda backups ou configura alertas. Antes de usuários reais: configurar rotina diária de cleanup, backup criptografado fora do host, monitoramento, operador responsável, RPO/RTO e rollback. Não imprimir configuração completa ou logs com senhas, tokens, cookies ou URLs de confirmação. A falta de logs de acesso no Caddy evita registrar tokens; estabelecer política de logs sanitizados para incidentes.
 
 ## 3. Administrador
 
@@ -57,7 +57,7 @@ Registrar data, versão, host, responsável e evidências sanitizadas para cada 
 5. Free salva links/cartões permitidos; Pro autorizado personaliza/salva/compartilha; expirar Pro preserva privados e remove recursos exclusivos públicos; exclusão torna perfil/mídia indisponíveis e remove papel/contacto. Os testes locais não aprovam estas jornadas no domínio real.
 6. Denúncia real sintética → recibo → fila privada → revisão/suspensão → perfil/mídia/QR/VibeCard indisponíveis → restauração. Rejeitar sessão não administrativa/CSRF/revisão antiga. Designar responsável, periodicidade de revisão, resposta humana e escalonamento; nenhuma mensagem é enviada automaticamente pela fila.
 7. Executar cleanup e confirmar remoção de casos expirados/eventos, com alerta para falha. `docker compose --env-file .env.staging -f compose.staging.yaml run --rm cleanup` deve ser agendado pelo operador.
-8. Celulares físicos iOS/Safari e Android/Chrome, 360/390/768/1440, teclado/leitor de tela/movimento reduzido: formulários, editor, salvar, upload, menu, fila, QR, download e compartilhamento. Guardar capturas e limitações.
+8. Celulares físicos iOS/Safari e Android/Chrome, 360/390/768/1024/1440, teclado/leitor de tela/movimento reduzido: formulários, editor, salvar, upload, menu, fila, QR, download e compartilhamento. Guardar capturas e limitações.
 9. Aprovar responsável/contato/idade/retenção/termos/privacidade e atendimento. Definir participantes do beta e acesso individual/rotação; Basic Auth de homologação não é um sistema final de convites.
 
 Somente com evidências aceitas e autorização expressa abrir beta fechado. Público e venda Pro têm decisões separadas; pagamento não existe nesta versão.

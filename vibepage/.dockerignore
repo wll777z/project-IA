@@ -7,3 +7,9 @@ node_modules
 *.zip
 *.bundle
 coverage
+
+backups
+*.backup
+*.dump
+*.age
+*.dump.gpg

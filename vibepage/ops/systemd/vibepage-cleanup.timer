@@ -1,0 +1,12 @@
+# Template only; not installed or enabled by this project.
+[Unit]
+Description=VibePage daily cleanup schedule
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=300
+Unit=vibepage-cleanup.service
+
+[Install]
+WantedBy=timers.target
