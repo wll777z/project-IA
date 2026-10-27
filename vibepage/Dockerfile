@@ -17,4 +17,5 @@ COPY --from=builder --chown=app:app /app/.next/standalone ./
 COPY --from=builder --chown=app:app /app/.next/static ./.next/static
 USER app
 EXPOSE 3000
+HEALTHCHECK --interval=30s --timeout=20s --start-period=30s --retries=3 CMD ["node", "healthcheck.mjs"]
 CMD ["node", "launch.mjs"]

@@ -1,5 +1,7 @@
 {$VIBEPAGE_DOMAIN} {
  tls {$TLS_EMAIL}
+ @internalReadiness path /api/health /api/health/*
+ respond @internalReadiness 404
  basic_auth {
   {$STAGING_BASIC_USER} {$STAGING_BASIC_PASSWORD_HASH}
  }
