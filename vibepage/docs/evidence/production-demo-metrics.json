@@ -1,0 +1,10 @@
+{
+  "environment": "Hydrated local demo, Chrome desktop; isolated QA; not production Web Vitals or mobile network",
+  "actions": "Changed public name, observed live preview, restored original name and saved demonstration locally; no real account or publication",
+  "metrics": {
+    "lcpMs": 116,
+    "cls": 0.00021128139745215323,
+    "observedInteractionMaxMs": null,
+    "interactionEntries": 0
+  }
+}

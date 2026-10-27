@@ -33,7 +33,7 @@ for (const [route, source] of [
   );
 }
 const pages = ["demo", "audit_perf", "landing", "login-real"],
-  widths = [360, 390, 768, 1440];
+  widths = [360, 390, 768, 1024, 1440];
 const links = [];
 for (const width of widths)
   for (const page of pages) {

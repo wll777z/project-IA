@@ -1,0 +1,485 @@
+{
+  "environment": "Chrome desktop, synthetic SSR snapshots, no app hydration or authenticated browser actions",
+  "results": [
+    {
+      "width": 360,
+      "page": "landing",
+      "clientWidth": 345,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "login",
+      "clientWidth": 360,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 360
+    },
+    {
+      "width": 360,
+      "page": "signup",
+      "clientWidth": 360,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 360
+    },
+    {
+      "width": 360,
+      "page": "demo",
+      "clientWidth": 345,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "dashboard",
+      "clientWidth": 345,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "editor",
+      "clientWidth": 345,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "collections",
+      "clientWidth": 345,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "sharing",
+      "clientWidth": 345,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "analytics",
+      "clientWidth": 345,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "public-profile",
+      "clientWidth": 345,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "support",
+      "clientWidth": 345,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 345
+    },
+    {
+      "width": 360,
+      "page": "moderation",
+      "clientWidth": 360,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 360
+    },
+    {
+      "width": 390,
+      "page": "landing",
+      "clientWidth": 375,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "login",
+      "clientWidth": 390,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 390
+    },
+    {
+      "width": 390,
+      "page": "signup",
+      "clientWidth": 390,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 390
+    },
+    {
+      "width": 390,
+      "page": "demo",
+      "clientWidth": 375,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "dashboard",
+      "clientWidth": 375,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "editor",
+      "clientWidth": 375,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "collections",
+      "clientWidth": 375,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "sharing",
+      "clientWidth": 375,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "analytics",
+      "clientWidth": 375,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "public-profile",
+      "clientWidth": 375,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "support",
+      "clientWidth": 375,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 375
+    },
+    {
+      "width": 390,
+      "page": "moderation",
+      "clientWidth": 390,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 390
+    },
+    {
+      "width": 768,
+      "page": "landing",
+      "clientWidth": 753,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "login",
+      "clientWidth": 768,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 768
+    },
+    {
+      "width": 768,
+      "page": "signup",
+      "clientWidth": 768,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 768
+    },
+    {
+      "width": 768,
+      "page": "demo",
+      "clientWidth": 753,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "dashboard",
+      "clientWidth": 753,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "editor",
+      "clientWidth": 753,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "collections",
+      "clientWidth": 753,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "sharing",
+      "clientWidth": 768,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 768
+    },
+    {
+      "width": 768,
+      "page": "analytics",
+      "clientWidth": 753,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "public-profile",
+      "clientWidth": 753,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "support",
+      "clientWidth": 753,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 753
+    },
+    {
+      "width": 768,
+      "page": "moderation",
+      "clientWidth": 768,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 768
+    },
+    {
+      "width": 1024,
+      "page": "landing",
+      "clientWidth": 1009,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "login",
+      "clientWidth": 1024,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1024
+    },
+    {
+      "width": 1024,
+      "page": "signup",
+      "clientWidth": 1024,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1024
+    },
+    {
+      "width": 1024,
+      "page": "demo",
+      "clientWidth": 1009,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "dashboard",
+      "clientWidth": 1009,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "editor",
+      "clientWidth": 1009,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "collections",
+      "clientWidth": 1009,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "sharing",
+      "clientWidth": 1024,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1024
+    },
+    {
+      "width": 1024,
+      "page": "analytics",
+      "clientWidth": 1009,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "public-profile",
+      "clientWidth": 1009,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "support",
+      "clientWidth": 1009,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1009
+    },
+    {
+      "width": 1024,
+      "page": "moderation",
+      "clientWidth": 1024,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1024
+    },
+    {
+      "width": 1440,
+      "page": "landing",
+      "clientWidth": 1425,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "login",
+      "clientWidth": 1440,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1440,
+      "page": "signup",
+      "clientWidth": 1440,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1440,
+      "page": "demo",
+      "clientWidth": 1425,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "dashboard",
+      "clientWidth": 1425,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "editor",
+      "clientWidth": 1425,
+      "h1Count": 2,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "collections",
+      "clientWidth": 1425,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "sharing",
+      "clientWidth": 1440,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1440,
+      "page": "analytics",
+      "clientWidth": 1425,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "public-profile",
+      "clientWidth": 1425,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "support",
+      "clientWidth": 1425,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1425
+    },
+    {
+      "width": 1440,
+      "page": "moderation",
+      "clientWidth": 1440,
+      "h1Count": 1,
+      "inputsWithoutLabel": [],
+      "scrollWidth": 1440
+    }
+  ]
+}

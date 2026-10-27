@@ -1,3 +1,30 @@
+# Candidata de produção — 27/10/2026
+
+Base freeze `3e166f2`, branch `release/vibepage-3.0-production-ready`; Node 24/Next standalone e Prisma/PGlite isolado.
+
+| Verificação                                   | Resultado real                                            |
+| --------------------------------------------- | --------------------------------------------------------- |
+| `npm run lint`                                | Aprovado                                                  |
+| `npm run typecheck`                           | Aprovado, Prisma gerado                                   |
+| `npm test`                                    | 214 testes, 30 arquivos aprovados                         |
+| `npm run build`                               | Aprovado com healthcheck empacotado e manifesto de origem |
+| `npm run test:http`                           | 111 verificações aprovadas                                |
+| Build HTTPS sintético + `npm run test:origin` | 9 verificações locais aprovadas                           |
+| Novo build explícito localhost + smoke        | 111 verificações aprovadas novamente                      |
+| `npm audit`                                   | 0 vulnerabilidades reportadas                             |
+
+`npm run format:check` aprovado após formatar o JSON das medições. Resumo e hashes de preservação em [production-results.json](docs/evidence/production-results.json).
+
+Seis testes novos: conexão pg sem handshake recusada por timeout; readiness 200 e 503 sem dados privados; SMTP STARTTLS/465 e falha sanitizada. Os testes SMTP mockam o provedor; não houve envio externo. O probe real empacotado foi executado por HTTP e retornou sucesso. Docker/Caddy, PostgreSQL nativo, SQL de aceite/restore, backups e timers não foram executados. YAML foi inspecionado estruturalmente, não como container em operação.
+
+QA Chrome local: 60 snapshots em 360/390/768/1024/1440, sem overflow/labels ausentes na triagem. Demo hidratada: prévia e save local conferidos; nenhuma página publicada. Métricas de demo, latência/JS/PNGs, CPU/RSS do probe e limites em `docs/evidence/production-*`. LCP/CLS observados localmente não são Web Vitals de campo; INP não foi mensurado (sem eventos qualificáveis), não é zero. Não foram testados Safari/iOS, Android físicos, leitor de tela, rede lenta ou CPU móvel.
+
+Os oito arquivos de migration permanecem iguais ao freeze (`production-migrations.sha256`). CI do freeze consultada e aprovada nos runs 40599503448/40599423775; isso não equivale ao CI do novo head. Sem merge/deploy, credenciais/dados reais ou pagamentos alterados.
+
+[Relatório](docs/PRODUCTION_RELEASE_REVIEW.md) · [Checklist objetivo](docs/PRODUCTION_GO_LIVE.md). **NO-GO beta real, público e comercialização Pro.** Resultados abaixo são históricos das respectivas branches.
+
+---
+
 # Release freeze — 27/10/2026
 
 Base GitHub `fix/vibepage-final-polish` em `22ab34d`; branch `release/vibepage-3.0-freeze`. Apenas mudanças necessárias à origem pública, compartilhamento e evidências. Sem merge/deploy.

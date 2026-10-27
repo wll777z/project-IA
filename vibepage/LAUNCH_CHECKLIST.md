@@ -1,3 +1,21 @@
+# Homologação da candidata de produção
+
+Checklist atual e assinaturas pendentes: [docs/PRODUCTION_GO_LIVE.md](docs/PRODUCTION_GO_LIVE.md).
+
+- [x] Partir do freeze `3e166f2`, preservar histórico, schema e oito migrations.
+- [x] Limites de banco/SMTP, falhas sanitizadas e readiness testados localmente.
+- [x] 214 testes, 111 HTTP, build, typecheck, lint e audit (0 achados) executados.
+- [x] 60 snapshots em cinco larguras, demo hidratada e probe de desempenho local registrados.
+- [x] Preparar SQL somente leitura, guard de restore vazio, backup criptografado e modelos systemd sem executá-los.
+- [ ] Homologar PostgreSQL nativo, Docker/HTTPS/SMTP, persistência, proxy, backup/restauração e alertas.
+- [ ] Definir administrador/operador, políticas, contatos públicos autorizados, suporte e manutenção reais.
+- [ ] Aceitar dispositivos físicos, acessibilidade e jornada com entrega externa de e-mail.
+- [ ] Aprovar separadamente demo pública, beta, público e futuro Pro comercial; sem merge/deploy automáticos.
+
+Nome da branch não é aprovação de produção. **GO demo local; demonstração pública condicionada; NO-GO beta/público/Pro comercial.** Histórico abaixo preservado.
+
+---
+
 # Release freeze — gates atuais
 
 - [x] Conferir GitHub e preservar referência `22ab34d`; cadeia histórica comprovada.

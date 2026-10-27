@@ -105,7 +105,29 @@ try {
       throw new Error("Standalone failed: " + serverOutput.slice(-1000));
     await new Promise((r) => setTimeout(r, 100));
   }
+  const pages = [];
+  await mkdir(".next/production-snapshots", { recursive: true });
+  for (const [name, path, authenticated] of [
+    ["landing", "/", false],
+    ["login", "/login", false],
+    ["signup", "/cadastro", false],
+    ["demo", "/demo", false],
+    ["dashboard", "/dashboard", true],
+    ["editor", "/dashboard/editor", true],
+    ["collections", "/dashboard/aparencias", true],
+    ["sharing", "/dashboard/compartilhar", true],
+    ["analytics", "/dashboard/analytics", true],
+  ] as const) {
+    const { html, ...metrics } = await sample(
+      path,
+      5,
+      authenticated ? cookie : "",
+    );
+    await writeFile(`.next/production-snapshots/${name}.html`, html);
+    pages.push({ name, path, ...metrics });
+  }
   const page = await sample("/audit_perf", 10);
+  await writeFile(".next/production-snapshots/public-profile.html", page.html);
   assert(
     page.html.includes("Audit Link 99") && page.html.includes("Audit Card 11"),
   );
@@ -134,6 +156,12 @@ try {
       gzipEstimateBytes: gzipSync(bytes).length,
     });
   }
+  const qrResponse = await fetch(origin + "/api/qr/audit_perf");
+  assert.equal(qrResponse.status, 200);
+  await writeFile(
+    ".next/production-snapshots/qr.png",
+    Buffer.from(await qrResponse.arrayBuffer()),
+  );
   const png = [];
   const { vibeCardPNG } = await import("../src/lib/sharing");
   for (const style of [
@@ -148,6 +176,10 @@ try {
     const t = performance.now();
     const response = await vibeCardPNG(profile, style);
     const bytes = await response.arrayBuffer();
+    await writeFile(
+      `.next/production-snapshots/vibecard-${style}.png`,
+      Buffer.from(bytes),
+    );
     const cost = process.cpuUsage(cpu);
     png.push({
       style,
@@ -179,6 +211,7 @@ try {
     environment:
       "Node standalone loopback + isolated PGlite; not production PostgreSQL or mobile network",
     profile: { cards: 12, links: 100 },
+    pages,
     publicProfileHTTP: pageMetrics,
     authenticatedProfileAPI: profileAPI,
     authenticatedStatsAPI: statsAPI,
@@ -198,7 +231,7 @@ try {
   await writeFile(".next/release-profile.html", page.html);
   await mkdir("docs/evidence", { recursive: true });
   await writeFile(
-    "docs/evidence/release-performance.json",
+    process.argv[2] || "docs/evidence/production-performance.json",
     JSON.stringify(evidence, null, 2) + "\n",
   );
   console.log(JSON.stringify(evidence, null, 2));
