@@ -20,6 +20,13 @@ export default function Terms() {
         outras pessoas. Proteja sua senha e forneça apenas informações que você
         tem direito de utilizar.
       </p>
+      <h2>Identidades de jogos e comunidades</h2>
+      <p>
+        Cartões são autodeclarados. Não representam verificação, vínculo oficial
+        com jogos ou plataformas, status online ou estatísticas de jogo. Use
+        imagens e informações que você tem direito de publicar e evite dados
+        privados de outras pessoas.
+      </p>
       <h2>Planos</h2>
       <p>
         Não existe cobrança nesta etapa. R$ 9,90/mês é uma sugestão inicial para
