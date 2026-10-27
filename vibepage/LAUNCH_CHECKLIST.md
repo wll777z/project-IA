@@ -1,6 +1,19 @@
-# Checklist de lançamento — VibePage Ultimate Release
+# Checklist de lançamento — VibePage 3.0 Next Level
 
 Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lançamento público** nem afirma que a infraestrutura já existe. Sem merge, deploy, contratação ou cobrança.
+
+## Novidades Next Level
+
+- [x] Comparar branches e partir da Ultimate Release, mantendo 13 temas/cartões/efeitos.
+- [x] Studio, blocos, modelos, coleções, agenda, VibeCard/QR e analytics com regras no servidor.
+- [x] Preservar Studio/blocos/galeria/coleções privados no downgrade; impedir aplicação premium pública.
+- [x] Testar QR por decodificação independente, PNGs, autorização, revisão, agregação e migration aditiva.
+- [x] Incluir novos dados na exportação/exclusão; atualizar a explicação de privacidade.
+- [ ] Ensaiar migration `202610270003_next_level` no PostgreSQL nativo de homologação com backup/restauração.
+- [ ] Validar agenda na origem real (fuso IANA, UTC, limites, cancelamento e início/fim), QR canônico e PNGs em dispositivos alvo.
+- [ ] Validar Web Share, clipboard e downloads no Safari/iOS e Chrome/Android. Há fallback por download/cópia; APIs dependem do navegador.
+- [ ] Medir CPU/memória da geração PNG, limites compartilhados, galeria e tempo de renderização com o volume máximo permitido.
+- [ ] Revisar DST/horários ambíguos com o operador; a UI mostra UTC para conferência antes de salvar.
 
 ## Código e dados
 
@@ -26,7 +39,7 @@ Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lan�
 ## Antes de aplicar em um banco de produção
 
 1. Usar PostgreSQL nativo compatível e um ambiente de homologação independente. Criar uma cópia de segurança, testar restauração em outro banco e confirmar que o operador consegue recuperar o serviço.
-2. Instalar com `npm ci`, gerar o client (`npm run db:generate`), executar `npm run db:migrate` e `npm run db:seed`. A quinta migration adiciona `GamerCard`, campos de aparência e slots de avatares; a sexta registra Aurora Blue; não remove perfis ou links.
+2. Instalar com `npm ci`, gerar o client (`npm run db:generate`), executar `npm run db:migrate` e `npm run db:seed`. A quinta migration adiciona `GamerCard`, campos de aparência e slots de avatares; a sexta registra Aurora Blue; a sétima adiciona Studio/blocos/coleções/agenda/contagens de cartões e slots de galeria, sem apagar perfis ou links.
 3. Testar cadastro, confirmação, login, recuperação, upload, edição, publicação, expiração Pro, exportação e exclusão em homologação com PostgreSQL nativo.
 4. Testar concorrência entre processos, carga e os limites compartilhados de autenticação. PGlite não substitui essa validação.
 5. Em rollback do aplicativo, conservar as novas tabelas/colunas. Não apagar dados nem executar migrations destrutivas para voltar ao código anterior.
@@ -57,3 +70,7 @@ Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lan�
 ## Teste de aceitação após provisionamento
 
 Criar uma conta nova, confirmar e-mail, publicar com 3 cartões e links, verificar de sessão anônima, despublicar e confirmar 404 e privacidade dos avatares. Conceder Pro pelo script administrativo, salvar 12 cartões e efeitos, expirar a permissão e confirmar o fallback. Restaurar o acesso apenas se autorizado, exportar os dados, excluir a conta e verificar cascatas. Fazer o mesmo em mobile. Registrar evidências sem expor credenciais.
+
+## Aceitação adicional 3.0 após provisionamento
+
+Publicar quatro layouts, testar seções/colunas e reordenação por teclado, criar conquista autodeclarada e galeria, verificar mídia oculta anonimamente. Salvar duas coleções, aplicar/desfazer com o editor aberto em outra aba e confirmar conflito de revisão. Agendar intervalo curto em fuso explícito e verificar transição sem aba aberta. Expirar Pro: confirmar fallback, CSV negado e dados privados preservados; cancelar agenda ainda como Free. Gerar cinco VibeCards e decodificar os QRs no domínio final. Conferir cliques de cartões somente no redirect público, comparação e CSV sem fórmulas executáveis. Exportar/excluir a conta e verificar cascatas. Esta aceitação em infraestrutura real ainda não foi executada.
