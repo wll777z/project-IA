@@ -56,7 +56,7 @@ export const getPublicProfile = cache(async (username: string) => {
     hideBranding: pro && profile.hideBranding,
     published: true,
     avatarKey: profile.avatarKey,
-    backgroundKey: profile.backgroundKey,
+    backgroundKey: pro ? profile.backgroundKey : null,
     revision: profile.revision,
     links: profile.links.flatMap((l) => {
       const parsed = safeLinkSchema.safeParse(l.url);

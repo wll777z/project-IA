@@ -84,7 +84,7 @@ export function ProfileView({
       >
         {paused ? "Ativar efeitos" : "Pausar efeitos"}
       </button>
-      {profile.backgroundKey && (
+      {pro && profile.backgroundKey && (
         <img
           className="public-background"
           src={`/api/media/${profile.backgroundKey}`}

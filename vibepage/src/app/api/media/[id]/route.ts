@@ -31,7 +31,6 @@ export async function GET(
   const isPublic =
     published &&
     (published.avatarKey === id ||
-      published.backgroundKey === id ||
       isPro(published.user.entitlement) ||
       published.gamerCards.some((c) => c.position < FREE_CARD_LIMIT));
   if (!isPublic) {

@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { isPro } from "@/lib/entitlements";
 import { db } from "@/lib/db";
 import { requireUser, readLimited, apiError, HttpError } from "@/lib/http";
 import { consumeLimit } from "@/lib/limits";
@@ -14,6 +15,11 @@ export async function POST(
     if (kind !== "avatar" && kind !== "background" && kind !== "gamer-avatar")
       throw new HttpError(400, "Tipo de imagem inválido.");
     await consumeLimit(user.id, "upload", 8);
+    if (
+      kind === "background" &&
+      !isPro(await db.entitlement.findUnique({ where: { userId: user.id } }))
+    )
+      throw new HttpError(403, "Imagem de fundo precisa do plano Pro.");
     const image = await processImage(
       await readLimited(request, MAX_UPLOAD),
       request.headers.get("content-type") || "",
@@ -21,6 +27,12 @@ export async function POST(
     );
     const upload = await db.$transaction(async (tx) => {
       await tx.$queryRaw`SELECT id FROM "User" WHERE id=${user.id} FOR UPDATE`;
+      // Recheck after acquiring the same owner lock used by profile saves.
+      if (
+        kind === "background" &&
+        !isPro(await tx.entitlement.findUnique({ where: { userId: user.id } }))
+      )
+        throw new HttpError(403, "Imagem de fundo precisa do plano Pro.");
       if (kind === "gamer-avatar") {
         const used = await tx.upload.findMany({
           where: { userId: user.id, kind },

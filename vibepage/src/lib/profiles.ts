@@ -81,6 +81,7 @@ export async function saveProfile(userId: string, body: unknown) {
       if (
         !pro &&
         (theme.premium ||
+          data.backgroundKey !== null ||
           data.gamerCards.length > FREE_CARD_LIMIT ||
           data.gamerCards.some(
             (c) =>

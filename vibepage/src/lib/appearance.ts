@@ -24,6 +24,7 @@ export function editableAppearance(
       })),
     themeId: allowed.id,
     backgroundColor: allowed.background,
+    backgroundKey: null,
     buttonStyle: "soft",
     animation: "none",
     hideBranding: false,
