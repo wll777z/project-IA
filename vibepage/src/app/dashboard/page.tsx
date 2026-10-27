@@ -1,3 +1,4 @@
+import { canonicalProfileURL } from "@/lib/sharing";
 import { getOwnedAvailability } from "@/lib/profile-availability";
 import {
   availabilityLabels,
@@ -113,7 +114,10 @@ export default async function Dashboard() {
                   : "Salve seu rascunho no editor. A página só fica visível após marcar Perfil público e salvar."}
             </p>
             {profile && availability === "published" ? (
-              <ShareLink username={profile.username} />
+              <ShareLink
+                username={profile.username}
+                url={canonicalProfileURL(profile.username)}
+              />
             ) : (
               <Link
                 className="button button-secondary"

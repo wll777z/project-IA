@@ -1,3 +1,4 @@
+import { canonicalProfileURL } from "@/lib/sharing";
 import { getOwnedAvailability } from "@/lib/profile-availability";
 import { UnavailableProfile } from "@/components/profile-availability";
 import { editableAppearance } from "@/lib/appearance";
@@ -49,6 +50,11 @@ export default async function Editor() {
         )}
         pro={isPro(entitlement)}
         unavailable={availability === "unavailable"}
+        publicURL={
+          profile && availability === "published"
+            ? canonicalProfileURL(profile.username)
+            : undefined
+        }
       />
     </>
   );

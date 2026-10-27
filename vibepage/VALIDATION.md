@@ -1,3 +1,33 @@
+# Release freeze — 27/10/2026
+
+Base GitHub `fix/vibepage-final-polish` em `22ab34d`; branch `release/vibepage-3.0-freeze`. Apenas mudanças necessárias à origem pública, compartilhamento e evidências. Sem merge/deploy.
+
+| Comando / verificação                                                                  | Resultado real                                              |
+| -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| `npm run lint`                                                                         | Aprovado                                                    |
+| `npm run typecheck`                                                                    | Aprovado; Prisma gerado                                     |
+| `npm test`                                                                             | 208 testes, 27 arquivos aprovados                           |
+| `npm run build`                                                                        | Aprovado com manifesto gerado de origem                     |
+| `npm run test:http`                                                                    | 108 verificações aprovadas                                  |
+| Build com `BETTER_AUTH_URL=https://freeze-origin.example.test` + `npm run test:origin` | 9 verificações locais aprovadas                             |
+| Build explícito com `BETTER_AUTH_URL=http://localhost:3000` + novo smoke HTTP          | Aprovado; 108 verificações, após o ensaio de origem pública |
+
+`npm run format:check` aprovado. Resumo verificável em [release-freeze-results.json](docs/evidence/release-freeze-results.json).
+
+Cinco testes novos cobrem metadados gerados, origem de build/runtime, manifesto inválido e rejeição de URL insegura. O smoke ampliado exercita despublicação/republicação, preservação de IDs, negação de Pro por payload, chave Pix sintética sem exibição, além dos atalhos de compartilhamento com URL do servidor. Cadastro/login/editor/publicação/QR/VibeCard/logout/exclusão e downgrade permanecem cobertos no standalone com Prisma/PGlite isolado. SMTP é interceptado em memória; não houve envio externo.
+
+Reprodução anterior à correção: origem runtime HTTPS sintética recebeu HTTP 200 com canonical `http://localhost:3000`. Após a correção, o launcher recusa origem pública divergente; o build com origem sintética correta produz canonical, OG, sitemap, robots e QRs sem URLs de loopback. **O tráfego do ensaio continua sendo HTTP loopback; isso não aprova certificado, DNS ou SMTP reais.**
+
+Um primeiro harness de build/restauração passou nove verificações, mas terminou com erro de chunks `ENOTEMPTY`. A automatização de restauração foi retirada da entrega; o comando atual apenas testa o build explicitamente preparado. A execução final de `test:origin`, a reconstrução local explícita e o smoke posterior passaram. Não se contabiliza a tentativa inicial como comando integral aprovado.
+
+Oito migrations e cinco arquivos centrais de schema/temas/cartões/Studio foram comparados à referência: intactos. Dez branches e seus ancestrais conferidos, com exclusão deliberada de PR #8 e CTA já presente do PR #4. Evidência em [release-freeze-history.json](docs/evidence/release-freeze-history.json). A CI da referência estava aprovada; a validação do novo PR é independente.
+
+Não executados: PostgreSQL nativo, Docker/Caddy, HTTPS/DNS/SMTP externos, backup/restauração reais, proxy/monitoramento remoto ou dispositivos físicos. Não houve novo ensaio visual: nenhuma alteração de layout nesta revisão. Os 36 cenários Chrome do polimento anterior permanecem evidência histórica, não teste físico ou certificado de acessibilidade.
+
+Decisão: **GO demo local/sintética; NO-GO beta real e lançamento público; Pro comercial desabilitado.** [Relatório](docs/RELEASE_FREEZE.md) · [Gates de homologação](docs/RELEASE_FREEZE_CHECKLIST.md).
+
+---
+
 # Polimento final — 27/10/2026
 
 Base `release/vibepage-3.0-rc1` em `2c1735e`, branch `fix/vibepage-final-polish`. Resultados desta revisão, sem merge/deploy:
