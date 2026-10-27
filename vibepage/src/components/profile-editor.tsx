@@ -57,11 +57,13 @@ export function ProfileEditor({
   pro,
   demo = false,
   unavailable = false,
+  publicURL,
 }: {
   initial: ProfileInput;
   pro: boolean;
   demo?: boolean;
   unavailable?: boolean;
+  publicURL?: string;
 }) {
   const router = useRouter();
   const controlsRef = useRef<HTMLFieldSetElement>(null);
@@ -727,7 +729,10 @@ export function ProfileEditor({
               {!demo &&
                 !unavailable &&
                 initial.published &&
-                initial.username && <ShareLink username={initial.username} />}
+                initial.username &&
+                publicURL && (
+                  <ShareLink username={initial.username} url={publicURL} />
+                )}
               <p>
                 A publicação é aplicada ao salvar. Desmarque Perfil público
                 abaixo para retirar a página do ar.

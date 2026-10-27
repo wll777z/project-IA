@@ -23,6 +23,7 @@ const app = spawn(process.execPath, [".next/standalone/launch.mjs"], {
     HOSTNAME: "127.0.0.1",
     BETTER_AUTH_URL: origin,
     NEXT_TELEMETRY_DISABLED: "1",
+    VIBEPAGE_PIX_KEY: "fixture-payment-key-must-never-be-displayed",
     SUPPORT_INTAKE_ENABLED: "true",
     SUPPORT_RETENTION_DAYS: "30",
     LEGAL_CONTROLLER_NAME: "Synthetic staging operator",
@@ -97,6 +98,13 @@ try {
     "APIs respondem com X-Robots-Tag noindex",
   );
   const landingHTML = await landing.text();
+  const proHTML = await (await request("/demo/pro")).text();
+  check(
+    !landingHTML.includes("fixture-payment-key-must-never-be-displayed") &&
+      !proHTML.includes("fixture-payment-key-must-never-be-displayed") &&
+      !proHTML.includes("Copiar chave Pix"),
+    "configurar chave sintética não exibe Pix nem habilita compra na candidata",
+  );
   const sitemapResponse = await request("/sitemap.xml");
   const sitemapXML = await sitemapResponse.text();
   const canonical = landingHTML.match(/<link rel="canonical" href="([^"]+)"/);
@@ -313,6 +321,15 @@ try {
   const publishedShare = await (
     await request("/dashboard/compartilhar")
   ).text();
+  check(
+    publishedDashboard.includes(`title="${origin}/http_player"`),
+    "copiar link no dashboard recebe URL canônica do servidor",
+  );
+  const publishedEditor = await (await request("/dashboard/editor")).text();
+  check(
+    publishedEditor.includes(origin + "/http_player"),
+    "editor recebe URL pública canônica para compartilhar",
+  );
   await snapshot("published", publishedDashboard);
   await snapshot("share", publishedShare);
   check(
@@ -419,6 +436,54 @@ try {
   );
   const stats = await (await request("/api/stats")).json();
   check(stats.views === 1 && !stats.days, "Free recebe resumo sem dados Pro");
+  const liveBeforeDraft = (await (await request("/api/profile")).json())
+    .profile;
+  const despublish = await request("/api/profile", "PUT", {
+    ...liveBeforeDraft,
+    published: false,
+  });
+  check(
+    despublish.status === 200,
+    "dono pode despublicar perfil publicado com revisão atual",
+  );
+  const savedDraft = (await despublish.json()).profile;
+  const unavailableTargets = [
+    "/http_player",
+    "/api/qr/http_player",
+    "/api/vibecard/http_player",
+    `/go/${profile.links[0].id}`,
+  ];
+  for (const path of unavailableTargets)
+    check(
+      (await request(path, "GET", undefined, "")).status === 404,
+      `despublicação revoga ${path}`,
+    );
+  check(
+    (await (await request("/dashboard/compartilhar")).text()).includes(
+      "Publique antes de compartilhar.",
+    ),
+    "central deixa de oferecer compartilhamento após despublicar",
+  );
+  const republish = await request("/api/profile", "PUT", {
+    ...savedDraft,
+    published: true,
+  });
+  check(
+    republish.status === 200,
+    "perfil pode ser republicado sem perder links e cartões",
+  );
+  loaded.profile = (await republish.json()).profile;
+  check(
+    loaded.profile.links[0].id === profile.links[0].id &&
+      loaded.profile.gamerCards[0].id === profile.gamerCards[0].id &&
+      (await request("/http_player", "GET", undefined, "")).status === 200,
+    "republicação preserva dados e URL pública",
+  );
+  check(
+    (await request("/api/profile", "PUT", { ...loaded.profile, plan: "PRO" }))
+      .status === 400 && (await fixture.db.entitlement.count()) === 0,
+    "payload de perfil não concede Pro e não existe ativação por Pix",
+  );
   const user = await fixture.db.user.findUniqueOrThrow({
     where: { email: credentials.email },
   });
