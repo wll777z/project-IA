@@ -230,7 +230,14 @@ it("denúncia publicada fica em fila privada sem divulgar telefone administrativ
     <SupportQueue initial={resolved} />,
   );
   expect(resolvedHTML).toContain('<option value="RESOLVED" selected="">');
-  expect(resolvedHTML).not.toContain('<option value="OPEN" selected="">');
+  const selectedStatuses = [
+    ...resolvedHTML.matchAll(/<select name="status">([\s\S]*?)<\/select>/g),
+  ];
+  expect(selectedStatuses).toHaveLength(resolved.items.length);
+  for (const [, options] of selectedStatuses) {
+    expect(options).toContain('<option value="RESOLVED" selected="">');
+    expect(options).not.toContain('<option value="OPEN" selected="">');
+  }
 });
 it("não administrador e CSRF não executam moderação", async () => {
   const data = {
