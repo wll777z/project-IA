@@ -3693,3 +3693,150 @@ a.gamer-card:focus-visible,
   width: 60%;
   height: 20px;
 }
+
+/* Keep the existing editor, with controls that are easier to reach and tap. */
+.editor-toolbar {
+  grid-column: 1 / -1;
+  position: sticky;
+  top: 8px;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #a78bfa40;
+  border-radius: 13px;
+  background: #111017f5;
+  box-shadow: 0 8px 24px #0005;
+}
+.editor-toolbar-actions {
+  display: flex;
+  gap: 10px;
+  margin-left: auto;
+}
+.editor-toolbar .button {
+  min-height: 46px;
+  font-size: 13px;
+  padding: 12px 18px;
+}
+.editor-dirty-note {
+  font-size: 12px;
+  color: #c4b4d5;
+}
+.editor-toolbar-status {
+  flex-basis: 100%;
+  font-size: 12px;
+  color: #e0d3f2;
+  line-height: 1.5;
+  margin: 0;
+}
+.editor-toolbar-status:empty {
+  display: none;
+}
+.editor-section-select {
+  display: none;
+}
+.editor-controls,
+.editor-preview {
+  scroll-margin-top: 145px;
+}
+.editor-preview {
+  top: 145px;
+}
+.editor-grid button:focus-visible,
+.app-sidebar nav a:focus-visible,
+.editor-section-select select:focus-visible {
+  outline: 3px solid #cbb4ed;
+  outline-offset: 3px;
+}
+.link-edit-heading {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.link-edit-heading button,
+.gamer-edit-card .link-edit-heading button,
+.studio-order-row button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.link-edit-heading button:hover:not(:disabled),
+.studio-order-row button:hover:not(:disabled) {
+  background: #a78bfa24;
+  border-color: #b99aff88;
+  color: #f5edff;
+}
+.editor-grid .text-button,
+.collection-actions .text-button,
+.viewport-switch button,
+.upload-label {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+@media (max-width: 850px) {
+  .app-sidebar nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .app-sidebar nav a {
+    min-height: 46px;
+    padding: 10px 12px;
+    font-size: 12px;
+    border: 1px solid #a78bfa20;
+    border-radius: 9px;
+  }
+  .app-sidebar nav svg {
+    flex-shrink: 0;
+    width: 17px;
+  }
+}
+@media (max-width: 600px) {
+  .editor-tabs {
+    display: none;
+  }
+  .editor-toolbar {
+    top: 6px;
+    gap: 10px;
+    padding: 12px;
+  }
+  .editor-section-select {
+    display: grid;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
+    font-size: 12px;
+    color: #d6c5e9;
+  }
+  .editor-section-select select {
+    min-width: 0;
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid #a78bfa40;
+    border-radius: 8px;
+    background: #181320;
+    color: #f5edff;
+    padding: 10px;
+    font-size: 14px;
+  }
+  .editor-dirty-note {
+    font-size: 11px;
+    max-width: 100px;
+  }
+  .editor-toolbar-actions {
+    width: 100%;
+    margin: 0;
+  }
+  .editor-toolbar .button {
+    flex: 1;
+    padding: 11px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .editor-controls,
+  .editor-preview {
+    scroll-margin-top: 190px;
+  }
+}

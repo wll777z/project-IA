@@ -189,6 +189,7 @@ export function StudioEditor({
           <button
             type="button"
             aria-label={`Mover seção ${sectionNames[id]} para cima`}
+            title={`Mover seção ${sectionNames[id]} para cima`}
             disabled={!i}
             onClick={() => {
               const order = [...profile.studio.order];
@@ -201,6 +202,7 @@ export function StudioEditor({
           <button
             type="button"
             aria-label={`Mover seção ${sectionNames[id]} para baixo`}
+            title={`Mover seção ${sectionNames[id]} para baixo`}
             disabled={i === 3}
             onClick={() => {
               const order = [...profile.studio.order];
@@ -325,6 +327,7 @@ export function StudioEditor({
                 <button
                   type="button"
                   aria-label={`Mover bloco ${index + 1} para cima`}
+                  title={`Mover bloco ${index + 1} para cima`}
                   disabled={!index}
                   onClick={() => fields.move(index, index - 1)}
                 >
@@ -333,6 +336,7 @@ export function StudioEditor({
                 <button
                   type="button"
                   aria-label={`Mover bloco ${index + 1} para baixo`}
+                  title={`Mover bloco ${index + 1} para baixo`}
                   disabled={index === fields.fields.length - 1}
                   onClick={() => fields.move(index, index + 1)}
                 >
@@ -341,6 +345,7 @@ export function StudioEditor({
                 <button
                   type="button"
                   aria-label={`Remover bloco ${index + 1}`}
+                  title={`Remover bloco ${index + 1}`}
                   onClick={() => fields.remove(index)}
                 >
                   <Trash2 size={16} />

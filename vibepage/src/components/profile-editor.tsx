@@ -2,7 +2,7 @@
 import { StudioEditor } from "@/components/studio-editor";
 import { loadDemo } from "@/lib/demo-state";
 import { clientId } from "@/lib/client-id";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
@@ -41,6 +41,17 @@ import { ShareLink } from "@/components/share-link";
 import { profileSchema, type ProfileInput } from "@/lib/validation";
 import { themes } from "@/lib/themes";
 import { ProfileView } from "@/components/profile-view";
+const editorSections = [
+  ["identity", UserRound, "Perfil"],
+  ["links", Link2, "Links"],
+  ["cards", Gamepad2, "Cartões"],
+  ["studio", Palette, "Studio 3.0"],
+  ["themes", Palette, "Temas"],
+  ["style", Palette, "Aparência"],
+  ["effects", Sparkles, "Efeitos"],
+  ["stats", ChartNoAxesCombined, "Estatísticas"],
+  ["settings", Settings2, "Configurações"],
+] as const;
 export function ProfileEditor({
   initial,
   pro,
@@ -51,6 +62,19 @@ export function ProfileEditor({
   demo?: boolean;
 }) {
   const router = useRouter();
+  const controlsRef = useRef<HTMLFieldSetElement>(null);
+  const previewRef = useRef<HTMLElement>(null);
+  const [previewFocused, setPreviewFocused] = useState(false);
+  function jumpTo(target: HTMLElement | null) {
+    if (!target) return;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        ? "instant"
+        : "smooth",
+    });
+  }
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const [applyRecipe, setApplyRecipe] = useState(true);
   const [tab, setTab] = useState("identity");
@@ -200,64 +224,128 @@ export function ProfileEditor({
   return (
     <form
       className="editor-grid"
-      onSubmit={handleSubmit(
-        async (data) => {
-          setStatus("");
-          if (demo) {
-            try {
-              const saved = { ...data, revision: data.revision + 1 };
-              localStorage.setItem("vibepage:demo", JSON.stringify(saved));
-              reset(saved);
-              setStatus(
-                "Demonstração salva neste navegador. Nenhuma página pública foi criada.",
-              );
-            } catch {
-              setStatus("Seu navegador não permitiu salvar a demonstração.");
+      onSubmit={(event) => {
+        void handleSubmit(
+          async (data) => {
+            setStatus("");
+            if (demo) {
+              try {
+                const saved = { ...data, revision: data.revision + 1 };
+                localStorage.setItem("vibepage:demo", JSON.stringify(saved));
+                reset(saved);
+                setStatus(
+                  "Demonstração salva neste navegador. Nenhuma página pública foi criada.",
+                );
+              } catch {
+                setStatus("Seu navegador não permitiu salvar a demonstração.");
+              }
+              return;
             }
-            return;
-          }
-          try {
-            const response = await fetch("/api/profile", {
-              method: "PUT",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(data),
-            });
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.error);
-            reset(result.profile);
-            setStatus("Perfil salvo com sucesso.");
-            router.refresh();
-          } catch (e) {
-            setStatus(
-              e instanceof Error ? e.message : "Não foi possível salvar.",
-            );
-          }
-        },
-        () => setStatus("Confira os campos destacados, incluindo os links."),
-      )}
+            try {
+              const response = await fetch("/api/profile", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+              });
+              const result = await response.json();
+              if (!response.ok) throw new Error(result.error);
+              reset(result.profile);
+              setStatus("Perfil salvo com sucesso.");
+              router.refresh();
+            } catch (e) {
+              setStatus(
+                e instanceof Error ? e.message : "Não foi possível salvar.",
+              );
+            }
+          },
+          (invalid) => {
+            const section =
+              invalid.username || invalid.displayName || invalid.bio
+                ? "identity"
+                : invalid.links
+                  ? "links"
+                  : invalid.gamerCards
+                    ? "cards"
+                    : invalid.studio || invalid.blocks
+                      ? "studio"
+                      : "settings";
+            setTab(section);
+            setPreviewFocused(false);
+            setStatus("Confira os campos destacados antes de salvar.");
+            jumpTo(controlsRef.current);
+          },
+        )(event);
+      }}
     >
+      <div className="editor-toolbar">
+        <label className="editor-section-select">
+          Editar seção
+          <select
+            value={tab}
+            disabled={isSubmitting || !!uploading}
+            onChange={(e) => {
+              setTab(e.target.value);
+              setPreviewFocused(false);
+              jumpTo(controlsRef.current);
+            }}
+          >
+            {editorSections.map(([id, , label]) => (
+              <option key={id} value={id}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
+        <span className="editor-dirty-note">
+          {isDirty ? "Alterações pendentes" : "Tudo em dia"}
+        </span>
+        <div className="editor-toolbar-actions">
+          <button
+            type="button"
+            className="button button-secondary editor-jump"
+            onClick={() => {
+              setPreviewFocused(!previewFocused);
+              jumpTo(previewFocused ? controlsRef.current : previewRef.current);
+            }}
+          >
+            {previewFocused ? <UserRound size={17} /> : <Eye size={17} />}
+            {previewFocused ? "Voltar a editar" : "Ver prévia"}
+          </button>
+          <button
+            className="button"
+            type="submit"
+            disabled={isSubmitting || !!uploading}
+          >
+            {isSubmitting || uploading ? (
+              <LoaderCircle className="spinner" size={17} />
+            ) : (
+              <Save size={17} />
+            )}
+            {isSubmitting
+              ? "Salvando…"
+              : uploading
+                ? "Enviando…"
+                : "Salvar alterações"}
+          </button>
+        </div>
+        <p role="status" className="editor-toolbar-status">
+          {status}
+        </p>
+      </div>
       <fieldset
+        ref={controlsRef}
+        tabIndex={-1}
+        aria-label="Campos do perfil"
         className="editor-controls"
         disabled={isSubmitting || !!uploading}
       >
         <div className="editor-tabs" role="group" aria-label="Seções do editor">
-          {[
-            ["identity", UserRound, "Perfil"],
-            ["links", Link2, "Links"],
-            ["cards", Gamepad2, "Cartões"],
-            ["studio", Palette, "Studio 3.0"],
-            ["themes", Palette, "Temas"],
-            ["style", Palette, "Aparência"],
-            ["effects", Sparkles, "Efeitos"],
-            ["stats", ChartNoAxesCombined, "Estatísticas"],
-            ["settings", Settings2, "Configurações"],
-          ].map(([id, Icon, label]) => {
+          {editorSections.map(([id, Icon, label]) => {
             const I = Icon as typeof UserRound;
             return (
               <button
                 key={String(id)}
                 type="button"
-
                 aria-pressed={tab === id}
                 onClick={() => setTab(String(id))}
               >
@@ -426,6 +514,7 @@ export function ProfileEditor({
                       <button
                         type="button"
                         aria-label={`Mover link ${index + 1} para cima`}
+                        title={`Mover link ${index + 1} para cima`}
                         disabled={index === 0}
                         onClick={() => move(index, index - 1)}
                       >
@@ -434,6 +523,7 @@ export function ProfileEditor({
                       <button
                         type="button"
                         aria-label={`Mover link ${index + 1} para baixo`}
+                        title={`Mover link ${index + 1} para baixo`}
                         disabled={index === fields.length - 1}
                         onClick={() => move(index, index + 1)}
                       >
@@ -442,6 +532,7 @@ export function ProfileEditor({
                       <button
                         type="button"
                         aria-label={`Remover link ${index + 1}`}
+                        title={`Remover link ${index + 1}`}
                         onClick={() => remove(index)}
                       >
                         <Trash2 size={15} />
@@ -816,29 +907,14 @@ export function ProfileEditor({
                 ? "Ao salvar, seu perfil ficará visível pelo link."
                 : "Rascunho: apenas você pode ver."}
           </p>
-          {status && (
-            <p role="status" className="status-message">
-              {status}
-            </p>
-          )}
-          <button
-            className="button"
-            type="submit"
-            disabled={isSubmitting || !!uploading}
-          >
-            {isSubmitting ? (
-              <LoaderCircle className="spinner" size={17} />
-            ) : (
-              <Save size={17} />
-            )}{" "}
-            {isSubmitting ? "Salvando…" : "Salvar alterações"}
-          </button>
-          <span className="save-hint">
-            {isDirty ? "Há alterações não salvas" : "Tudo em dia"}
-          </span>
         </div>
       </fieldset>
-      <aside className={`editor-preview preview-${viewport}`}>
+      <aside
+        ref={previewRef}
+        tabIndex={-1}
+        aria-label="Prévia do perfil"
+        className={`editor-preview preview-${viewport}`}
+      >
         <div className="preview-heading">
           <span>
             <Eye size={14} /> PRÉVIA AO VIVO

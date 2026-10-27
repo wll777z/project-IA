@@ -191,3 +191,5 @@ O editor usa Web Crypto para IDs também nas prévias HTTP/LAN que não expõem 
 A sétima migration adiciona `ProfileBlock`, `SavedAppearance`, `AppearanceSchedule`, `CardClick`, `Profile.studio`, `Profile.previousAppearance` e `Profile.vibeCardStyle`, com índices, checks e cascatas. Expande os tipos/slots válidos de upload para a galeria sem apagar arquivos. Não modifica migrations anteriores nem reserva novos usernames raiz. Novas páginas ficam sob `/dashboard` e `/demo`.
 
 Dependências adicionadas com versões exatas: `qrcode@1.5.4`, `@types/qrcode@1.5.6` e `jsqr@1.4.0` (decodificação independente nos testes). Referências oficiais: [node-qrcode](https://github.com/soldair/node-qrcode), [jsQR](https://github.com/cozmo/jsQR). QR não depende de serviço externo.
+
+No editor, **Salvar alterações** fica na barra superior durante a rolagem. **Ver prévia / Voltar a editar** evita procurar o outro painel. No celular, use **Editar seção** para escolher Perfil, Links, Cartões, Studio e as demais opções; no desktop as abas permanecem. Erros de validação abrem a seção correspondente.

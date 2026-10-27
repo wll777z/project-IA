@@ -65,6 +65,7 @@ export function GamerCardEditor({
               <button
                 type="button"
                 aria-label={`Mover cartão ${index + 1} para cima`}
+                title={`Mover cartão ${index + 1} para cima`}
                 disabled={!index}
                 onClick={() => move(index, index - 1)}
               >
@@ -73,6 +74,7 @@ export function GamerCardEditor({
               <button
                 type="button"
                 aria-label={`Mover cartão ${index + 1} para baixo`}
+                title={`Mover cartão ${index + 1} para baixo`}
                 disabled={index === fields.length - 1}
                 onClick={() => move(index, index + 1)}
               >
@@ -81,6 +83,7 @@ export function GamerCardEditor({
               <button
                 type="button"
                 aria-label={`Remover cartão ${index + 1}`}
+                title={`Remover cartão ${index + 1}`}
                 onClick={() => remove(index)}
               >
                 <Trash2 size={16} />
