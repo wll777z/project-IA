@@ -1,3 +1,4 @@
+import { getPublicProfile } from "@/lib/public-profile";
 import { recordClick } from "@/lib/analytics";
 import { consumeLimit, clientIdentity } from "@/lib/limits";
 import { db } from "@/lib/db";
@@ -12,10 +13,16 @@ export async function GET(
     return new Response("Link não encontrado.", { status: 404 });
   const link = await db.profileLink.findUnique({
     where: { id },
-    include: { profile: { select: { published: true } } },
+    include: { profile: { select: { published: true, username: true } } },
   });
   if (!link?.profile.published || !safeLinkSchema.safeParse(link.url).success)
     return new Response("Link não encontrado.", { status: 404 });
+  const visible = await getPublicProfile(link.profile.username);
+  if (!visible?.profile.links.some((l) => l.id === id))
+    return new Response(null, {
+      status: 404,
+      headers: { "Cache-Control": "no-store" },
+    });
   try {
     if (
       !/bot|crawler|spider|preview/i.test(

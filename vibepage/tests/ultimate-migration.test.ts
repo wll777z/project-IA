@@ -30,12 +30,33 @@ it("aplica a migration aditiva em perfil existente sem apagar identidade ou link
       username: string;
       backgroundEffect: string;
       entranceEffect: string;
-    }>(`SELECT username,"backgroundEffect","entranceEffect" FROM "Profile"`);
+      studio: { layout: string };
+      vibeCardStyle: string;
+      previousAppearance: unknown;
+    }>(
+      `SELECT username,"backgroundEffect","entranceEffect",studio,"vibeCardStyle","previousAppearance" FROM "Profile"`,
+    );
     expect(result.rows[0]).toEqual({
       username: "legacy",
       backgroundEffect: "none",
       entranceEffect: "fade",
+      studio: expect.objectContaining({ layout: "classic", columns: 1 }),
+      vibeCardStyle: "minimal",
+      previousAppearance: null,
     });
+    for (const table of [
+      "ProfileBlock",
+      "SavedAppearance",
+      "AppearanceSchedule",
+      "CardClick",
+    ])
+      expect((await pg.query(`SELECT * FROM "${table}"`)).rows).toHaveLength(0);
+    // New dashboard routes must not reserve a formerly valid root username.
+    await pg.exec(`UPDATE "Profile" SET username='pro' WHERE id='profile'`);
+    expect(
+      (await pg.query<{ username: string }>(`SELECT username FROM "Profile"`))
+        .rows[0].username,
+    ).toBe("pro");
     expect((await pg.query(`SELECT * FROM "ProfileLink"`)).rows).toHaveLength(
       1,
     );

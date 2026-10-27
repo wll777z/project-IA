@@ -59,6 +59,20 @@ export default async function Dashboard() {
         <strong>{profile?.gamerCards.length ?? 0} cartões gamer</strong>
         <Link href="/dashboard/editor">Personalizar cartões e efeitos ↗</Link>
       </div>
+      <div className="next-quick-links">
+        {[
+          ["/dashboard/editor", "Profile Studio", "Layouts e blocos"],
+          ["/dashboard/aparencias", "Coleções", "Aparências e temporadas"],
+          ["/dashboard/compartilhar", "VibeCard", "QR e compartilhamento"],
+          ["/dashboard/analytics", "Analytics Pro", "Comparação e CSV"],
+        ].map(([href, title, copy]) => (
+          <Link key={href} href={href}>
+            <strong>{title}</strong>
+            <span>{copy}</span>
+            <ArrowUpRight size={16} />
+          </Link>
+        ))}
+      </div>
       <div className="dashboard-grid">
         <section>
           <div className="workspace-card">

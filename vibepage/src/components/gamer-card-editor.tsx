@@ -16,10 +16,12 @@ export function GamerCardEditor({
   pro,
   demo,
   upload,
+  onSelect,
 }: {
   form: UseFormReturn<ProfileInput>;
   pro: boolean;
   demo: boolean;
+  onSelect?: (id: string) => void;
   upload: (file: File, index: number) => Promise<void>;
 }) {
   const {
@@ -52,13 +54,18 @@ export function GamerCardEditor({
         </p>
       )}
       {fields.map((field, index) => (
-        <div className="link-edit-card gamer-edit-card" key={field.fieldKey}>
+        <div
+          className="link-edit-card gamer-edit-card"
+          onFocusCapture={() => onSelect?.(field.id)}
+          key={field.fieldKey}
+        >
           <div className="link-edit-heading">
             <span>CARTÃO {String(index + 1).padStart(2, "0")}</span>
             <div>
               <button
                 type="button"
                 aria-label={`Mover cartão ${index + 1} para cima`}
+                title={`Mover cartão ${index + 1} para cima`}
                 disabled={!index}
                 onClick={() => move(index, index - 1)}
               >
@@ -67,6 +74,7 @@ export function GamerCardEditor({
               <button
                 type="button"
                 aria-label={`Mover cartão ${index + 1} para baixo`}
+                title={`Mover cartão ${index + 1} para baixo`}
                 disabled={index === fields.length - 1}
                 onClick={() => move(index, index + 1)}
               >
@@ -75,6 +83,7 @@ export function GamerCardEditor({
               <button
                 type="button"
                 aria-label={`Remover cartão ${index + 1}`}
+                title={`Remover cartão ${index + 1}`}
                 onClick={() => remove(index)}
               >
                 <Trash2 size={16} />

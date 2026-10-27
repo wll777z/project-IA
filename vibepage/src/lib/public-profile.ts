@@ -1,3 +1,6 @@
+import { resolveSeason } from "@/lib/appearance-store";
+import { studioSchema } from "@/lib/studio-schema";
+import { blockSchema } from "@/lib/validation";
 import { editableAppearance } from "@/lib/appearance";
 import {
   gamerCardSchema,
@@ -19,6 +22,7 @@ export const getPublicProfile = cache(async (username: string) => {
   const profile = await db.profile.findUnique({
     where: { username: parsed.data },
     include: {
+      blocks: { orderBy: { position: "asc" } },
       gamerCards: { orderBy: { position: "asc" } },
       links: { orderBy: { position: "asc" } },
       user: { select: { entitlement: true } },
@@ -31,6 +35,16 @@ export const getPublicProfile = cache(async (username: string) => {
     theme.premium && !pro ? findTheme("midnight-purple") : theme;
   // Explicit public DTO: never send email, userId, billing or session data.
   const data: ProfileInput = {
+    studio: studioSchema.parse(profile.studio),
+    blocks: pro
+      ? profile.blocks.flatMap((b) => {
+          const v = blockSchema.safeParse(b.payload);
+          return v.success ? [v.data] : [];
+        })
+      : [],
+    vibeCardStyle: pro
+      ? (profile.vibeCardStyle as ProfileInput["vibeCardStyle"])
+      : "minimal",
     backgroundEffect:
       profile.backgroundEffect as ProfileInput["backgroundEffect"],
     avatarEffect: profile.avatarEffect as ProfileInput["avatarEffect"],
@@ -65,7 +79,20 @@ export const getPublicProfile = cache(async (username: string) => {
         : [];
     }),
   };
-  return { profile: editableAppearance(data, pro), pro };
+  const effective = editableAppearance(
+    await resolveSeason(profile.userId, data, pro),
+    pro,
+  );
+  effective.blocks = effective.studio.hidden.includes("blocks")
+    ? []
+    : effective.blocks.filter((b) => !b.hidden);
+  if (effective.studio.hidden.includes("gamerCards")) effective.gamerCards = [];
+  if (effective.studio.hidden.includes("links")) effective.links = [];
+  if (effective.studio.hidden.includes("identity")) {
+    effective.bio = "";
+    effective.avatarKey = null;
+  }
+  return { profile: effective, pro };
 });
 export function appOrigin() {
   return new URL(process.env.BETTER_AUTH_URL || "http://localhost:3000").origin;

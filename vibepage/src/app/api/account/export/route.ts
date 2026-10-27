@@ -9,8 +9,12 @@ export async function GET(request: Request) {
         name: true,
         email: true,
         createdAt: true,
-        profile: { include: { links: true, views: true, gamerCards: true } },
+        profile: {
+          include: { links: true, views: true, gamerCards: true, blocks: true },
+        },
         entitlement: { select: { plan: true, expiresAt: true } },
+        appearances: true,
+        schedules: true,
         uploads: {
           select: {
             id: true,

@@ -1,12 +1,25 @@
 # VibePage
 
-## Ultimate Release — revisão sobre a main
+## VibePage 3.0 — Next Level
 
-A branch `feature/vibepage-ultimate-release` parte da `main` `080141f` e incorpora, sem merge, o código dos PRs #1 e #2. Preserva cartões, efeitos, editor, landing e estatísticas já criados; completa as diferenças desta revisão. Consulte [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md), [VALIDATION.md](VALIDATION.md) e [docs/RELEASE_AUDIT.md](docs/RELEASE_AUDIT.md). Esta entrega não fez deploy nem alterou a prévia hospedada.
+A branch `feature/vibepage-next-level` parte de `feature/vibepage-ultimate-release` (`e8cb1f6`), a versão mais completa conferida. Preserva os 13 temas, cartões gamer, efeitos, autenticação e correções existentes. O inventário e a comparação de branches estão em [docs/NEXT_LEVEL_INVENTORY.md](docs/NEXT_LEVEL_INVENTORY.md). Mudanças somente dentro de `vibepage/`; sem merge ou deploy nesta entrega.
 
-O fundo por imagem agora é Pro em todas as camadas: upload, salvamento, DTO público, renderer e acesso à mídia. Ao expirar, a imagem deixa de ser pública, mas permanece no banco e acessível ao dono. O Free pode continuar usando avatar, avatares dos cartões e cores de destaque.
+Novidades funcionais:
 
-Aurora Blue amplia o catálogo para 13 temas, preservando os cinco originais e os sete do PR anterior. A seção **Temas** permite aplicar uma receita de paleta, fonte, botões, estilo dos cartões e efeitos; desmarque a opção para trocar somente a paleta. **Aparência** continua disponível para ajustes individuais. A seleção é persistida e continua sujeita ao plano no servidor.
+- **Profile Studio 3.0:** quatro layouts, seções ordenáveis por teclado, largura, colunas, grade de cartões, espaçamento e visibilidade. Usa o renderer público existente e salva com revisão otimista.
+- **Sete tipos de bloco:** favoritos, conquistas autodeclaradas, projetos, galeria, redes sociais, sobre mim e destaque vinculado a cartão existente. Até 16 blocos Pro; galeria com até seis imagens por bloco e 18 por conta.
+- **Sete modelos originais:** categorias Gamer, Streamer, Criador, Minimalista, Futurista, Anime Inspired e Retro. Filtro, prévia completa e restauração de aparência preservando o conteúdo atual. Quiet Focus é Free.
+- **Coleções:** salvar, duplicar, renomear, excluir com confirmação, pré-visualizar, aplicar e desfazer a última troca. Até dez coleções Pro; não duplicam links, cartões ou conteúdo dos blocos.
+- **Temporadas:** até cinco intervalos futuros sem sobreposição, duração de até 90 dias, início em até um ano e até vinte registros totais. Datas são armazenadas como instantes UTC com fuso IANA. O servidor resolve a aparência ativa em cada leitura; não depende de cron ou aba aberta. Ao terminar, reaparece a aparência padrão atual.
+- **Central de compartilhamento:** URL canônica, QR PNG local, cinco estilos de VibeCard PNG 1280×720 (Minimal Free; Neon, Holographic, Galaxy e Retro Pro), estilo persistido, download e Web Share quando disponível. Somente perfis publicados geram imagens.
+- **Analytics Pro:** comparação de 7/30 dias com período anterior, histórico de 90 dias, resumo semanal, ranking e CSV protegido contra fórmulas. Cliques de cartões passam por redirect seguro e são contados separadamente a partir desta versão.
+- **Dashboard:** acessos ao Studio, aparências, compartilhamento, analytics e comparação real Free/Pro em `/demo/pro`. A demo testa recursos visuais sem promover a conta real.
+
+Coleções guardam tema, cores, fontes, layout, botões, efeitos, configurações visuais do avatar, apresentação dos cartões e organização dos blocos. Avatar, imagens, conteúdo e links continuam vinculados ao perfil atual; não são copiados para snapshots. Trocar aparência não restaura conteúdo que você apagou. Uma temporada também usa o conteúdo atual.
+
+Ao expirar Pro, Studio/blocos/galeria/estilos premium deixam de ser públicos, mas suas configurações e arquivos permanecem privados. Um save Free não apaga os novos dados privados. Agendamentos ficam suspensos e o dono pode cancelá-los. Aplicar coleções, criar temporadas e personalizar Studio exigem Pro no servidor.
+
+Consulte [VALIDATION.md](VALIDATION.md), [LAUNCH_CHECKLIST.md](LAUNCH_CHECKLIST.md) e [docs/RELEASE_AUDIT.md](docs/RELEASE_AUDIT.md). Há pendências de infraestrutura e operação que impedem afirmar lançamento público concluído.
 
 MVP de páginas de perfil para gamers, comunidades e criadores, com identidade visual própria. Next.js App Router, TypeScript, Tailwind, PostgreSQL, Prisma, Better Auth, Zod, React Hook Form, Motion e Lucide.
 
@@ -49,7 +62,7 @@ No PowerShell a cópia é `Copy-Item .env.example .env`; no Linux/macOS, `cp .en
 - Editor com username único, nome público, bio, avatar, fundo, cores, temas, até 100 links, ordenação, prévia ao vivo e salvamento transacional.
 - Cartões Roblox, Discord, Minecraft (Java/Bedrock), Fortnite, Valorant, Free Fire, League of Legends, Pokémon e personalizados. Nome, handle, detalhe, link HTTPS opcional, avatar normalizado, cor, ícone e reordenação. Sem integração oficial ou status online.
 - Seis visuais de cartão, layouts compacto/banner, bordas luminosas e animação; oito efeitos de fundo, cinco de avatar, seis de botões e quatro entradas. Efeitos opcionais, pausa manual, movimento reduzido e pausa quando fora da tela/aba oculta.
-- Editor em oito seções, prévia mobile/desktop com o mesmo renderer, alterações pendentes, bloqueio dos campos durante save/upload e redefinição de aparência com confirmação.
+- Editor em nove seções, prévia mobile/desktop com o mesmo renderer, alterações pendentes, bloqueio dos campos durante save/upload e redefinição de aparência com confirmação.
 - Controle de revisão para impedir que uma aba antiga sobrescreva alterações novas. Dados da conta e perfis de outros usuários não podem ser editados pelo cliente.
 - Uploads com verificação real do formato, limite de 4 MB e 16 milhões de pixels, normalização WebP, remoção de metadados e limite de armazenamento. A imagem publicada permanece até salvar a substituta.
 - Páginas `/username`, metadados Open Graph/Twitter, imagem de compartilhamento gerada e links externos seguros.
@@ -62,7 +75,7 @@ No PowerShell a cópia é `Copy-Item .env.example .env`; no Linux/macOS, `cp .en
 
 Free: um perfil, até 100 links, 3 cartões (Neon Gamer/Minimal Dark compactos), username disponível, cores de destaque, uploads, temas Midnight Purple/Minimal Black/Ice Blue, marca e total de visitas.
 
-Pro: até 12 cartões, seis estilos e banner, oito temas adicionais além de Cyber Neon/Pink Dream, efeitos e fontes locais, animações, formato de botões, fundo personalizado, remoção da marca, cliques e detalhamento diário de 30 dias e seleção de gráfico dos últimos 7/30 dias. R$ 9,90/mês continua sendo apenas uma sugestão de preço: **não há checkout nem cobrança**.
+Pro: Studio, blocos, galeria, coleções, agenda sazonal, quatro estilos adicionais de VibeCard, analytics de 90 dias/CSV, até 12 cartões, seis estilos e banner, oito temas adicionais além de Cyber Neon/Pink Dream, efeitos e fontes locais, animações, formato de botões, fundo personalizado, remoção da marca, cliques e detalhamento diário de 30 dias e seleção de gráfico dos últimos 7/30 dias. R$ 9,90/mês continua sendo apenas uma sugestão de preço: **não há checkout nem cobrança**.
 
 Não existe endpoint para o usuário promover a própria conta. O administrador pode conceder ou revogar uma permissão pelo terminal, sem registrar pagamento:
 
@@ -81,6 +94,8 @@ npm run typecheck
 npm test
 npm run build
 npm run test:http
+npm run format:check
+npm audit
 npm start
 ```
 
@@ -114,10 +129,10 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 - Senhas scrypt e sessões no banco, cookies HttpOnly/SameSite e Secure com HTTPS. Recuperação revoga sessões anteriores. Cadastro duplicado não revela existência da conta; login usa erro genérico. Produção pública exige confirmação de e-mail.
 - Validação no servidor e no formulário; payload de autenticação limitado a 16 KB e perfil a 64 KB. Não há HTML ou JavaScript arbitrário. React escapa os textos.
 - URLs somente HTTPS público, sem credenciais, IPs literais/locais ou portas alternativas. O redirecionamento usa somente o destino armazenado, não uma URL recebida na query. Não fazemos fetch de URLs de usuários. A validação sintática não detecta phishing em domínios públicos; moderação e denúncias serão necessárias para lançamento amplo.
-- Todos os writes autenticados verificam a origem exata. Rate limits ficam no banco e resistem a requisições concorrentes. Limites: login 5/min, cadastro e recuperação 3/min, gravação de perfil 30/min, upload 8/min, views 60/min e cliques 90/min.
+- Todos os writes autenticados verificam a origem exata. Rate limits ficam no banco e resistem a requisições concorrentes. Limites: login 5/min, cadastro e recuperação 3/min, gravação de perfil 30/min, upload 8/min, views 60/min, cliques compartilhados 90/min, coleções 20/min, agenda 15/min, QR 30/min, VibeCard 12/min e CSV 10/min.
 - Sem `AUTH_IP_HEADER`, os limites públicos são compartilhados por endpoint para não confiar em cabeçalhos falsificados. Em produção configure somente um cabeçalho sobrescrito pelo proxy e impeça acesso direto à origem. O limitador da biblioteca pode manter IP temporariamente para segurança; os limites do aplicativo usam HMAC. Nada disso é usado como analytics individual.
-- Imagens permitidas: PNG, JPEG e WebP estáticos. SVG/GIF e dados incompatíveis com o MIME são recusados. No máximo quatro imagens de perfil (ativa e rascunho por tipo) e vinte avatares de cartões normalizados de até 1 MB cada. Avatares de cartões sem uso são liberados ao salvar o perfil; a exclusão da conta remove todos. Imagens não publicadas exigem sessão do dono; exclusão de conta elimina os arquivos do banco.
-- Os números são aproximações, não visitantes únicos. Cada aba tenta registrar uma visita diária por perfil usando sessionStorage. Limites, bloqueadores e bots alteram a contagem. Cliques contam apenas os links personalizados que passam por `/go/`; os cartões gamer abrem destinos diretamente e não entram nesses números. Cliques são totais; não são garantia de pessoa real ou conversão. Dados diários ficam em UTC.
+- Imagens permitidas: PNG, JPEG e WebP estáticos. SVG/GIF e dados incompatíveis com o MIME são recusados. No máximo quatro imagens de perfil (ativa e rascunho por tipo) vinte avatares de cartões e dezoito imagens de galeria Pro normalizados de até 1 MB cada. Avatares de cartões sem uso são liberados ao salvar o perfil; a exclusão da conta remove todos. Imagens não publicadas exigem sessão do dono; exclusão de conta elimina os arquivos do banco.
+- Os números são aproximações, não visitantes únicos. Cada aba tenta registrar uma visita diária por perfil usando sessionStorage. Limites, bloqueadores e bots alteram a contagem. Cliques contam apenas os links personalizados que passam por `/go/`; cartões gamer publicados usam `/go/card/:id` e possuem contagem separada a partir desta versão. Links dos blocos não são rastreados. Excluir um link/cartão remove suas contagens individuais em cascata; não há reconstrução histórica de elementos removidos. Cliques são totais; não são garantia de pessoa real ou conversão. Dados diários ficam em UTC.
 - Execute `npm run db:cleanup` diariamente para remover sessões, tokens e limites expirados. Não criamos agendamento externo.
 - Imagens de compartilhamento usam `no-store` e retornam 404 para rascunhos e contas removidas. Cópias já baixadas ou armazenadas por terceiros não podem ser revogadas pelo site. `Referrer-Policy: no-referrer` impede que URLs de confirmação/recuperação sejam enviadas como Referer.
 - CSP restringe recursos ao próprio site e impede frames e objetos embutidos. Scripts/styles inline necessários ao Next permanecem permitidos; CSP com nonce é um endurecimento futuro.
@@ -135,7 +150,7 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 | `src/app/api/`                               | Perfil, uploads, mídia, views, stats e exportação                              |
 | `src/components/`                            | Componentes do editor, perfil, formulários e gráfico acessível                 |
 | `src/lib/`                                   | Validação, regras de acesso, permissões, limites, perfis, temas e estatísticas |
-| `prisma/`                                    | Schema, seis migrations SQL, índices, checks e seed                            |
+| `prisma/`                                    | Schema, sete migrations SQL, índices, checks e seed                            |
 | `tests/`                                     | Suítes e smoke HTTP com banco isolado                                          |
 | `scripts/`                                   | Setup, manutenção, permissões administrativas e exportação da demo             |
 | `compose.yaml`, `Dockerfile`, `.env.example` | Execução local e preparação para hospedagem                                    |
@@ -153,10 +168,28 @@ A branch `fix/vibepage-launch-readiness` parte da `main` e mantém o visual exis
 
 ## Atualizar uma instalação existente
 
-Faça backup e valide restauração antes de atualizar um ambiente com dados. Em homologação, rode `npm ci`, `npm run db:migrate`, `npm run db:seed`, `npm run build` e `npm start`. As migrations `202610270001_ultimate` e `202610270002_aurora_blue` são aditivas e conservam perfis, links e estatísticas; o teste automatizado confirma o upgrade de um perfil legado em PGlite. PostgreSQL nativo e concorrência entre instâncias ainda precisam de validação própria. Não remova as novas tabelas para voltar ao código anterior.
+Faça backup e valide restauração antes de atualizar um ambiente com dados. Em homologação, rode `npm ci`, `npm run db:migrate`, `npm run db:seed`, `npm run build` e `npm start`. As migrations `202610270001_ultimate`, `202610270002_aurora_blue` e `202610270003_next_level` são aditivas e conservam perfis, links e estatísticas; o teste automatizado confirma o upgrade de um perfil legado em PGlite. PostgreSQL nativo e concorrência entre instâncias ainda precisam de validação própria. Não remova as novas tabelas para voltar ao código anterior.
 
 Os temas novos são Voltage City (amarelo elétrico, identidade original), Galaxy Purple, Sakura Dream, Ice Crystal, Crimson Shadow, Retro Arcade, Holographic e Aurora Blue. Os cinco originais foram preservados. `src/lib/themes.ts` contém as paletas e a classificação Free/Pro; `src/lib/customization.ts` contém opções e limites. Nenhum recurso faz fetch de links ou avatares externos.
 
-A demo é identificada como local e não cria conta ou assinatura. Escolher um tema na landing abre `/demo?theme=…`; a demo migra as escolhas antigas locais adicionando os campos novos. O aplicativo com banco usa as APIs existentes. A prévia hospedada anterior continua sem estas alterações até um deploy explicitamente autorizado.
+A demo é identificada como local e não cria conta ou assinatura. Escolher um tema na landing abre `/demo?theme=…`; a demo migra as escolhas antigas locais adicionando os campos novos. O aplicativo com banco usa as APIs existentes. A prévia hospedada anterior continua sem as novidades Next Level até um deploy explicitamente autorizado.
 
 O editor usa Web Crypto para IDs também nas prévias HTTP/LAN que não expõem `randomUUID`, sem recorrer a `Math.random`. Isso não substitui HTTPS em produção nem o controle de propriedade no servidor. Recarregar um link `/demo?theme=…` do mesmo tema preserva cores, efeitos e estilos já salvos. O exportador da demo preserva o JavaScript da landing; rotas de login/cadastro na exportação estática direcionam à demonstração identificada, sem simular contas.
+
+## Arquivos e migration Next Level
+
+| Área                | Principais arquivos                                                                                                                                                                    |
+| ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Studio/blocos       | `src/lib/studio-schema.ts`, `src/lib/validation.ts`, `src/lib/profiles.ts`, `src/components/studio-editor.tsx`, `src/components/profile-blocks.tsx`, `src/components/profile-view.tsx` |
+| Modelos             | `src/lib/profile-templates.ts`, `tests/studio-templates.test.ts`                                                                                                                       |
+| Coleções/temporadas | `src/lib/appearance-config.ts`, `src/lib/appearance-store.ts`, `src/components/appearance-manager.tsx`, `src/app/api/appearances/`, `src/app/api/schedules/`                           |
+| Compartilhamento    | `src/lib/sharing.tsx`, `src/components/share-center.tsx`, `src/app/api/qr/`, `src/app/api/vibecard/`, `src/app/api/profile/vibecard-style/`                                            |
+| Analytics           | `src/lib/analytics-advanced.ts`, `src/components/advanced-analytics.tsx`, `src/app/go/card/`, `src/app/api/stats/advanced/`, `src/app/api/stats/export/`                               |
+| Dashboard           | `src/app/dashboard/aparencias/`, `src/app/dashboard/compartilhar/`, `src/app/dashboard/analytics/`, `src/app/demo/pro/`                                                                |
+| Regressões          | `tests/studio.integration.test.ts`, `tests/collections.integration.test.ts`, `tests/sharing-analytics.integration.test.ts`, `tests/ultimate-migration.test.ts`, `tests/http-smoke.ts`  |
+
+A sétima migration adiciona `ProfileBlock`, `SavedAppearance`, `AppearanceSchedule`, `CardClick`, `Profile.studio`, `Profile.previousAppearance` e `Profile.vibeCardStyle`, com índices, checks e cascatas. Expande os tipos/slots válidos de upload para a galeria sem apagar arquivos. Não modifica migrations anteriores nem reserva novos usernames raiz. Novas páginas ficam sob `/dashboard` e `/demo`.
+
+Dependências adicionadas com versões exatas: `qrcode@1.5.4`, `@types/qrcode@1.5.6` e `jsqr@1.4.0` (decodificação independente nos testes). Referências oficiais: [node-qrcode](https://github.com/soldair/node-qrcode), [jsQR](https://github.com/cozmo/jsQR). QR não depende de serviço externo.
+
+No editor, **Salvar alterações** fica na barra superior durante a rolagem. **Ver prévia / Voltar a editar** evita procurar o outro painel. No celular, use **Editar seção** para escolher Perfil, Links, Cartões, Studio e as demais opções; no desktop as abas permanecem. Erros de validação abrem a seção correspondente.

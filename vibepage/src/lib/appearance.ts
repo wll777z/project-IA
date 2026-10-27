@@ -1,3 +1,4 @@
+import { defaultStudio, studioSchema } from "@/lib/studio-schema";
 import { defaultEffects, FREE_CARD_LIMIT } from "@/lib/customization";
 import type { ProfileInput } from "@/lib/validation";
 import { findTheme, themeRecipes, type ThemeId } from "@/lib/themes";
@@ -12,6 +13,9 @@ export function editableAppearance(
   return {
     ...profile,
     ...defaultEffects,
+    studio: preserveCards ? profile.studio : studioSchema.parse(defaultStudio),
+    blocks: preserveCards ? profile.blocks : [],
+    vibeCardStyle: "minimal",
     entranceEffect: profile.entranceEffect === "none" ? "none" : "fade",
     gamerCards: profile.gamerCards
       .slice(0, preserveCards ? profile.gamerCards.length : FREE_CARD_LIMIT)

@@ -46,6 +46,22 @@ export default async function DashboardLayout({
               <ChartNoAxesCombined size={17} />
               Estatísticas
             </Link>
+            <Link href="/dashboard/aparencias">
+              <Palette size={17} />
+              Coleções e temporadas
+            </Link>
+            <Link href="/dashboard/compartilhar">
+              <Settings2 size={17} />
+              VibeCard e compartilhar
+            </Link>
+            <Link href="/dashboard/analytics">
+              <ChartNoAxesCombined size={17} />
+              Analytics Pro 3.0
+            </Link>
+            <Link href="/demo/pro">
+              <Palette size={17} />
+              Recursos Pro
+            </Link>
             <Link href="/dashboard/conta">
               <Settings2 size={17} />
               Minha conta

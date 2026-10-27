@@ -5,7 +5,7 @@ export default function Privacy() {
     <main id="main" className="legal-page">
       <Brand />
       <h1>Privacidade, sem mistério.</h1>
-      <p>Versão de desenvolvimento · 26 de outubro de 2026</p>
+      <p>Versão de desenvolvimento · 27 de outubro de 2026</p>
       <h2>O que guardamos</h2>
       <p>
         Seu nome, e-mail e credenciais protegidas são usados para criar e
@@ -16,13 +16,17 @@ export default function Privacy() {
       <h2>Estatísticas e arquivos</h2>
       <p>
         Perfis publicados tornam visíveis o nome público, username, bio, links,
-        cartões gamer e imagens que você escolheu. Os dados de jogos e
+        cartões gamer, blocos e imagens que você escolheu. Coleções de aparência
+        e agendamentos ficam vinculados à sua conta; a aparência sazonal pode
+        ser exibida publicamente no intervalo escolhido. Os dados de jogos e
         comunidades dos cartões são informados por você; não consultamos status
         online ou contas externas. Recebemos imagens PNG, JPEG ou WebP,
         normalizamos para WebP e removemos metadados. Visitas e cliques são
         armazenados em totais diários, sem identificação individual, localização
         ou IP na base de estatísticas. Contadores não representam visitantes
-        únicos.
+        únicos. Cliques em cartões são agregados separadamente. QR Codes e
+        VibeCards usam apenas dados publicados; arquivos já compartilhados com
+        terceiros não são revogados ao despublicar.
       </p>
       <h2>Demonstração</h2>
       <p>
@@ -41,12 +45,12 @@ export default function Privacy() {
       <p>
         Você pode excluir permanentemente sua conta na área autenticada,
         confirmando sua senha. A exclusão remove perfil, imagens, links, cartões
-        gamer, estatísticas, credenciais, sessões e tokens associados no banco
-        ativo. Na área da conta você também pode exportar seus dados em JSON.
-        Limites de acesso guardam chaves temporárias que podem conter IP e
-        endpoint quando há proxy configurado e devem ser removidos regularmente
-        pela tarefa de manutenção. Eventuais backups exigirão uma política de
-        retenção antes do lançamento.
+        gamer, blocos, coleções, agendamentos, estatísticas, credenciais,
+        sessões e tokens associados no banco ativo. Na área da conta você também
+        pode exportar seus dados em JSON. Limites de acesso guardam chaves
+        temporárias que podem conter IP e endpoint quando há proxy configurado e
+        devem ser removidos regularmente pela tarefa de manutenção. Eventuais
+        backups exigirão uma política de retenção antes do lançamento.
       </p>
       <h2>Antes do lançamento público</h2>
       <p>

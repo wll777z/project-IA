@@ -1,3 +1,4 @@
+import { studioSchema, blockKinds, vibeCardStyles } from "@/lib/studio-schema";
 import { z } from "zod";
 import { themes } from "@/lib/themes";
 import {
@@ -125,8 +126,42 @@ export function gamerCardDTO(card: GamerCardInput): GamerCardInput {
 }
 export type GamerCardInput = z.infer<typeof gamerCardSchema>;
 
+export const blockSchema = z
+  .object({
+    id: z.uuid(),
+    kind: z.enum(blockKinds),
+    title: shortText(80).min(1),
+    description: z
+      .string()
+      .trim()
+      .max(600)
+      .refine(
+        (v) => !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f]/.test(v),
+        "Texto inválido.",
+      ),
+    icon: z.enum(["gamepad", "swords", "blocks", "sparkles", "headset"]),
+    url: z.union([z.literal(""), safeLinkSchema]),
+    imageKeys: z.array(z.uuid()).max(6),
+    items: z.array(shortText(80).min(1)).max(12),
+    game: shortText(80),
+    date: z.union([z.literal(""), z.iso.date()]),
+    cardId: z.uuid().nullable(),
+    hidden: z.boolean(),
+    width: z.union([z.literal(1), z.literal(2)]),
+  })
+  .strict();
+export type BlockInput = z.infer<typeof blockSchema>;
 export const profileSchema = z
   .object({
+    studio: studioSchema,
+    blocks: z
+      .array(blockSchema)
+      .max(16)
+      .refine(
+        (v) => new Set(v.map((b) => b.id)).size === v.length,
+        "Blocos duplicados.",
+      ),
+    vibeCardStyle: z.enum(vibeCardStyles),
     username: usernameSchema,
     displayName: z
       .string()

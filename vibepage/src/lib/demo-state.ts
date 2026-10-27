@@ -1,3 +1,4 @@
+import { defaultStudio, studioSchema } from "@/lib/studio-schema";
 import { profileSchema, type ProfileInput } from "@/lib/validation";
 import { defaultEffects } from "@/lib/customization";
 import { themes } from "@/lib/themes";
@@ -13,7 +14,14 @@ export function loadDemo(
     const value: unknown = stored ? JSON.parse(stored) : null;
     const parsed = profileSchema.safeParse(
       value && typeof value === "object" && !Array.isArray(value)
-        ? { ...defaultEffects, gamerCards: [], ...value }
+        ? {
+            ...defaultEffects,
+            gamerCards: [],
+            studio: studioSchema.parse(defaultStudio),
+            blocks: [],
+            vibeCardStyle: "minimal",
+            ...value,
+          }
         : value,
     );
     if (parsed.success) {

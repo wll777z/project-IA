@@ -21,9 +21,13 @@ const icons = {
 export function GamerCard({
   card,
   index = 0,
+  preview = true,
+  selected = false,
 }: {
   card: GamerCardInput;
   index?: number;
+  preview?: boolean;
+  selected?: boolean;
 }) {
   const Icon = icons[card.icon] ?? Gamepad2;
   const safe = safeLinkSchema.safeParse(card.url);
@@ -68,6 +72,7 @@ export function GamerCard({
     </>
   );
   const props = {
+    "data-selected": selected || undefined,
     className: `gamer-card card-${card.style} card-layout-${card.layout} ${card.glow ? "card-glow" : ""} ${card.animated ? "card-animated" : ""}`,
     style: {
       "--card-color": card.color,
@@ -77,7 +82,7 @@ export function GamerCard({
   return safe.success ? (
     <a
       {...props}
-      href={safe.data}
+      href={preview ? safe.data : `/go/card/${card.id}`}
       target="_blank"
       rel="noopener noreferrer nofollow ugc"
       aria-label={`${gameNames[card.game]}: ${card.displayName} — abrir link externo`}
