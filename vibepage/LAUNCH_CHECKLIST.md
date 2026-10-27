@@ -2,6 +2,22 @@
 
 Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lançamento público** nem afirma que a infraestrutura já existe. Sem merge, deploy, contratação ou cobrança.
 
+## Gate da auditoria final — 27/10/2026
+
+Decisão atual: **NO-GO beta fechado com usuários reais / NO-GO lançamento público / NO-GO comercialização Pro**. GO somente para homologação local sintética. Evidências e critérios de mudança em `docs/FINAL_RELEASE_REVIEW.md`.
+
+- [x] Base GitHub atual conferida: Next Level `07d1e8c`; PRs #1/#2 contidos no #3; #5 incremental. PR #4 repete CTA já presente. Nenhum merge automático.
+- [x] Reproduzir e corrigir perda de aparência privada após save Free, e bloqueio de save com cartões legados excedentes.
+- [x] Limitar Open Graph PNG e testar 429 no standalone.
+- [x] Confirmar cookies HTTPS, bloqueio de sessão legada não verificada, XSS de blocos e revogação de QR/VibeCard/galeria ao despublicar em testes isolados.
+- [x] Medir perfil de 12 cartões/100 links e APIs/PNGs locais; registrar ambiente PGlite e limitações.
+- [ ] Aprovar PostgreSQL nativo vazio/upgrade/concorrência, backup e restauração em homologação autorizada.
+- [ ] Aprovar confirmação/recuperação com SMTP externo e domínio HTTPS reais. Callbacks em memória não aprovam entrega.
+- [ ] Concluir controle de acesso do beta, contatos/responsáveis, retenção e processo de denúncias/revisão/retirada.
+- [ ] Validar Safari/iOS, Chrome/Android, leitores de tela, movimento reduzido do sistema e rede móvel lenta.
+- [ ] Validar proxy/limites por cliente, persistência, alertas, recuperação e rollback com responsáveis.
+- [ ] Para vender Pro: integração de cobrança autorizada, condições comerciais e operação de suporte/cancelamento; não há checkout ativo.
+
 ## Novidades Next Level
 
 - [x] Comparar branches e partir da Ultimate Release, mantendo 13 temas/cartões/efeitos.
@@ -24,7 +40,7 @@ Atualização: 27/10/2026. Esta revisão prepara o código; **não autoriza lan�
 - [x] Corrigir IDs de links/cartões em HTTP/LAN e preservar customizações da demo ao recarregar o mesmo tema.
 - [x] Persistir cartões, efeitos e fontes com validação no servidor.
 - [x] Aplicar limites Free/Pro, propriedade dos IDs, transação e revisão otimista.
-- [x] Manter dados excedentes ao expirar Pro; limitar somente a exibição pública. No editor, a remoção dos excedentes exige ação explícita antes de salvar.
+- [x] Manter dados excedentes ao expirar Pro; limitar somente a exibição pública. O save Free mantém cartões legados excedentes e suas apresentações Pro privadas; incluir IDs novos acima de três é recusado.
 - [x] Normalizar avatares dos cartões, limitar armazenamento e proteger imagens privadas e cartões ocultos por plano.
 - [x] Incluir cartões na exportação e na exclusão em cascata.
 - [x] Migration aditiva testada em PGlite com perfil e links legados, sem alterar as quatro migrations anteriores.
