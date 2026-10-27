@@ -1,4 +1,5 @@
 import type { Prisma } from "@/generated/prisma/client";
+import { retainPrivateProAppearance } from "@/lib/appearance";
 import { isDeepStrictEqual } from "node:util";
 import { studioSchema, defaultStudio } from "@/lib/studio-schema";
 import { db } from "@/lib/db";
@@ -139,7 +140,11 @@ export async function saveProfile(userId: string, body: unknown) {
         !pro &&
         (theme.premium ||
           data.backgroundKey !== null ||
-          data.gamerCards.length > FREE_CARD_LIMIT ||
+          (data.gamerCards.length > FREE_CARD_LIMIT &&
+            (!current ||
+              data.gamerCards.some(
+                (card) => !current.gamerCards.some((old) => old.id === card.id),
+              ))) ||
           data.gamerCards.some(
             (c) =>
               c.glow ||
@@ -244,7 +249,10 @@ export async function saveProfile(userId: string, body: unknown) {
         vibeCardStyle,
         revision,
         ...fields
-      } = data;
+      } =
+        !pro && current
+          ? retainPrivateProAppearance(ownedProfileDTO(current), data)
+          : data;
       const studioFields = pro ? { studio, vibeCardStyle } : {};
       const profile = current
         ? await tx.profile.update({
