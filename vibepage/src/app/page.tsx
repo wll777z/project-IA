@@ -53,9 +53,9 @@ export default function Home() {
               <Link className="button" href="/cadastro">
                 Criar meu perfil grátis <ArrowRight size={18} />
               </Link>
-              <a className="text-button" href="#temas">
+              <Link className="text-button" href="/demo">
                 Experimentar o editor <ArrowUpRight size={16} />
-              </a>
+              </Link>
             </div>
             <div className="hero-note">
               <span className="mini-avatars">
