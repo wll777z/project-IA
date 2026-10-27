@@ -22,7 +22,7 @@ export function ShareCenter({
     [revision, setRevision] = useState(profile?.revision ?? 0),
     [message, setMessage] = useState(""),
     [busy, setBusy] = useState(false);
-  if (unavailable) return <UnavailableProfile />;
+  if (unavailable) return <UnavailableProfile page />;
   if (!profile?.published || !url)
     return (
       <section className="workspace-card">

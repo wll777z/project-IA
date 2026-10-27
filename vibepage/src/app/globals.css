@@ -3971,3 +3971,10 @@ a.gamer-card:focus-visible,
   white-space: nowrap;
   border: 0;
 }
+
+.workspace-card h1.availability-title {
+  font-size: 22px;
+  letter-spacing: -0.6px;
+  line-height: normal;
+  margin: 0;
+}

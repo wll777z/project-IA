@@ -6,10 +6,13 @@ export const availabilityLabels: Record<ProfileAvailability, string> = {
   published: "PUBLICADO",
   unavailable: "INDISPONÍVEL",
 };
-export function UnavailableProfile() {
+export function UnavailableProfile({ page = false }: { page?: boolean }) {
+  const Heading = page ? "h1" : "h2";
   return (
     <section className="workspace-card" aria-label="Disponibilidade do perfil">
-      <h2>Seu perfil está indisponível ao público.</h2>
+      <Heading className="availability-title">
+        Seu perfil está indisponível ao público.
+      </Heading>
       <p>
         Você pode continuar editando seus dados. Salvar alterações não libera a
         página, o QR Code ou a VibeCard.
