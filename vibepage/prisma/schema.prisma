@@ -27,6 +27,8 @@ model User {
   uploads       Upload[]
   appearances   SavedAppearance[]
   schedules     AppearanceSchedule[]
+  administrator Administrator?
+  caseEvents    SupportCaseEvent[]
 }
 
 model Session {
@@ -115,6 +117,8 @@ model Profile {
   views              PageView[]
   createdAt          DateTime       @default(now())
   updatedAt          DateTime       @updatedAt
+  suspendedAt        DateTime?
+  supportCases       SupportCase[]
 }
 
 model ProfileLink {
@@ -252,4 +256,47 @@ model CardClick {
 
   @@id([cardId, day])
   @@index([day])
+}
+
+model Administrator {
+  userId    String   @id
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  phone     String   @db.VarChar(16)
+  createdAt DateTime @default(now())
+}
+
+model SupportCase {
+  id             String             @id
+  kind           String             @db.VarChar(10)
+  category       String             @db.VarChar(24)
+  subject        String             @db.VarChar(120)
+  message        String             @db.VarChar(2000)
+  replyEmail     String?            @db.VarChar(254)
+  targetUsername String?            @db.VarChar(24)
+  profileId      String?
+  profile        Profile?           @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  status         String             @default("OPEN") @db.VarChar(16)
+  internalNote   String             @default("") @db.VarChar(1000)
+  revision       Int                @default(0)
+  createdAt      DateTime           @default(now())
+  updatedAt      DateTime           @updatedAt
+  expiresAt      DateTime
+  events         SupportCaseEvent[]
+
+  @@index([status, createdAt, id])
+  @@index([expiresAt])
+  @@index([profileId])
+}
+
+model SupportCaseEvent {
+  id          String      @id
+  caseId      String
+  supportCase SupportCase @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  actorId     String?
+  actor       User?       @relation(fields: [actorId], references: [id], onDelete: SetNull)
+  action      String      @db.VarChar(32)
+  createdAt   DateTime    @default(now())
+
+  @@index([caseId, createdAt])
+  @@index([actorId])
 }

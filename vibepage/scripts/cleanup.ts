@@ -3,6 +3,7 @@ import { db } from "../src/lib/db";
 try {
   const now = new Date();
   const result = await db.$transaction([
+    db.supportCase.deleteMany({ where: { expiresAt: { lte: now } } }),
     db.session.deleteMany({ where: { expiresAt: { lt: now } } }),
     db.verification.deleteMany({ where: { expiresAt: { lt: now } } }),
     db.rateLimit.deleteMany({

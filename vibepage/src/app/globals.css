@@ -3857,3 +3857,26 @@ a.gamer-card:focus-visible,
     overflow: clip;
   }
 }
+.profile-report {
+  grid-column: 1/-1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  font-size: 11px;
+  color: #c2b2d6;
+}
+.profile-report:focus-visible {
+  outline: 3px solid #cbb4ed;
+  outline-offset: 3px;
+}
+.legal-page select,
+.legal-page textarea {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid #a78bfa40;
+  border-radius: 8px;
+  background: #15111e;
+  color: #eee;
+  padding: 12px;
+}

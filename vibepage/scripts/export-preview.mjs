@@ -1,4 +1,5 @@
 import { readFile, writeFile, mkdir, rm, cp } from "node:fs/promises";
+import { spawnSync } from "node:child_process";
 import { resolve, join } from "node:path";
 const destination = process.argv[2];
 if (!destination)
@@ -9,7 +10,7 @@ const target = resolve(destination, "dist");
 await mkdir(target, { recursive: true });
 await rm(join(target, "_next"), { recursive: true, force: true });
 await cp(".next/static", join(target, "_next/static"), { recursive: true });
-for (const name of ["index", "demo", "demo/pro", "privacidade", "termos"]) {
+for (const name of ["index", "demo", "demo/pro"]) {
   const html = await readFile(`.next/server/app/${name}.html`, "utf8");
   // Preserve hydration for the interactive landing showcase and editor.
   // Rewriting React's server HTML causes hydration mismatches; preview-only
@@ -21,6 +22,15 @@ for (const name of ["index", "demo", "demo/pro", "privacidade", "termos"]) {
   await mkdir(resolve(output, ".."), { recursive: true });
   await writeFile(output, html);
 }
+const legal = spawnSync(
+  process.execPath,
+  ["--import", "tsx", "scripts/export-legal-preview.tsx", target],
+  { stdio: "inherit" },
+);
+if (legal.status !== 0)
+  throw new Error(
+    "Não foi possível exportar as páginas legais da demonstração.",
+  );
 for (const route of ["cadastro", "login"]) {
   await mkdir(join(target, route), { recursive: true });
   await writeFile(

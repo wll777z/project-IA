@@ -13,6 +13,7 @@ export async function GET(request: Request) {
           include: { links: true, views: true, gamerCards: true, blocks: true },
         },
         entitlement: { select: { plan: true, expiresAt: true } },
+        administrator: { select: { phone: true, createdAt: true } },
         appearances: true,
         schedules: true,
         uploads: {

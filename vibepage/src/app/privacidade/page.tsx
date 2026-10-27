@@ -1,3 +1,6 @@
+import { LegalDetails } from "@/components/legal-details";
+import { supportConfig } from "@/lib/support-config";
+export const dynamic = "force-dynamic";
 import { Brand } from "@/components/brand";
 export const metadata = { title: "Privacidade" };
 export default function Privacy() {
@@ -5,7 +8,11 @@ export default function Privacy() {
     <main id="main" className="legal-page">
       <Brand />
       <h1>Privacidade, sem mistério.</h1>
-      <p>Versão de desenvolvimento · 27 de outubro de 2026</p>
+      <p>
+        {supportConfig()
+          ? "Informações operacionais configuradas pelo responsável"
+          : "Versão de desenvolvimento · informações legais pendentes"}
+      </p>
       <h2>O que guardamos</h2>
       <p>
         Seu nome, e-mail e credenciais protegidas são usados para criar e
@@ -52,6 +59,16 @@ export default function Privacy() {
         devem ser removidos regularmente pela tarefa de manutenção. Eventuais
         backups exigirão uma política de retenção antes do lançamento.
       </p>
+      <h2>Suporte e denúncias</h2>
+      <p>
+        Mensagens enviadas pelo canal de suporte são privadas e têm retenção
+        própria, informada antes do envio. Não envie dados sensíveis. Ao excluir
+        a conta, removemos o contato de resposta que coincidir com seu e-mail; o
+        conteúdo de solicitações pode permanecer até o prazo informado para
+        tratamento e revisão. Solicite avaliação de exclusão pelo próprio canal.
+        O telefone administrativo é um contato privado, não uma identidade
+        verificada por SMS.
+      </p>
       <h2>Antes do lançamento público</h2>
       <p>
         Este é um ambiente de desenvolvimento. A identidade e o contato do
@@ -59,6 +76,7 @@ export default function Privacy() {
         correção, a política de retenção e os requisitos aplicáveis a menores de
         idade precisam ser definidos antes de receber público real.
       </p>
+      <LegalDetails />
     </main>
   );
 }

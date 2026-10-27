@@ -1,3 +1,6 @@
+import { LegalDetails } from "@/components/legal-details";
+import { supportConfig } from "@/lib/support-config";
+export const dynamic = "force-dynamic";
 import { Brand } from "@/components/brand";
 export const metadata = { title: "Termos de uso" };
 export default function Terms() {
@@ -5,7 +8,11 @@ export default function Terms() {
     <main id="main" className="legal-page">
       <Brand />
       <h1>Seu espaço, com respeito.</h1>
-      <p>Versão de desenvolvimento · 26 de outubro de 2026</p>
+      <p>
+        {supportConfig()
+          ? "Informações operacionais configuradas pelo responsável"
+          : "Versão de desenvolvimento · informações legais pendentes"}
+      </p>
       <h2>Disponibilidade</h2>
       <p>
         O VibePage oferece criação de conta, editor, páginas públicas e
@@ -40,6 +47,7 @@ export default function Terms() {
         legais e os canais de suporte deverão ser finalizados antes do
         lançamento público.
       </p>
+      <LegalDetails />
     </main>
   );
 }
