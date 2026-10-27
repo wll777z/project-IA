@@ -1,3 +1,4 @@
+import { db } from "@/lib/db";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -21,6 +22,9 @@ export default async function DashboardLayout({
 }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) redirect("/login");
+  const administrator =
+    session.user.emailVerified &&
+    (await db.administrator.findUnique({ where: { userId: session.user.id } }));
   return (
     <>
       <header className="app-header">
@@ -34,6 +38,12 @@ export default async function DashboardLayout({
         <aside className="app-sidebar">
           <p className="kicker">SEU UNIVERSO</p>
           <nav aria-label="Área da conta">
+            {administrator && (
+              <Link href="/dashboard/moderacao">
+                <Settings2 size={17} />
+                Suporte e moderação
+              </Link>
+            )}
             <Link href="/dashboard">
               <LayoutDashboard size={17} />
               Visão geral

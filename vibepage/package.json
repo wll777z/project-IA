@@ -1,7 +1,7 @@
 {
   "name": "vibepage",
-  "version": "0.2.0",
-  "description": "VibePage — MVP de perfis públicos, editor e estatísticas.",
+  "version": "3.0.0-rc.1",
+  "description": "VibePage \u2014 MVP de perfis p\u00fablicos, editor e estat\u00edsticas.",
   "scripts": {
     "test": "prisma generate && vitest run",
     "dev": "next dev",
@@ -18,7 +18,9 @@
     "format:check": "prettier --check .",
     "admin:plan": "node --import tsx scripts/entitlement.ts",
     "test:http": "node --import tsx tests/http-smoke.ts",
-    "setup": "node scripts/setup.mjs"
+    "setup": "node scripts/setup.mjs",
+    "admin:bootstrap": "node --env-file-if-exists=.env.admin.local --import tsx scripts/bootstrap-admin.ts",
+    "staging:check": "node scripts/check-staging.mjs"
   },
   "keywords": [],
   "author": "",

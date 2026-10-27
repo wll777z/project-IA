@@ -291,6 +291,7 @@ export default function Home() {
         <Brand />
         <p>Seu universo, em um link. © {new Date().getFullYear()} VibePage</p>
         <div>
+          <Link href="/suporte">Suporte e denúncias</Link>
           <Link href="/privacidade">Privacidade</Link>
           <Link href="/termos">Termos</Link>
           <span>

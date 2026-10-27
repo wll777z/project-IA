@@ -22,6 +22,14 @@ const app = spawn(process.execPath, [".next/standalone/launch.mjs"], {
     HOSTNAME: "127.0.0.1",
     BETTER_AUTH_URL: origin,
     NEXT_TELEMETRY_DISABLED: "1",
+    SUPPORT_INTAKE_ENABLED: "true",
+    SUPPORT_RETENTION_DAYS: "30",
+    LEGAL_CONTROLLER_NAME: "Synthetic staging operator",
+    LEGAL_CONTACT_EMAIL: "privacy@example.test",
+    LEGAL_NOTICE_VERSION: "http-test-v1",
+    LEGAL_RETENTION_NOTICE:
+      "Synthetic retention notice for isolated HTTP tests only.",
+    LEGAL_AGE_NOTICE: "Synthetic age policy for isolated HTTP tests only.",
   },
   stdio: ["ignore", "pipe", "pipe"],
 });
@@ -492,6 +500,88 @@ try {
       (await request(path)).status === 200,
       `nova área autenticada renderiza ${path}`,
     );
+  const supportBody = {
+    kind: "REPORT",
+    category: "ABUSE",
+    subject: "HTTP moderation test",
+    message: 'Test <img src=x onerror="alert(1)">',
+    replyEmail: credentials.email,
+    username: "http_player",
+    noticeVersion: "http-test-v1",
+  };
+  check(
+    (await request("/api/support", "POST", supportBody, "")).status === 503,
+    "canal sem administrador não promete receber solicitações",
+  );
+  await fixture.db.user.update({
+    where: { id: user.id },
+    data: { emailVerified: true },
+  });
+  await fixture.db.administrator.create({
+    data: { userId: user.id, phone: "+5511999999999" },
+  });
+  check(
+    (await request("/suporte")).status === 200,
+    "suporte configurado renderiza no standalone",
+  );
+  const report = await request("/api/support", "POST", supportBody, "");
+  check(report.status === 201, "denúncia real persiste no canal privado");
+  const reportId = (await report.json()).id;
+  check(
+    (await request("/api/admin/cases", "GET", undefined, "")).status === 401,
+    "fila administrativa não é pública",
+  );
+  check(
+    (await request("/api/admin/cases")).status === 200,
+    "administrador confirmado acessa fila privada",
+  );
+  const moderationHTML = await (await request("/dashboard/moderacao")).text();
+  check(
+    moderationHTML.includes("&lt;img") &&
+      !moderationHTML.includes("<img src=x"),
+    "administração renderiza denúncias com texto escapado",
+  );
+  check(
+    (
+      await request(`/api/admin/cases/${reportId}`, "POST", {
+        revision: 0,
+        status: "IN_REVIEW",
+        note: "Teste HTTP de ocultação",
+        action: "hide-profile",
+      })
+    ).status === 200,
+    "administrador registra ocultação de perfil",
+  );
+  check(
+    (await request("/http_player", "GET", undefined, "")).status === 404 &&
+      (await request("/api/qr/http_player", "GET", undefined, "")).status ===
+        404,
+    "moderação retira página e QR públicos",
+  );
+  check(
+    (await request(`/api/media/${backgroundKey}`, "GET", undefined, ""))
+      .status === 404,
+    "moderação retira acesso anônimo à mídia",
+  );
+  const ownerState = (await (await request("/api/profile")).json()).profile;
+  check(
+    (await request("/api/profile", "PUT", { ...ownerState, published: true }))
+      .status === 200 &&
+      (await request("/http_player", "GET", undefined, "")).status === 404,
+    "save do dono não contorna bloqueio administrativo",
+  );
+  check(
+    (
+      await request(`/api/admin/cases/${reportId}`, "POST", {
+        revision: 1,
+        status: "RESOLVED",
+        note: "Teste HTTP de restauração",
+        action: "restore-profile",
+      })
+    ).status === 200 &&
+      (await request("/http_player", "GET", undefined, "")).status === 200,
+    "revisão administrativa restaura perfil sem apagar conteúdo",
+  );
   await fixture.db.entitlement.update({
     where: { userId: user.id },
     data: { expiresAt: new Date(0) },
@@ -551,6 +641,13 @@ try {
     "exclusão confirmada por senha funciona",
   );
   check((await fixture.db.user.count()) === 0, "conta removida do banco");
+  check(
+    (await fixture.db.administrator.count()) === 0 &&
+      (await fixture.db.supportCase.count({
+        where: { replyEmail: credentials.email },
+      })) === 0,
+    "exclusão revoga administração e limpa contato de suporte",
+  );
   check(
     (await request("/http_player", "GET", undefined, "")).status === 404,
     "página excluída não permanece pública",

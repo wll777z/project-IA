@@ -72,6 +72,10 @@ export function createAuth({
       deleteUser: {
         enabled: true,
         beforeDelete: async (user) => {
+          await db.supportCase.updateMany({
+            where: { replyEmail: user.email },
+            data: { replyEmail: null },
+          });
           await db.verification.deleteMany({
             where: { OR: [{ value: user.id }, { identifier: user.email }] },
           });

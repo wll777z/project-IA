@@ -1,0 +1,100 @@
+x-runtime: &runtime
+  NODE_ENV: production
+  DATABASE_URL: postgresql://vibepage:${POSTGRES_PASSWORD:?Defina a senha URL-safe do banco}@db:5432/vibepage?schema=public
+  BETTER_AUTH_URL: ${BETTER_AUTH_URL:?Defina a origem HTTPS de homologacao}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET:?Defina uma chave aleatoria exclusiva}
+  REQUIRE_EMAIL_VERIFICATION: "true"
+  SMTP_HOST: ${SMTP_HOST:?Configure SMTP real}
+  SMTP_PORT: ${SMTP_PORT:-587}
+  SMTP_USER: ${SMTP_USER:?Configure SMTP real}
+  SMTP_PASSWORD: ${SMTP_PASSWORD:?Configure SMTP real}
+  SMTP_FROM: ${SMTP_FROM:?Configure o remetente}
+  AUTH_IP_HEADER: x-vibepage-client-ip
+  SUPPORT_INTAKE_ENABLED: ${SUPPORT_INTAKE_ENABLED:-false}
+  SUPPORT_RETENTION_DAYS: ${SUPPORT_RETENTION_DAYS:-}
+  LEGAL_CONTROLLER_NAME: ${LEGAL_CONTROLLER_NAME:-}
+  LEGAL_CONTACT_EMAIL: ${LEGAL_CONTACT_EMAIL:-}
+  LEGAL_NOTICE_VERSION: ${LEGAL_NOTICE_VERSION:-}
+  LEGAL_RETENTION_NOTICE: ${LEGAL_RETENTION_NOTICE:-}
+  LEGAL_AGE_NOTICE: ${LEGAL_AGE_NOTICE:-}
+services:
+  preflight:
+    build: { context: ., target: builder }
+    environment:
+      <<: *runtime
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina a senha do banco}
+      VIBEPAGE_DOMAIN: ${VIBEPAGE_DOMAIN:?Defina dominio DNS real}
+      TLS_EMAIL: ${TLS_EMAIL:?Defina contato ACME}
+      STAGING_BASIC_USER: ${STAGING_BASIC_USER:?Defina acesso privado}
+      STAGING_BASIC_PASSWORD_HASH: ${STAGING_BASIC_PASSWORD_HASH:?Defina hash bcrypt}
+    command:
+      [
+        node,
+        -e,
+        "import('./scripts/staging-env.mjs').then(m=>m.validateStagingEnv(process.env)).catch(()=>{console.error('Configuracao de homologacao invalida; nenhum segredo foi impresso.');process.exit(1)})",
+      ]
+  db:
+    image: postgres:17-alpine
+    depends_on: { preflight: { condition: service_completed_successfully } }
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vibepage
+      POSTGRES_USER: vibepage
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Defina a senha do banco}
+    volumes: [staging_pg:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U vibepage -d vibepage]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+  migrate:
+    build: { context: ., target: builder }
+    environment: *runtime
+    depends_on: { db: { condition: service_healthy } }
+    command: [sh, -c, "npm run db:migrate && npm run db:seed"]
+  web:
+    build: { context: ., target: runner }
+    restart: unless-stopped
+    environment:
+      <<: *runtime
+      HOSTNAME: 0.0.0.0
+      PORT: "3000"
+    depends_on: { migrate: { condition: service_completed_successfully } }
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      VIBEPAGE_DOMAIN: ${VIBEPAGE_DOMAIN:?Defina dominio DNS real}
+      TLS_EMAIL: ${TLS_EMAIL:?Defina contato ACME do operador}
+      STAGING_BASIC_USER: ${STAGING_BASIC_USER:?Defina acesso privado de homologacao}
+      STAGING_BASIC_PASSWORD_HASH: ${STAGING_BASIC_PASSWORD_HASH:?Defina hash bcrypt, nunca senha em texto}
+    ports: ["80:80", "443:443", "443:443/udp"]
+    volumes:
+      [
+        ./ops/Caddyfile.staging:/etc/caddy/Caddyfile:ro,
+        staging_caddy_data:/data,
+        staging_caddy_config:/config,
+      ]
+    depends_on: [web]
+  admin-bootstrap:
+    profiles: [admin]
+    build: { context: ., target: builder }
+    environment:
+      <<: *runtime
+      ADMIN_BOOTSTRAP_EMAIL: ${ADMIN_BOOTSTRAP_EMAIL:-}
+      ADMIN_BOOTSTRAP_PHONE: ${ADMIN_BOOTSTRAP_PHONE:-}
+    stdin_open: true
+    tty: true
+    depends_on: { db: { condition: service_healthy } }
+    command: [npm, run, "admin:bootstrap"]
+  cleanup:
+    profiles: [maintenance]
+    build: { context: ., target: builder }
+    environment:
+      DATABASE_URL: postgresql://vibepage:${POSTGRES_PASSWORD:?Defina a senha do banco}@db:5432/vibepage?schema=public
+    depends_on: { db: { condition: service_healthy } }
+    command: [npm, run, "db:cleanup"]
+volumes:
+  staging_pg:
+  staging_caddy_data:
+  staging_caddy_config:

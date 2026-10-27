@@ -28,7 +28,7 @@ export const getPublicProfile = cache(async (username: string) => {
       user: { select: { entitlement: true } },
     },
   });
-  if (!profile?.published) return null;
+  if (!profile?.published || profile.suspendedAt) return null;
   const pro = isPro(profile.user.entitlement);
   const theme = findTheme(profile.themeId);
   const effectiveTheme =

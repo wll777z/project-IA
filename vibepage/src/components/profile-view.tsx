@@ -214,6 +214,14 @@ export function ProfileView({
               {sections[id]}
             </motion.section>
           ))}
+        {!preview && (
+          <Link
+            className="profile-report"
+            href={`/suporte?perfil=${encodeURIComponent(profile.username)}`}
+          >
+            Denunciar perfil
+          </Link>
+        )}
         {!(pro && profile.hideBranding) && (
           <Link className="public-brand" href="/">
             <AudioLines size={15} /> feito com <strong>vibepage</strong>
