@@ -1,0 +1,242 @@
+[
+  {
+    "width": 360,
+    "page": "demo",
+    "cardCount": 1,
+    "clientWidth": 345,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 60,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 387
+  },
+  {
+    "width": 360,
+    "page": "audit_perf",
+    "cardCount": 12,
+    "clientWidth": 345,
+    "linkCount": 100,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 88,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 345
+  },
+  {
+    "width": 360,
+    "page": "landing",
+    "cardCount": 1,
+    "clientWidth": 345,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 96,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 345
+  },
+  {
+    "width": 360,
+    "page": "login-real",
+    "cardCount": 0,
+    "clientWidth": 360,
+    "linkCount": 0,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 60,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 360
+  },
+  {
+    "width": 390,
+    "page": "demo",
+    "cardCount": 1,
+    "clientWidth": 375,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 72,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 387
+  },
+  {
+    "width": 390,
+    "page": "audit_perf",
+    "cardCount": 12,
+    "clientWidth": 375,
+    "linkCount": 100,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 76,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 375
+  },
+  {
+    "width": 390,
+    "page": "landing",
+    "cardCount": 1,
+    "clientWidth": 375,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 64,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 375
+  },
+  {
+    "width": 390,
+    "page": "login-real",
+    "cardCount": 0,
+    "clientWidth": 390,
+    "linkCount": 0,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 80,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 390
+  },
+  {
+    "width": 768,
+    "page": "demo",
+    "cardCount": 1,
+    "clientWidth": 753,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 72,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 753
+  },
+  {
+    "width": 768,
+    "page": "audit_perf",
+    "cardCount": 12,
+    "clientWidth": 753,
+    "linkCount": 100,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 88,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 753
+  },
+  {
+    "width": 768,
+    "page": "landing",
+    "cardCount": 1,
+    "clientWidth": 753,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 84,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 817
+  },
+  {
+    "width": 768,
+    "page": "login-real",
+    "cardCount": 0,
+    "clientWidth": 768,
+    "linkCount": 0,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 68,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 768
+  },
+  {
+    "width": 1440,
+    "page": "demo",
+    "cardCount": 1,
+    "clientWidth": 1425,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 72,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 1425
+  },
+  {
+    "width": 1440,
+    "page": "audit_perf",
+    "cardCount": 12,
+    "clientWidth": 1425,
+    "linkCount": 100,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 76,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 1425
+  },
+  {
+    "width": 1440,
+    "page": "landing",
+    "cardCount": 1,
+    "clientWidth": 1425,
+    "linkCount": 2,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 72,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 1425
+  },
+  {
+    "width": 1440,
+    "page": "login-real",
+    "cardCount": 0,
+    "clientWidth": 1440,
+    "linkCount": 0,
+    "metrics": {
+      "cls": 0,
+      "interactionEntries": 0,
+      "lcpMs": 168,
+      "longTasksMs": 0,
+      "observedInteractionMaxMs": null
+    },
+    "scrollWidth": 1440
+  }
+]

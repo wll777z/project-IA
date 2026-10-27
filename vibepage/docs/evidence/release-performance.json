@@ -1,0 +1,151 @@
+{
+  "date": "2026-10-27T10:04:21.109Z",
+  "environment": "Node standalone loopback + isolated PGlite; not production PostgreSQL or mobile network",
+  "profile": {
+    "cards": 12,
+    "links": 100
+  },
+  "publicProfileHTTP": {
+    "coldMs": 388.49,
+    "warmMedianMs": 30.93,
+    "warmP95Ms": 34.68,
+    "samplesMs": [
+      388.49, 34.68, 30.93, 31.06, 31.4, 32.6, 26.65, 27.1, 24.63, 25.62
+    ],
+    "decodedBytes": 135034
+  },
+  "authenticatedProfileAPI": {
+    "coldMs": 120.31,
+    "warmMedianMs": 13.72,
+    "warmP95Ms": 21.05,
+    "samplesMs": [
+      120.31, 13.71, 14.47, 21.05, 16.47, 11.4, 11.23, 10.88, 17.15, 13.72
+    ],
+    "decodedBytes": 14451
+  },
+  "authenticatedStatsAPI": {
+    "coldMs": 24.66,
+    "warmMedianMs": 12.94,
+    "warmP95Ms": 14.46,
+    "samplesMs": [
+      24.66, 12.94, 12.45, 12.75, 12.66, 12.25, 14.46, 13.21, 13.65, 13
+    ],
+    "decodedBytes": 14477
+  },
+  "publicProfileDomainReadMs": [
+    13.89, 8.79, 7.55, 7.46, 12.99, 7.11, 5.38, 5.55, 5.26, 5.35
+  ],
+  "scripts": [
+    {
+      "path": "/_next/static/chunks/2r4s4h5xul1n-.js",
+      "decodedBytes": 28739,
+      "gzipEstimateBytes": 7624
+    },
+    {
+      "path": "/_next/static/chunks/3wbm-994r45kr.js",
+      "decodedBytes": 229820,
+      "gzipEstimateBytes": 71969
+    },
+    {
+      "path": "/_next/static/chunks/0lg7b9d_6tekw.js",
+      "decodedBytes": 168357,
+      "gzipEstimateBytes": 46368
+    },
+    {
+      "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+      "decodedBytes": 11255,
+      "gzipEstimateBytes": 4390
+    },
+    {
+      "path": "/_next/static/chunks/42onvq6nokjl2.js",
+      "decodedBytes": 13822,
+      "gzipEstimateBytes": 3514
+    },
+    {
+      "path": "/_next/static/chunks/2n5qeheznvl4u.js",
+      "decodedBytes": 7820,
+      "gzipEstimateBytes": 3307
+    },
+    {
+      "path": "/_next/static/chunks/2ylbvju29p_ix.js",
+      "decodedBytes": 710,
+      "gzipEstimateBytes": 458
+    },
+    {
+      "path": "/_next/static/chunks/3n8wrxyy_crzr.js",
+      "decodedBytes": 28896,
+      "gzipEstimateBytes": 10879
+    },
+    {
+      "path": "/_next/static/chunks/0l5fp8_ck80qf.js",
+      "decodedBytes": 109124,
+      "gzipEstimateBytes": 31454
+    },
+    {
+      "path": "/_next/static/chunks/16bwvysfl_chj.js",
+      "decodedBytes": 133836,
+      "gzipEstimateBytes": 44631
+    },
+    {
+      "path": "/_next/static/chunks/0cz1d0mv5g_q7.js",
+      "decodedBytes": 112594,
+      "gzipEstimateBytes": 39627
+    },
+    {
+      "path": "/_next/static/chunks/1x6obpmlu1_c2.js",
+      "decodedBytes": 5361,
+      "gzipEstimateBytes": 1975
+    }
+  ],
+  "scriptTotals": {
+    "decodedBytes": 850334,
+    "gzipEstimateBytes": 266196
+  },
+  "png": [
+    {
+      "style": "minimal",
+      "ms": 251.02,
+      "bytes": 44020,
+      "parentCpuMs": 352.62,
+      "parentRssMiB": 714.34,
+      "parentRssDeltaMiB": 77.39
+    },
+    {
+      "style": "neon",
+      "ms": 46.63,
+      "bytes": 43979,
+      "parentCpuMs": 59.48,
+      "parentRssMiB": 733.71,
+      "parentRssDeltaMiB": 19.38
+    },
+    {
+      "style": "holographic",
+      "ms": 53.31,
+      "bytes": 80043,
+      "parentCpuMs": 84.28,
+      "parentRssMiB": 733.93,
+      "parentRssDeltaMiB": 0.21
+    },
+    {
+      "style": "galaxy",
+      "ms": 74.58,
+      "bytes": 80876,
+      "parentCpuMs": 86.44,
+      "parentRssMiB": 752.93,
+      "parentRssDeltaMiB": 19
+    },
+    {
+      "style": "retro",
+      "ms": 42.43,
+      "bytes": 43940,
+      "parentCpuMs": 46.51,
+      "parentRssMiB": 753.68,
+      "parentRssDeltaMiB": 0.75
+    }
+  ],
+  "limits": [
+    "10 sequential samples, not load or multi-process concurrency",
+    "PNG CPU/RSS refer to the probe process including PGlite/Prisma, not an isolated server worker",
+    "No native PostgreSQL, SMTP, real-user Web Vitals, slow-mobile network or animation CPU measurement"
+  ]
+}
