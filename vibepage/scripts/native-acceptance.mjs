@@ -224,6 +224,23 @@ try {
     }
     if (!(await sql(database, fingerprintSQL)).equals(before))
       throw new Error("Persistence fingerprint mismatch.");
+    // Docker may reallocate an automatically published host port on restart.
+    const restartedPort = (
+      await docker(["port", container, "5432/tcp"], { quiet: true })
+    )
+      .toString()
+      .trim();
+    const restartedMatch = /^127\.0\.0\.1:(\d+)$/.exec(restartedPort);
+    if (!restartedMatch)
+      throw new Error("Restarted fixture must remain loopback-only.");
+    const restartedURL = new URL(url);
+    restartedURL.port = restartedMatch[1];
+    env.DATABASE_URL = env.VIBEPAGE_NATIVE_TEST_URL = restartedURL.href;
+    await run(
+      process.execPath,
+      ["--import", "tsx", "tests/native-lifecycle.ts", "restart"],
+      { env },
+    );
   });
   await stage(
     "Custom backup, checksum, empty isolated restore and full-row comparison",

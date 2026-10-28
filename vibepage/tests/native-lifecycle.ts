@@ -1,6 +1,8 @@
 // Executed only by scripts/native-acceptance.mjs in its new synthetic container.
 import assert from "node:assert/strict";
 import { randomUUID } from "node:crypto";
+import { spawn } from "node:child_process";
+import { createServer } from "node:net";
 import { nativeTestURL } from "../scripts/native-test-env.mjs";
 assert(nativeTestURL(), "Native fixture URL required");
 process.env.DATABASE_URL = nativeTestURL()!;
@@ -91,6 +93,49 @@ try {
           value: "synthetic",
           expiresAt,
         },
+      });
+    }
+  } else if (process.argv[2] === "restart") {
+    const probe = createServer();
+    await new Promise<void>((resolve) => probe.listen(0, "127.0.0.1", resolve));
+    const address = probe.address();
+    assert(address && typeof address !== "string");
+    const port = address.port;
+    await new Promise<void>((resolve) => probe.close(() => resolve()));
+    const origin = `http://127.0.0.1:${port}`;
+    const child = spawn(process.execPath, [".next/standalone/launch.mjs"], {
+      env: {
+        ...process.env,
+        NODE_ENV: "production",
+        HOSTNAME: "127.0.0.1",
+        PORT: String(port),
+        BETTER_AUTH_URL: origin,
+      },
+      stdio: "ignore",
+    });
+    try {
+      const deadline = Date.now() + 30000;
+      while (true) {
+        try {
+          assert.equal((await fetch(origin + "/api/health")).status, 200);
+          break;
+        } catch (error) {
+          if (Date.now() >= deadline || child.exitCode !== null) throw error;
+          await new Promise((r) => setTimeout(r, 100));
+        }
+      }
+      const page = await fetch(origin + "/native_acceptance");
+      assert.equal(page.status, 200);
+      assert((await page.text()).includes("native_acceptance"));
+    } finally {
+      child.kill("SIGTERM");
+      await new Promise<void>((resolve) => {
+        if (child.exitCode !== null) return resolve();
+        child.once("exit", () => resolve());
+        setTimeout(() => {
+          child.kill("SIGKILL");
+          resolve();
+        }, 5000).unref();
       });
     }
   } else if (process.argv[2] === "cleanup") {
