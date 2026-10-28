@@ -3,14 +3,18 @@ import { spawn } from "node:child_process";
 import { randomBytes, createHash } from "node:crypto";
 import { mkdtemp, readFile, readdir, writeFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, resolve } from "node:path";
 const nonce = randomBytes(8).toString("hex");
 const container = `vibepage-acceptance-${nonce}`;
 const database = `vibepage_acceptance_${nonce}`;
 const restored = `vibepage_restore_${nonce}`;
 const password = randomBytes(24).toString("hex");
 const root = await mkdtemp(join(tmpdir(), "vibepage-acceptance-"));
-let created = false;
+let created = false,
+  webCreated = false,
+  imageCreated = false;
+const web = `vibepage-web-acceptance-${nonce}`;
+const image = `vibepage-acceptance:${nonce}`;
 const started = Date.now(),
   results = [];
 function run(
@@ -297,6 +301,107 @@ try {
         throw new Error("Restored full-row fingerprint mismatch.");
     },
   );
+  await stage(
+    "Standalone Docker image starts as non-root and reaches healthy with native DB",
+    async () => {
+      await docker(
+        [
+          "build",
+          "--quiet",
+          "--target",
+          "runner",
+          "--build-arg",
+          "BETTER_AUTH_URL=http://localhost:3000",
+          "--tag",
+          image,
+          ".",
+        ],
+        { quiet: true, timeout: 600000 },
+      );
+      imageCreated = true;
+      await docker(
+        [
+          "run",
+          "--detach",
+          "--name",
+          web,
+          "--network",
+          `container:${container}`,
+          "--env",
+          "DATABASE_URL",
+          "--env",
+          "BETTER_AUTH_URL=http://localhost:3000",
+          "--env",
+          "BETTER_AUTH_SECRET",
+          "--env",
+          "REQUIRE_EMAIL_VERIFICATION=false",
+          image,
+        ],
+        {
+          quiet: true,
+          env: {
+            DATABASE_URL: `postgresql://vibepage_test:${password}@127.0.0.1:5432/${database}`,
+            BETTER_AUTH_SECRET: env.BETTER_AUTH_SECRET,
+          },
+        },
+      );
+      webCreated = true;
+      const deadline = Date.now() + 100000;
+      while (true) {
+        const health = (
+          await docker(
+            ["inspect", "--format", "{{.State.Health.Status}}", web],
+            { quiet: true },
+          )
+        )
+          .toString()
+          .trim();
+        if (health === "healthy") break;
+        if (health === "unhealthy" || Date.now() > deadline)
+          throw new Error("Standalone container did not become healthy.");
+        await new Promise((r) => setTimeout(r, 1000));
+      }
+      const uid = (await docker(["exec", web, "id", "-u"], { quiet: true }))
+        .toString()
+        .trim();
+      if (uid === "0") throw new Error("Runner must not run as root.");
+      await docker(["exec", web, "node", "healthcheck.mjs"], { quiet: true });
+    },
+  );
+  await stage(
+    "Caddy staging configuration validates without external publication",
+    async () => {
+      await docker(
+        [
+          "run",
+          "--rm",
+          "--network",
+          "none",
+          "--env",
+          "VIBEPAGE_DOMAIN=staging.example.test",
+          "--env",
+          "TLS_EMAIL=operator@example.test",
+          "--env",
+          "STAGING_BASIC_USER=operator",
+          "--env",
+          "STAGING_BASIC_PASSWORD_HASH",
+          "--volume",
+          `${resolve("ops/Caddyfile.staging")}:/etc/caddy/Caddyfile:ro`,
+          "caddy:2-alpine",
+          "caddy",
+          "validate",
+          "--config",
+          "/etc/caddy/Caddyfile",
+          "--adapter",
+          "caddyfile",
+        ],
+        {
+          quiet: true,
+          env: { STAGING_BASIC_PASSWORD_HASH: "$2b$12$" + "a".repeat(53) },
+        },
+      );
+    },
+  );
   await stage("Cleanup deletes expired records only", async () => {
     await run("npm", ["run", "db:cleanup"], { env });
     await run(
@@ -332,6 +437,16 @@ try {
   );
   process.exitCode = 1;
 } finally {
+  if (webCreated)
+    await docker(["rm", "--force", web], { quiet: true }).catch(() => {
+      process.exitCode = 1;
+    });
+  if (imageCreated)
+    await docker(["image", "rm", "--force", image], { quiet: true }).catch(
+      () => {
+        process.exitCode = 1;
+      },
+    );
   if (created)
     await docker(["rm", "--force", "--volumes", container], {
       quiet: true,

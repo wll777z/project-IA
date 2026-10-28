@@ -1,5 +1,6 @@
 import { beforeAll, afterAll, it, expect } from "vitest";
 import { setupDB } from "./setup-db";
+import { createEmailVerificationToken } from "better-auth/api";
 let fixture: Awaited<ReturnType<typeof setupDB>>;
 let auth: ReturnType<typeof import("../src/lib/auth").createAuth>;
 const messages: { to: string; text: string }[] = [];
@@ -61,6 +62,20 @@ it("não permite login antes de confirmar o e-mail", async () => {
   );
   expect(await fixture.db.session.count()).toBe(0);
 });
+it("token de confirmação expirado não verifica conta pendente nem cria sessão", async () => {
+  const token = await createEmailVerificationToken(
+    process.env.BETTER_AUTH_SECRET!,
+    email,
+    undefined,
+    -60,
+  );
+  expect((await request(`verify-email?token=${token}`)).ok).toBe(false);
+  expect(
+    (await fixture.db.user.findUniqueOrThrow({ where: { email } }))
+      .emailVerified,
+  ).toBe(false);
+  expect(await fixture.db.session.count()).toBe(0);
+});
 it("rejeita token inválido e aceita a confirmação sem auto-login", async () => {
   expect((await request("verify-email?token=invalid")).ok).toBe(false);
   const response = await auth.handler(new Request(lastURL()));
@@ -69,6 +84,15 @@ it("rejeita token inválido e aceita a confirmação sem auto-login", async () =
     (await fixture.db.user.findUniqueOrThrow({ where: { email } }))
       .emailVerified,
   ).toBe(true);
+  expect(await fixture.db.session.count()).toBe(0);
+});
+it("repetir confirmação já concluída não cria sessão nem altera identidade", async () => {
+  const before = await fixture.db.user.findUniqueOrThrow({ where: { email } });
+  const result = await auth.handler(new Request(lastURL()));
+  expect([200, 302]).toContain(result.status);
+  expect(
+    (await fixture.db.user.findUniqueOrThrow({ where: { email } })).id,
+  ).toBe(before.id);
   expect(await fixture.db.session.count()).toBe(0);
 });
 it("recuperação não enumera contas e troca a senha revogando sessões", async () => {
@@ -104,4 +128,43 @@ it("recuperação não enumera contas e troca a senha revogando sessões", async
   expect(
     (await request("sign-in/email", { email, password: newPassword })).status,
   ).toBe(200);
+});
+
+it("reset expirado não altera senha nem revoga sessão válida", async () => {
+  await fixture.db.rateLimit.deleteMany();
+  await request("request-password-reset", {
+    email,
+    redirectTo: "/redefinir-senha",
+  });
+  const token = new URL(lastURL()).pathname.split("/").at(-1)!;
+  const user = await fixture.db.user.findUniqueOrThrow({ where: { email } });
+  const before = await fixture.db.account.findFirstOrThrow({
+    where: { userId: user.id },
+  });
+  const sessions = await fixture.db.session.count({
+    where: { userId: user.id },
+  });
+  expect(
+    (
+      await fixture.db.verification.updateMany({
+        where: { identifier: `reset-password:${token}` },
+        data: { expiresAt: new Date(0) },
+      })
+    ).count,
+  ).toBe(1);
+  expect(
+    (
+      await request("reset-password", {
+        token,
+        newPassword: "expired-token-must-not-change-password",
+      })
+    ).status,
+  ).toBe(400);
+  expect(
+    (await fixture.db.account.findUniqueOrThrow({ where: { id: before.id } }))
+      .password,
+  ).toBe(before.password);
+  expect(await fixture.db.session.count({ where: { userId: user.id } })).toBe(
+    sessions,
+  );
 });
