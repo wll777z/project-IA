@@ -1,0 +1,169 @@
+{
+  "baseCommit": "7a7c72118bf3e8476f5d055325b497c4019b6477",
+  "codeCommitWithNativeCI": "2c5006899a805db41f60d1a8387de50f4f31e36b",
+  "branch": "fix/vibepage-final-launch-blockers",
+  "pullRequest": 12,
+  "environment": {
+    "os": "Ubuntu 24.04 managed Linux",
+    "node": "v24.22.1",
+    "npm": "11.9.0",
+    "databaseLocal": "PGlite 0.5.12",
+    "nativeEnvironment": "GitHub Actions Ubuntu runner, isolated Docker PostgreSQL 17"
+  },
+  "npmCI": {
+    "exitCode": 0,
+    "durationReportedSeconds": 32
+  },
+  "commands": [
+    {
+      "label": "lint",
+      "command": "npm run lint",
+      "exitCode": 0,
+      "durationSeconds": 4.74
+    },
+    {
+      "label": "typecheck",
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "durationSeconds": 3.29
+    },
+    {
+      "label": "test",
+      "command": "npm test",
+      "exitCode": 0,
+      "durationSeconds": 57.68
+    },
+    {
+      "label": "build",
+      "command": "npm run build",
+      "exitCode": 0,
+      "durationSeconds": 12.67
+    },
+    {
+      "label": "http",
+      "command": "npm run test:http",
+      "exitCode": 0,
+      "durationSeconds": 6.69
+    },
+    {
+      "label": "format",
+      "command": "npm run format:check",
+      "exitCode": 0,
+      "durationSeconds": 2.75
+    },
+    {
+      "label": "audit",
+      "command": "npm audit",
+      "exitCode": 0,
+      "durationSeconds": 6.63
+    }
+  ],
+  "originContract": {
+    "commands": [
+      {
+        "label": "public-build",
+        "command": "npm run build",
+        "exitCode": 0,
+        "durationSeconds": 11.99
+      },
+      {
+        "label": "origin",
+        "command": "npm run test:origin",
+        "exitCode": 0,
+        "durationSeconds": 4.32
+      }
+    ],
+    "checks": 9,
+    "transport": "HTTP loopback; synthetic HTTPS origin only, no external TLS/SMTP"
+  },
+  "testCount": 221,
+  "testFiles": 32,
+  "httpChecks": 111,
+  "auditVulnerabilities": 0,
+  "preservation": {
+    "base": "7a7c72118bf3e8476f5d055325b497c4019b6477",
+    "schemaUnchanged": true,
+    "migrations": [
+      {
+        "path": "prisma/migrations/202610260001_init/migration.sql",
+        "sha256": "3125de4092e93106eb3b6326b9b040555767d271e8449346e36b6d784e3bbe05",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610260002_profiles/migration.sql",
+        "sha256": "a9c1cbcbf7ff2f2bbc711d2b755564bf21a96812bf0794517edcde103ff9c726",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610260003_analytics/migration.sql",
+        "sha256": "ff10397155b5676cb02fb60947a82403ceec06ecce0153bcf517f65a6b6201e2",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610260004_staged_uploads/migration.sql",
+        "sha256": "5f484b61adec77e28051e3551c0e02fb4dbc329105a8031d8fb8aeeefb76063a",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610270001_ultimate/migration.sql",
+        "sha256": "9686b11bbd80e158b124200cd3555d5bd8cbe4ae0c4c0a3e57a1eb7a42be493c",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610270002_aurora_blue/migration.sql",
+        "sha256": "433f268a22d1240a80080cd2987728ecfd95276bee03cea414c2df1fe1c16f3b",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610270003_next_level/migration.sql",
+        "sha256": "05c5846eaa6b8d928387fd5708fa660537a1149ace2f0bc9de086f315aaac899",
+        "unchanged": true
+      },
+      {
+        "path": "prisma/migrations/202610270004_release_operations/migration.sql",
+        "sha256": "6120f8b2af94c7d2a762129f75dcef1eee1116cc02ae66bbb254ab5af9ca92a7",
+        "unchanged": true
+      }
+    ]
+  },
+  "nativeEvidence": "final-launch-native.json",
+  "ciRunsForCode": [40639939948, 40639945352],
+  "ciConclusionForCode": "success",
+  "browser": {
+    "width": 390,
+    "dashboardAndEditorDOMObserved": true,
+    "functionalHydrationAndSaveVerified": false,
+    "fullJourneyVerified": false,
+    "blocker": "Browser policy blocked continuation; no workaround attempted. Temporary QA harness removed from release tree.",
+    "physicalDevices": false
+  },
+  "expectedBlockedCommands": [
+    {
+      "command": "npm run test:native",
+      "localExitCode": 1,
+      "reason": "Docker unavailable locally; native suite passed separately in CI"
+    },
+    {
+      "command": "npm run ops:status -- /tmp/nonexistent-vibepage-env",
+      "localExitCode": 1,
+      "reason": "Docker/private configuration unavailable; sanitized failure observed, no target monitoring configured"
+    }
+  ],
+  "attemptsRepaired": [
+    "Initial concurrent Prisma generation/typecheck conflicted; final commands run sequentially",
+    "Native guard ProcessEnv typing corrected",
+    "Legacy upgrade fixture missing Theme row seeded",
+    "Docker restart reallocated fixture port; URL refreshed before reconnect",
+    "Origin test initially built for wrong synthetic hostname; rebuilt for the existing freeze-origin.example.test fixture and nine checks passed"
+  ],
+  "notPerformed": [
+    "No external SMTP sent; token tests use captured delivery",
+    "No target server/DNS/HTTPS/Compose deployment",
+    "No production or real-account mutation",
+    "No real backup encryption/operator-key/off-host restoration",
+    "No installed timers or delivered alerts",
+    "No iOS/Safari, Android physical device or screen-reader certification",
+    "No merge/deploy/payments"
+  ],
+  "buildOriginAtEnd": "http://localhost:3000"
+}

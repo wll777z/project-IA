@@ -1,3 +1,37 @@
+# Execução final de bloqueadores — 28/10/2026
+
+Branch `fix/vibepage-final-launch-blockers`, base completa `7a7c721`, PR #12. Node 24.22.1/npm11.9.0/Ubuntu24.04 local; CI nativo em runner GitHub com Docker. Sem merge/deploy, SMTP externo ou alteração de dados reais.
+
+| Comando                                       | Resultado real                                                            | Duração da rodada final   |
+| --------------------------------------------- | ------------------------------------------------------------------------- | ------------------------- |
+| `npm ci`                                      | Aprovado, 617 pacotes instalados neste ambiente                           | npm reportou32 s          |
+| `npm run lint`                                | Aprovado, sem avisos ESLint                                               | 4,74s                     |
+| `npm run typecheck`                           | Aprovado                                                                  | 3,29s                     |
+| `npm test`                                    | **221 testes/32 arquivos aprovados**                                      | 57,68s                    |
+| `npm run build`                               | Aprovado, standalone e manifesto local                                    | 12,67s                    |
+| `npm run test:http`                           | **111 verificações aprovadas**, PGlite local                              | 6,69s                     |
+| `npm run format:check`                        | Aprovado                                                                  | 2,75s                     |
+| `npm audit`                                   | **0 vulnerabilidades reportadas**                                         | 6,63s                     |
+| Build HTTPS sintético + `npm run test:origin` | **9 checks aprovados**, loopback HTTP                                     | 11,99s +4,32 s            |
+| `npm run test:native` local                   | Bloqueado, saída1: Docker ausente                                         | Não é aprovação nativa    |
+| `npm run test:native` no CI                   | **12 etapas aprovadas**, incluindo111 checks HTTP em PostgreSQL 17 nativo | 81,17s no job122655486508 |
+
+CI do código `2c5006899a805db41f60d1a8387de 50f4f31e36b` aprovado nos runs [40639939948](https://github.com/wll777z/project-IA/actions/runs/40639939948) e [40639945352](https://github.com/wll777z/project-IA/actions/runs/40639945352). O CI do commit final de documentação deve ser conferido separadamente. Dados brutos/durações/limitações em [final-launch-results.json](docs/evidence/final-launch-results.json) e [final-launch-native.json](docs/evidence/final-launch-native.json).
+
+O ensaio nativo criou container/bancos novos e descartáveis: oito migrations em banco vazio, catálogo/FK/índices, jornada real standalone por HTTP, perfil/links/cartões/blocos/coleção/temporada, corrida de revisão, downgrade sem perda privada, upgrade da fixture com quatro migrations, reinício do banco e novo processo da aplicação, dump/checksum/restore separado com hashes de todas as linhas, cleanup de expirados preservando vivos e cascatas. A imagem Docker foi construída e executada sem root até o HEALTHCHECK ficar saudável com PostgreSQL nativo. Caddy validou o arquivo real sem publicar portas/HTTPS. **Não é homologação do servidor final nem execução integral do Compose com domínio/SMTP.**
+
+Sete testes adicionados: dois de guarda da URL nativa, três de expiração/idempotência de confirmação/reset e dois de sanitização/parser das métricas internas. Os testes de e-mail usam entrega capturada em memória: não houve SMTP externo. Navegação/regressões existentes adaptadas aos atalhos mobile. Segurança/Free/Pro/suporte/privacidade continuam nas suítes anteriores. Schema e oito migrations comparados byte a byte à base: intactos. Nenhuma dependência alterada.
+
+O proxy agora oferece agregados de status/latência somente pela API interna Caddy 2019 (loopback do container, não publicada). O probe operacional foi testado na falha de infraestrutura, retornando erro sanitizado; parser testado com séries sintéticas. Não houve coleta real no host final ou entrega de alerta. Séries cumulativas por handler não são taxas por período nem devem ser somadas entre handlers.
+
+Browser: dashboard/editor SSR observados em frame de 390 px com os três atalhos visíveis. **Não foi comprovada jornada com hidratação/salvar/publicar**; navegador bloqueou continuação por política do ambiente. Harness temporário removido, nenhum bypass/rota auxiliar entregue. Não se repetiram os60 snapshots antigos nem o benchmark sem necessidade. Safari/iOS, Android físicos, leitor de tela, teclado virtual, rede móvel e métricas de campo pendentes.
+
+Tentativas corrigidas: geração Prisma concorrente com typecheck (erro de orquestração; rodada final sequencial), tipo do env da fixture no primeiro CI, tema ausente na fixture legada e porta Docker realocada após restart. Um build inicial usou hostname sintético diferente do fixado no teste de origem; reconstruído com `freeze-origin.example.test`, passou 9 checks e foi reconstruído explicitamente para localhost. Nenhuma dessas falhas foi classificada falsamente como vulnerabilidade de produção. Avisos de depreciação pg@9 futura/ESLint instalado continuam documentados; audit0 não garante ausência de falhas.
+
+Decisão: demo visual pública anterior apta como demo; nova candidata não publicada. **NO-GO beta real, lançamento público e venda Pro** até os gates externos em [PRODUCTION_GO_LIVE](docs/PRODUCTION_GO_LIVE.md). Relatório/pendências em [FINAL_LAUNCH_BLOCKERS](docs/FINAL_LAUNCH_BLOCKERS.md). Evidências abaixo são históricas.
+
+---
+
 # Candidata de produção — 27/10/2026
 
 Base freeze `3e166f2`, branch `release/vibepage-3.0-production-ready`; Node 24/Next standalone e Prisma/PGlite isolado.

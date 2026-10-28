@@ -1,0 +1,78 @@
+{
+  "testedCommit": "2c5006899a805db41f60d1a8387de50f4f31e36b",
+  "workflowRun": 40639939948,
+  "jobId": 122655486508,
+  "httpChecks": 111,
+  "environment": "isolated Docker PostgreSQL 17, synthetic data, no SMTP/TLS",
+  "durationMs": 81170,
+  "results": [
+    {
+      "label": "Docker daemon available",
+      "status": "passed",
+      "durationMs": 273
+    },
+    {
+      "label": "Eight migrations on empty native PostgreSQL",
+      "status": "passed",
+      "durationMs": 817
+    },
+    {
+      "label": "Read-only index/FK/migration acceptance",
+      "status": "passed",
+      "durationMs": 54
+    },
+    {
+      "label": "Production standalone HTTP journeys on native PostgreSQL",
+      "status": "passed",
+      "durationMs": 3161
+    },
+    {
+      "label": "Native content, optimistic race, collections, seasons, downgrade and cleanup fixtures",
+      "status": "passed",
+      "durationMs": 715
+    },
+    {
+      "label": "Upgrade from four-migration fixture preserves legacy IDs and content",
+      "status": "passed",
+      "durationMs": 4179
+    },
+    {
+      "label": "Database restart preserves every fixture row",
+      "status": "passed",
+      "durationMs": 2140
+    },
+    {
+      "label": "Custom backup, checksum, empty isolated restore and full-row comparison",
+      "status": "passed",
+      "durationMs": 474
+    },
+    {
+      "label": "Standalone Docker image starts as non-root and reaches healthy with native DB",
+      "status": "passed",
+      "durationMs": 57087
+    },
+    {
+      "label": "Caddy staging configuration validates without external publication",
+      "status": "passed",
+      "durationMs": 2160
+    },
+    {
+      "label": "Cleanup deletes expired records only",
+      "status": "passed",
+      "durationMs": 965
+    },
+    {
+      "label": "Account cascades and referential integrity",
+      "status": "passed",
+      "durationMs": 578
+    }
+  ],
+  "notValidated": [
+    "Target hosting and persistent volume acceptance",
+    "Real DNS and HTTPS certificate",
+    "Actual SMTP delivery and inbox/spam",
+    "External encrypted backup and operator key recovery",
+    "Physical devices and full hydrated browser journey",
+    "Alert delivery and installed maintenance schedule"
+  ]
+}

@@ -1,5 +1,11 @@
 # VibePage
 
+## Execução final e uso no celular
+
+A candidata incremental `fix/vibepage-final-launch-blockers` parte de `7a7c721`, preservando recursos e pagamentos desabilitados. Atalhos de visão geral/editor/compartilhamento ficam visíveis no celular; demais rotas continuam no menu. Controles têm áreas de toque maiores e campos 16px. Nenhum deploy nesta entrega.
+
+Use [FINAL_LAUNCH_BLOCKERS](docs/FINAL_LAUNCH_BLOCKERS.md) para inventário/resultados e [PRODUCTION_GO_LIVE](docs/PRODUCTION_GO_LIVE.md) para as configurações manuais e comandos de implantação autorizada. `npm run test:native` executa fixture Docker PostgreSQL 17 isolada depois de um build localhost; não usa DATABASE_URL real como fallback. `npm run ops:status -- /caminho/privado/staging.env` fornece diagnóstico local sanitizado, sem instalar serviços ou enviar alertas. SMTP real segue [SMTP_ACCEPTANCE](docs/SMTP_ACCEPTANCE.md).
+
 ## Candidata para homologação de produção
 
 `release/vibepage-3.0-production-ready` parte do freeze `3e166f2` e preserva os recursos existentes, sem pagamentos nem mudanças de design. A entrega adiciona limites de espera no banco/SMTP, erros de e-mail sanitizados, prontidão interna do container, SQL de aceite somente leitura e modelos de manutenção. Não foi publicada nem homologada em infraestrutura externa.
