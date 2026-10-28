@@ -71,6 +71,7 @@ const sql = (databaseName, input) =>
   );
 async function stage(label, fn) {
   const begin = Date.now();
+  console.log(`START ${label}`);
   await fn();
   results.push({ label, status: "passed", durationMs: Date.now() - begin });
   console.log(`PASS ${label}`);
@@ -188,7 +189,8 @@ try {
       }
       await sql(
         legacy,
-        `INSERT INTO "User"(id,name,email,"updatedAt") VALUES ('legacy-owner','Legacy','legacy@example.test',now());
+        `INSERT INTO "Theme"(id,name,premium) VALUES ('midnight-purple','Midnight Purple',false);
+      INSERT INTO "User"(id,name,email,"updatedAt") VALUES ('legacy-owner','Legacy','legacy@example.test',now());
       INSERT INTO "Profile"(id,"userId",username,"displayName","updatedAt") VALUES ('legacy-profile','legacy-owner','legacy_native','Legacy',now());
       INSERT INTO "ProfileLink"(id,"profileId",title,url,position) VALUES ('legacy-link','legacy-profile','Keep','https://example.com/',0);`,
       );

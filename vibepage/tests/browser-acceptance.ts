@@ -70,7 +70,14 @@ const proxy = createServer((req, res) => {
       headers: req.headers,
     },
     (response) => {
-      res.writeHead(response.statusCode || 502, response.headers);
+      // QA frame only. Production headers remain DENY / frame-ancestors none.
+      const headers = { ...response.headers };
+      delete headers["x-frame-options"];
+      if (typeof headers["content-security-policy"] === "string")
+        headers["content-security-policy"] = headers[
+          "content-security-policy"
+        ].replace("frame-ancestors 'none'", "frame-ancestors 'self'");
+      res.writeHead(response.statusCode || 502, headers);
       response.pipe(res);
     },
   );
