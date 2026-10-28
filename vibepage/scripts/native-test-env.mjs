@@ -1,4 +1,5 @@
 // Test-only URLs: never accept DATABASE_URL or a public/production database.
+/** @param {Record<string, string | undefined>} env */
 export function nativeTestURL(env = process.env) {
   const value = env.VIBEPAGE_NATIVE_TEST_URL;
   if (!value) return null;
