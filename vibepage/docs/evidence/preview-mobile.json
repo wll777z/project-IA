@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-28",
+  "scope": "Static demo, desktop Chrome frame; no physical device or real account",
+  "before": {
+    "viewport": 390,
+    "displayNameFontPx": 13,
+    "saveButtonHeightPx": 48,
+    "horizontalOverflow": false
+  },
+  "after": {
+    "viewport": 390,
+    "displayNameFontPx": 16,
+    "saveButtonHeightPx": 48,
+    "horizontalOverflow": false
+  },
+  "observed": {
+    "sectionSwitchToLinks": true,
+    "liveNamePreview": true,
+    "originalNameRestored": true,
+    "localSaveConfirmation": true
+  },
+  "buildOrigin": "https://vibepage-wl-preview.speedylotus18.chatgpt.site",
+  "checks": {
+    "build": "passed",
+    "lint": "passed"
+  },
+  "notTested": [
+    "Physical iOS/Safari or Android",
+    "Authenticated user journey",
+    "SMTP",
+    "Backend deployment"
+  ]
+}

@@ -4004,14 +4004,20 @@ a.gamer-card:focus-visible,
 }
 @media (max-width: 600px) {
   /* 16px avoids focus zoom in iOS; never disable user zoom. */
-  .app-content input:not([type="checkbox"]):not([type="radio"]),
+  .app-content
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not(
+      [type="file"]
+    ),
   .app-content select,
   .app-content textarea,
   .auth-form input,
   .legal-page input,
   .legal-page select,
   .legal-page textarea,
-  .editor-grid input:not([type="checkbox"]):not([type="radio"]),
+  .editor-grid
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not(
+      [type="file"]
+    ),
   .editor-grid select,
   .editor-grid textarea {
     font-size: 16px;

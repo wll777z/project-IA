@@ -1,3 +1,7 @@
+# Atualização da prévia — 28/10/2026
+
+Ao atualizar a demonstração pública, o QA hidratado em frame Chrome de390px reproduziu fonte13px em alguns inputs: o seletor antigo do editor tinha especificidade maior que a nova regra mobile. Ajustado somente o seletor CSS, sem !important ou redesign. Após novo build: fonte16px, botão salvar48px e sem overflow. Troca de seção, alteração do nome refletida na prévia, restauração do nome e salvamento local foram conferidos. Isso valida a demonstração estática, não cadastro/login ou jornada autenticada. Build com origem pública e lint aprovados nesta alteração; não se repetiu a suíte de backend por uma mudança exclusiva de CSS. Evidência em `docs/evidence/preview-mobile.json`.
+
 # Execução final de bloqueadores — 28/10/2026
 
 Branch `fix/vibepage-final-launch-blockers`, base completa `7a7c721`, PR #12. Node 24.22.1/npm11.9.0/Ubuntu24.04 local; CI nativo em runner GitHub com Docker. Sem merge/deploy, SMTP externo ou alteração de dados reais.
