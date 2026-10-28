@@ -21,7 +21,9 @@
     "setup": "node scripts/setup.mjs",
     "admin:bootstrap": "node --env-file-if-exists=.env.admin.local --import tsx scripts/bootstrap-admin.ts",
     "staging:check": "node scripts/check-staging.mjs",
-    "test:origin": "node --import tsx tests/public-origin-http.ts"
+    "test:origin": "node --import tsx tests/public-origin-http.ts",
+    "test:native": "node scripts/native-acceptance.mjs",
+    "ops:status": "node scripts/ops-status.mjs"
   },
   "keywords": [],
   "author": "",

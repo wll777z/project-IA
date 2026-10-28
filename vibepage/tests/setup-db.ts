@@ -1,7 +1,20 @@
 import { PGlite } from "@electric-sql/pglite";
 import { PGLiteSocketServer } from "@electric-sql/pglite-socket";
 import { readdir, readFile } from "node:fs/promises";
+import { nativeTestURL } from "../scripts/native-test-env.mjs";
 export async function setupDB() {
+  const native = nativeTestURL();
+  if (native) {
+    process.env.DATABASE_URL = native;
+    configureTestAuth();
+    const { db } = await import("../src/lib/db");
+    return {
+      db,
+      async close() {
+        await db.$disconnect();
+      },
+    };
+  }
   const pg = await PGlite.create();
   const root = new URL("../prisma/migrations/", import.meta.url);
   for (const name of (await readdir(root)).sort())
@@ -17,6 +30,21 @@ export async function setupDB() {
   });
   await server.start();
   process.env.DATABASE_URL = `postgresql://postgres:postgres@${server.getServerConn()}/postgres`;
+  configureTestAuth();
+  const { db } = await import("../src/lib/db");
+  return {
+    db,
+    async close() {
+      await db.$disconnect();
+      await server.stop();
+      await new Promise((r) => setImmediate(r));
+      await new Promise((r) => setImmediate(r));
+      await pg.close();
+    },
+  };
+}
+
+function configureTestAuth() {
   process.env.BETTER_AUTH_URL = "http://localhost:3000";
   process.env.BETTER_AUTH_SECRET =
     "integration-only-key-never-use-in-production-12345";
@@ -30,15 +58,4 @@ export async function setupDB() {
     "SMTP_PASSWORD",
   ])
     delete process.env[key];
-  const { db } = await import("../src/lib/db");
-  return {
-    db,
-    async close() {
-      await db.$disconnect();
-      await server.stop();
-      await new Promise((r) => setImmediate(r));
-      await new Promise((r) => setImmediate(r));
-      await pg.close();
-    },
-  };
 }
