@@ -1,6 +1,7 @@
 // Read-only local monitoring. No raw logs, secrets, mail or external requests.
 import { spawn } from "node:child_process";
 import { statfs } from "node:fs/promises";
+import { caddyMetrics } from "./caddy-metrics.mjs";
 const envFile = process.argv[2];
 if (!envFile) {
   console.error("Usage: npm run ops:status -- /private/path/staging.env");
@@ -51,6 +52,16 @@ try {
     "1000",
     "web",
   ]);
+  const metrics = caddyMetrics(
+    await docker([
+      "exec",
+      "-T",
+      "proxy",
+      "wget",
+      "-qO-",
+      "http://127.0.0.1:2019/metrics",
+    ]),
+  );
   const disk = await statfs(process.cwd());
   const diskAvailablePercent = Math.round((disk.bavail / disk.blocks) * 100);
   const events = Object.fromEntries(
@@ -73,10 +84,11 @@ try {
         status: ok ? "ok" : "attention",
         checkedAt: new Date().toISOString(),
         services,
+        caddyHTTP: metrics,
         diskAvailablePercent,
         sampledEventsLast15m: events,
         limits:
-          "Last 1000 log lines only; no HTTP 5xx/429 counts, SMTP inbox delivery or external HTTPS check. Disk refers to checkout filesystem; inspect other volume filesystems separately.",
+          "Last 1000 log lines only; HTTP series are cumulative by handler; do not sum handlers or treat them as interval rates. No SMTP inbox delivery or external HTTPS check. Disk refers to checkout filesystem; inspect other volume filesystems separately.",
       },
       null,
       2,
