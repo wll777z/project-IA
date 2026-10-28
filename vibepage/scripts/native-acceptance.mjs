@@ -28,25 +28,32 @@ function run(
       env: childEnv,
       stdio: ["pipe", "pipe", "pipe"],
     });
-    const chunks = [];
+    const chunks = [],
+      errors = [];
     child.stdout.on("data", (c) => {
       chunks.push(c);
       if (!quiet) process.stdout.write(c);
     });
     child.stderr.on("data", (c) => {
-      void c; /* don't print raw diagnostics/URLs */
+      errors.push(c); /* only sanitized fixture diagnostics on failure */
     });
     child.once("error", reject);
     const timer = setTimeout(() => child.kill("SIGKILL"), timeout);
     child.once("close", (code) => {
       clearTimeout(timer);
-      if (code !== 0)
+      if (code !== 0) {
+        // Only our fresh synthetic databases are used. Still redact credentials/URLs.
+        const diagnostic = Buffer.concat(errors)
+          .toString()
+          .replaceAll(password, "[redacted]")
+          .replace(/postgres(?:ql)?:\/\/[^\s'"]+/g, "[database-url]");
+        console.error(diagnostic.slice(-3500));
         reject(
           new Error(
             `${command} failed (exit ${code}); no credentials or provider diagnostics printed.`,
           ),
         );
-      else resolve(Buffer.concat(chunks));
+      } else resolve(Buffer.concat(chunks));
     });
     child.stdin.on("error", () => {});
     child.stdin.end(input);
