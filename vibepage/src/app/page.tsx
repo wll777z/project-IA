@@ -31,7 +31,7 @@ import { ProfileDemo } from "@/components/profile-demo";
 export default function Home() {
   return (
     <>
-      <header className="site-header shell">
+      <header className="site-header shell site-header--modern">
         <Brand />
         <nav className="desktop-nav" aria-label="Principal">
           <a href="#como-funciona">Como funciona</a>
@@ -39,18 +39,25 @@ export default function Home() {
           <a href="#temas">Temas</a>
           <a href="#planos">Planos</a>
         </nav>
-        <div className="nav-actions">
+        <nav className="mobile-nav" aria-label="Navegação da página">
+          <a href="#como-funciona">Explorar</a>
+          <a href="#cartoes">Cartões</a>
+          <a href="#temas">Temas</a>
+          <a href="#planos">Planos</a>
+          <Link href="/login">Entrar</Link>
+        </nav>
+        <div className="nav-actions nav-actions--modern">
           <Link href="/login" className="login-link">
             Entrar
           </Link>
           <Link href="/cadastro" className="button button-small">
-            Criar meu perfil <ArrowUpRight size={15} />
+            Criar perfil grátis <ArrowUpRight size={15} />
           </Link>
         </div>
       </header>
-      <main id="main">
-        <section className="hero shell">
-          <div className="hero-copy">
+      <main id="main" className="landing-main">
+        <section className="hero shell hero--modern">
+          <div className="hero-copy hero-copy--modern">
             <div className="eyebrow">
               <span className="online" /> PARA QUEM NÃO CABE EM UMA BIO{" "}
               <span>↗</span>
@@ -103,7 +110,7 @@ export default function Home() {
             <strong>Você.</strong>
           </div>
         </div>
-        <section id="como-funciona" className="section shell">
+        <section id="como-funciona" className="section shell section--features">
           <div className="section-heading">
             <div>
               <p className="kicker">MENOS LIMITES. MAIS VOCÊ.</p>
@@ -118,7 +125,7 @@ export default function Home() {
               Tudo começa no seu espaço.
             </p>
           </div>
-          <div className="feature-grid">
+          <div className="feature-grid feature-grid--modern">
             {[
               [
                 Palette,
@@ -193,7 +200,7 @@ export default function Home() {
             </div>
           </div>
         </section>
-        <section id="planos" className="section shell">
+        <section id="planos" className="section shell pricing-section">
           <div className="center-heading">
             <p className="kicker">COMECE COM A SUA VIBE</p>
             <h2>Seu espaço. No seu ritmo.</h2>

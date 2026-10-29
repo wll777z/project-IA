@@ -21,15 +21,15 @@ export default async function DashboardLayout({
     (await db.administrator.findUnique({ where: { userId: session.user.id } }));
   return (
     <>
-      <header className="app-header">
+      <header className="app-header app-header--modern">
         <Brand />
         <div>
           <span className="account-label">{session.user.name}</span>
           <Logout />
         </div>
       </header>
-      <div className="app-layout">
-        <aside className="app-sidebar">
+      <div className="app-layout app-layout--modern">
+        <aside className="app-sidebar app-sidebar--modern">
           <p className="kicker">SEU UNIVERSO</p>
           <DashboardNav administrator={!!administrator} />
           <div className="sidebar-note">
@@ -38,7 +38,7 @@ export default async function DashboardLayout({
             <p>Cada detalhe conta uma parte da sua história.</p>
           </div>
         </aside>
-        <main id="main" className="app-content">
+        <main id="main" className="app-content app-content--modern">
           {children}
         </main>
       </div>
