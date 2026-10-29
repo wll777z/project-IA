@@ -15,13 +15,17 @@ it("navegação preserva oito destinos distintos e marca somente a página corre
     <DashboardNavigation pathname="/dashboard/analytics" />,
   );
   const menus = [...html.matchAll(/<nav[^>]*>([\s\S]*?)<\/nav>/g)];
-  expect(menus).toHaveLength(2);
-  for (const [, menu] of menus) {
-    expect([...menu.matchAll(/<a /g)].length).toBe(8);
+  expect(menus).toHaveLength(3);
+  expect([...menus[1][1].matchAll(/<a /g)]).toHaveLength(3);
+  expect(menus[1][1]).toContain('href="/dashboard/editor"');
+  expect(menus[1][1]).toContain('href="/dashboard/compartilhar"');
+  for (const [index, [, menu]] of menus.entries()) {
+    expect([...menu.matchAll(/<a /g)].length).toBe([8, 3, 5][index]);
     const current = [...menu.matchAll(/<a\b[^>]*>/g)]
       .map(([tag]) => tag)
       .filter((tag) => tag.includes('aria-current="page"'));
-    expect(current).toHaveLength(1);
+    expect(current).toHaveLength(index === 1 ? 0 : 1);
+    if (index === 1) continue;
     expect(current[0]).toContain('href="/dashboard/analytics"');
     expect(menu).toContain('href="/dashboard/estatisticas"');
     expect(menu).toContain('href="/dashboard/conta"');

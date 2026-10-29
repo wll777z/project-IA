@@ -1,3 +1,5 @@
+> Atualização de 28/10/2026: [FINAL_LAUNCH_BLOCKERS](FINAL_LAUNCH_BLOCKERS.md) registra execução PostgreSQL 17 nativa, upgrade, backup/restore, persistência, Dockerfile non-root/health e Caddy no CI da candidata incremental;221 testes locais/111 HTTP/9 de origem. Isso resolve a ausência de ensaio nativo genérico, mas **não** homologa o servidor final, SMTP/HTTPS externos, cópia criptografada externa, alertas ou dispositivos. Relatório histórico abaixo preservado.
+
 # Candidata de produção — revisão técnica final
 
 27/10/2026. Branch `release/vibepage-3.0-production-ready`, a partir de `release/vibepage-3.0-freeze` (`3e166f26b0faf885872790bae812379fc6b74da3`). O nome da branch indica destino de revisão, não aprovação de produção. Exclusivamente `vibepage/`; sem merge, deploy, contratação, alteração de dados reais ou pagamentos.

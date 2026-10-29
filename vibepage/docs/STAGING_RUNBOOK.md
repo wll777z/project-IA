@@ -65,3 +65,7 @@ Somente com evidências aceitas e autorização expressa abrir beta fechado. Pú
 ## 5. Rollback
 
 Guardar imagem/commit anterior, segredos em gerenciador e snapshot/backup verificável. Fazer rollback do aplicativo mantendo tabelas/colunas aditivas. Código anterior à suspensão administrativa não é rollback seguro se houver perfis suspensos: manter modo manutenção/acesso fechado até versão que respeite a suspensão. Não apagar migrations nem restaurar banco real sem autorização. Registrar incidente e recuperação sem dados pessoais nos logs.
+
+## Candidata incremental e comandos de aceite
+
+Após revisão usar `fix/vibepage-final-launch-blockers` (base `7a7c721`), fixando o commit aprovado. Nenhum merge automático. Consulte [PRODUCTION_GO_LIVE](PRODUCTION_GO_LIVE.md) para configuração manual/publicação autorizada e [SMTP_ACCEPTANCE](SMTP_ACCEPTANCE.md) para recebimento externo. `npm run test:native` ensaia somente bancos Docker novos; não aceita DATABASE_URL real como fallback. `npm run ops:status -- /arquivo/privado/staging.env` não altera serviços e não entrega alerta: configurar operador/agenda/canal de falha separadamente.

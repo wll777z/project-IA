@@ -1,3 +1,8 @@
+{
+ # Aggregate counters only; admin/metrics stay on container loopback, never published.
+ admin 127.0.0.1:2019
+ metrics
+}
 {$VIBEPAGE_DOMAIN} {
  tls {$TLS_EMAIL}
  @internalReadiness path /api/health /api/health/*

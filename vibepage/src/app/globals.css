@@ -3978,3 +3978,69 @@ a.gamer-card:focus-visible,
   line-height: normal;
   margin: 0;
 }
+
+/* Launch usability: primary destinations stay visible without opening a menu. */
+.app-sidebar nav.dashboard-nav-shortcuts {
+  display: none;
+}
+@media (max-width: 850px) {
+  .app-sidebar nav.dashboard-nav-shortcuts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .app-sidebar nav.dashboard-nav-shortcuts a {
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    min-height: 68px;
+    padding: 8px 5px;
+    font-size: 12px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+}
+@media (max-width: 600px) {
+  /* 16px avoids focus zoom in iOS; never disable user zoom. */
+  .app-content
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not(
+      [type="file"]
+    ),
+  .app-content select,
+  .app-content textarea,
+  .auth-form input,
+  .legal-page input,
+  .legal-page select,
+  .legal-page textarea,
+  .editor-grid
+    input:not([type="checkbox"]):not([type="radio"]):not([type="color"]):not(
+      [type="file"]
+    ),
+  .editor-grid select,
+  .editor-grid textarea {
+    font-size: 16px;
+  }
+  .editor-toolbar {
+    top: max(6px, env(safe-area-inset-top));
+    padding: 10px;
+    gap: 8px;
+  }
+  .editor-toolbar-actions {
+    gap: 8px;
+  }
+  .editor-toolbar .button {
+    min-height: 48px;
+  }
+  .editor-save {
+    padding-bottom: max(18px, env(safe-area-inset-bottom));
+  }
+  .editor-save .button {
+    width: 100%;
+    min-height: 48px;
+  }
+  .app-content {
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
+  }
+}

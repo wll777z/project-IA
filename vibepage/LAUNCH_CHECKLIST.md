@@ -1,3 +1,19 @@
+# Gate incremental — 28/10/2026
+
+A candidata `fix/vibepage-final-launch-blockers` parte da versão completa `7a7c721`. [Execução/inventário](docs/FINAL_LAUNCH_BLOCKERS.md) · [configurações manuais e implantação autorizada](docs/PRODUCTION_GO_LIVE.md) · [SMTP real](docs/SMTP_ACCEPTANCE.md).
+
+- [x] Referência GitHub/PRs conferidos, sem base antiga nem incorporação do Pix #8.
+- [x] Atalhos mobile e áreas de toque ajustados preservando rotas/identidade.
+- [x] Comando nativo isolado e job CI preparados; resultado efetivo em VALIDATION.
+- [x] Probe operacional sanitizado e procedimentos de operador preparados.
+- [ ] Aceite no servidor final: PostgreSQL, Docker/Caddy, HTTPS, SMTP, backup externo, monitoramento e suporte.
+- [ ] Jornadas hidratadas completas, Safari/iOS e Android físicos, leitor de tela/teclado/movimento reduzido.
+- [ ] Aprovação expressa de beta/público. Pro comercial continua indisponível.
+
+Nenhum teste local/CI ou prévia visual substitui esses gates. Nenhum merge/deploy foi executado. Itens abaixo são históricos.
+
+---
+
 # Homologação da candidata de produção
 
 Checklist atual e assinaturas pendentes: [docs/PRODUCTION_GO_LIVE.md](docs/PRODUCTION_GO_LIVE.md).

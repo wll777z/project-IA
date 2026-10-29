@@ -61,3 +61,7 @@ find "$BACKUP_DIR" -maxdepth 1 -type f -name 'vibepage-*.dump.gpg' -mtime +"$BAC
 ```
 
 Antes de aprovar a eliminação, confirmar cópia externa restaurável, retenção mínima e necessidades de incidente/exclusão de dados. Este procedimento não agenda nem apaga backups. Falhas de dump, criptografia, checksum, chave, restore ou comparação devem alertar o operador e manter o gate NO-GO. Fazer rollback de aplicativo com imagem/schema compatíveis; não apagar migrations nem restaurar banco real automaticamente. Consulte `STAGING_RUNBOOK.md` para o risco de reintroduzir versões anteriores à suspensão administrativa.
+
+## Ensaio automático com dados descartáveis
+
+`npm run test:native` prepara PostgreSQL17 nativo em container próprio, gera dump custom/checksum em diretório temporário modo restrito e restaura em outro banco vazio `vibepage_restore_*`, conferindo hashes de todas as linhas/tabelas (inclusive bytes de uploads), constraints e migrations. Reinicia o banco para verificar persistência e remove somente a fixture da execução. Esse ensaio local/CI não executa GPG, não testa chave do operador, cópia externa, retenção, recuperação em outro host ou RPO/RTO de produção. Não substitui os gates privados acima. Não executar `ops/fixture-fingerprint.sql` em banco grande de produção: agrega linhas completas e foi escrito somente para fixtures pequenas.

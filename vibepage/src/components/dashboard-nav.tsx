@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
@@ -45,6 +46,10 @@ export function DashboardNavigation({
   pathname: string;
   administrator?: boolean;
 }) {
+  const menuRef = useRef<HTMLDetailsElement>(null);
+  useEffect(() => {
+    if (menuRef.current) menuRef.current.open = false;
+  }, [pathname]);
   const items = administrator
     ? [
         ...destinations,
@@ -60,8 +65,9 @@ export function DashboardNavigation({
       pathname === href ||
       (href !== "/dashboard" && pathname.startsWith(href + "/")),
   );
-  function links() {
-    return items.map(({ href, label, icon: Icon }) => (
+  const primary = destinations.slice(0, 3);
+  function links(entries = items) {
+    return entries.map(({ href, label, icon: Icon }) => (
       <Link
         key={href}
         href={href}
@@ -77,14 +83,26 @@ export function DashboardNavigation({
       <nav className="dashboard-nav-desktop" aria-label="Área da conta">
         {links()}
       </nav>
-      <details className="dashboard-nav-mobile">
+      <nav
+        className="dashboard-nav-shortcuts"
+        aria-label="Acessos rápidos no celular"
+      >
+        {links(primary)}
+      </nav>
+      <details className="dashboard-nav-mobile" ref={menuRef}>
         <summary>
           <span>
-            Navegação <strong>{active?.label ?? "Área da conta"}</strong>
+            Mais opções <strong>{active?.label ?? "Área da conta"}</strong>
           </span>
           <ChevronDown size={18} aria-hidden="true" />
         </summary>
-        <nav aria-label="Área da conta no celular">{links()}</nav>
+        <nav aria-label="Mais opções da conta no celular">
+          {links(
+            items.filter(
+              ({ href }) => !primary.some((item) => item.href === href),
+            ),
+          )}
+        </nav>
       </details>
     </>
   );
