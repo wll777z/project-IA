@@ -1,5 +1,7 @@
 # VibePage 3.0 — checklist objetivo de publicação
 
+Preparação de homologação Render + Neon: [RENDER_NEON_STAGING.md](RENDER_NEON_STAGING.md). O Blueprint não cria recursos automaticamente; não representa aceite de produção.
+
 27/10/2026. Branch proposta: `release/vibepage-3.0-production-ready`, base freeze `3e166f26b0faf885872790bae812379fc6b74da3`. O nome da branch não aprova produção. Sem contratação, implantação, merge ou alteração de dados reais.
 
 ## Registro do ambiente — operador deve preencher

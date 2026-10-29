@@ -1,3 +1,7 @@
+# Preparação Render + Neon — 29/10/2026
+
+Criado `render.yaml` de homologação free, sem deploy automático, para a branch `fix/vibepage-final-launch-blockers`; guia em `docs/RENDER_NEON_STAGING.md`. `python3`/PyYAML analisou o YAML e encontrou um serviço; `npx prettier --check README.md render.yaml docs/RENDER_NEON_STAGING.md` aprovado; `git diff --check` aprovado. Não havia Render CLI e não foi chamada a validação Blueprint da API. Nenhuma conta/projeto, variável secreta, banco, SMTP ou deploy foi configurado/testado. `npm test`, lint, typecheck e build não foram repetidos porque a alteração contém apenas infraestrutura declarativa e documentação. O host requer valores privados de Neon e SMTP antes de iniciar; Render Free bloqueia as portas SMTP padrão e não foi considerado produção.
+
 # Atualização da prévia — 28/10/2026
 
 Ao atualizar a demonstração pública, o QA hidratado em frame Chrome de390px reproduziu fonte13px em alguns inputs: o seletor antigo do editor tinha especificidade maior que a nova regra mobile. Ajustado somente o seletor CSS, sem !important ou redesign. Após novo build: fonte16px, botão salvar48px e sem overflow. Troca de seção, alteração do nome refletida na prévia, restauração do nome e salvamento local foram conferidos. Isso valida a demonstração estática, não cadastro/login ou jornada autenticada. Build com origem pública e lint aprovados nesta alteração; não se repetiu a suíte de backend por uma mudança exclusiva de CSS. Evidência em `docs/evidence/preview-mobile.json`.

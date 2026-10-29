@@ -1,0 +1,41 @@
+# Staging blueprint only. Render Free is not approved for production use.
+# In Render, select this custom Blueprint path: vibepage/render.yaml.
+services:
+  - type: web
+    name: vibepage-staging
+    runtime: node
+    plan: free
+    region: oregon
+    branch: fix/vibepage-final-launch-blockers
+    rootDir: vibepage
+    autoDeployTrigger: off
+    buildCommand: npm ci && npm run build
+    startCommand: npm run db:migrate && npm run db:seed && npm start
+    # /api/health is intended for a private proxy probe. Use the public landing page here.
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 24.22.1
+      - key: DATABASE_URL
+        sync: false
+      - key: BETTER_AUTH_URL
+        fromService:
+          type: web
+          name: vibepage-staging
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: BETTER_AUTH_SECRET
+        generateValue: true
+      - key: REQUIRE_EMAIL_VERIFICATION
+        value: "true"
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_FROM
+        sync: false
+      - key: SUPPORT_INTAKE_ENABLED
+        value: "false"
