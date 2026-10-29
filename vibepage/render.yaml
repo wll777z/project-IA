@@ -8,7 +8,7 @@ services:
     region: oregon
     branch: fix/vibepage-final-launch-blockers
     rootDir: vibepage
-    autoDeployTrigger: off
+    autoDeployTrigger: "off"
     buildCommand: npm ci && npm run build
     startCommand: npm run db:migrate && npm run db:seed && npm start
     # /api/health is intended for a private proxy probe. Use the public landing page here.
