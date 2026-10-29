@@ -32,7 +32,7 @@ Este arquivo adapta ao projeto práticas dos agentes Frontend Developer, UI Desi
 
 ## Fluxo de trabalho adaptado do Superpowers
 
-Adaptação local das práticas de [Superpowers](https://github.com/obra/superpowers); o pacote de skills completo só fica ativo após sua instalação no Codex.
+Adaptação local das práticas de [Superpowers](https://github.com/obra/superpowers). Quando as skills do Superpowers estiverem disponíveis no Codex, use as pertinentes à tarefa; esta seção adapta o fluxo às regras específicas do VibePage e não instala nem altera o plugin.
 
 - Para pedidos pequenos e específicos, faça a menor mudança necessária. Para trabalho amplo ou ambíguo, organize primeiro o escopo, as decisões e os passos; use o contexto já fornecido e não peça confirmação para escolhas que possam ser inferidas com segurança.
 - Ao investigar um bug, reproduza o comportamento e trace a causa antes de corrigir. Não tente correções por tentativa e erro sem evidência.
