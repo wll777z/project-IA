@@ -65,3 +65,43 @@ it("falha do provedor não repassa destinatário ou credenciais para logs/erro",
     log.mockRestore();
   }
 });
+
+it("permite testar recuperação sem SMTP somente no desenvolvimento", async () => {
+  vi.stubEnv("NODE_ENV", "development");
+  for (const name of [
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_FROM",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+  ])
+    delete process.env[name];
+  const mail = await import("../src/lib/mail");
+  const log = vi.spyOn(console, "info").mockImplementation(() => {});
+  await mail.sendMail(
+    "player@example.test",
+    "Reset fixture",
+    "http://localhost/reset/token",
+  );
+  expect(mail.mailAvailable).toBe(true);
+  expect(mail.mailConfigured).toBe(false);
+  expect(log).toHaveBeenCalledWith(
+    expect.stringContaining("http://localhost/reset/token"),
+  );
+  log.mockRestore();
+});
+
+it("não habilita recuperação sem SMTP em produção", async () => {
+  vi.stubEnv("NODE_ENV", "production");
+  for (const name of [
+    "SMTP_HOST",
+    "SMTP_PORT",
+    "SMTP_FROM",
+    "SMTP_USER",
+    "SMTP_PASSWORD",
+  ])
+    delete process.env[name];
+  const mail = await import("../src/lib/mail");
+  expect(mail.mailAvailable).toBe(false);
+  expect(mail.mailConfigured).toBe(false);
+});

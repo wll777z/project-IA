@@ -152,13 +152,16 @@ model PageView {
   @@index([day])
 }
 
-// No billing provider or paid activation in stage 1. Missing entitlement = FREE.
+// Pro pode vir de concessão administrativa ou de assinatura Stripe. Missing entitlement = FREE.
 model Entitlement {
-  id        String    @id @default(cuid())
-  userId    String    @unique
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  plan      Plan      @default(FREE)
-  expiresAt DateTime?
+  id                   String    @id @default(cuid())
+  userId               String    @unique
+  user                 User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan                 Plan      @default(FREE)
+  expiresAt            DateTime?
+  stripeCustomerId     String?   @unique
+  stripeSubscriptionId String?   @unique
+  subscriptionStatus   String?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 }

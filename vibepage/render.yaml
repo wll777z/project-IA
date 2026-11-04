@@ -39,3 +39,5 @@ services:
         sync: false
       - key: SUPPORT_INTAKE_ENABLED
         value: "false"
+      - key: PAYMENTS_ENABLED
+        value: "false"

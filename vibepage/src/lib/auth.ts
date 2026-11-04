@@ -3,7 +3,7 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import { createAuthMiddleware, APIError } from "better-auth/api";
 import { db } from "@/lib/db";
 import { credentialsSchema, registrationSchema } from "@/lib/validation";
-import { mailConfigured, sendMail } from "@/lib/mail";
+import { mailAvailable, sendMail } from "@/lib/mail";
 import { validateProductionEnv } from "../../scripts/production-env.mjs";
 type AuthDelivery = (
   to: string,
@@ -11,7 +11,7 @@ type AuthDelivery = (
   text: string,
 ) => Promise<void>;
 export function createAuth({
-  deliver = mailConfigured ? sendMail : undefined,
+  deliver = mailAvailable ? sendMail : undefined,
   requireVerification = process.env.REQUIRE_EMAIL_VERIFICATION === "true",
 }: { deliver?: AuthDelivery; requireVerification?: boolean } = {}) {
   if (requireVerification && !deliver)
