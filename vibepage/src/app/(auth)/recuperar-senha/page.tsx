@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 import Link from "next/link";
-import { mailConfigured } from "@/lib/mail";
+import { mailAvailable } from "@/lib/mail";
 import { ResetForm } from "@/components/reset-form";
 export const metadata = {
   title: "Recuperar senha",
@@ -11,7 +11,7 @@ export default function Page() {
     <>
       <p className="kicker">VOLTE PARA A SUA VIBE</p>
       <h1>Esqueceu sua senha?</h1>
-      {mailConfigured ? (
+      {mailAvailable ? (
         <>
           <p>Enviaremos um link para você escolher uma nova senha.</p>
           <ResetForm />

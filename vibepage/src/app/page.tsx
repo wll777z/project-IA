@@ -204,7 +204,7 @@ export default function Home() {
           <div className="center-heading">
             <p className="kicker">COMECE COM A SUA VIBE</p>
             <h2>Seu espaço. No seu ritmo.</h2>
-            <p>Comece grátis. A evolução Pro chega depois.</p>
+            <p>Comece grátis. Evolua para o Pro quando quiser.</p>
           </div>
           <div className="pricing-grid">
             <article className="price-card">
@@ -233,11 +233,11 @@ export default function Home() {
             </article>
             <article className="price-card pro">
               <span className="outline-pill">
-                <Sparkles size={13} /> PRO · EM BREVE
+                <Sparkles size={13} /> PRO
               </span>
               <h3>Sua vibe, outro nível.</h3>
               <div className="price">
-                R$ 9,90<span>/ mês, valor sugerido</span>
+                R$ 9,90<span>/ mês</span>
               </div>
               <ul>
                 {[
@@ -254,9 +254,11 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
+              <Link href="/dashboard/conta" className="button">
+                Assinar Pro <ArrowRight size={16} />
+              </Link>
               <p className="coming-soon">
-                Acesso Pro apenas por concessão administrativa. Sem checkout ou
-                cobrança.
+                Pagamento seguro com cartão. Cancele quando quiser.
               </p>
             </article>
           </div>

@@ -5,7 +5,16 @@ export const mailConfigured = Boolean(
   process.env.SMTP_USER &&
   process.env.SMTP_PASSWORD,
 );
+// Fora de produção, sem SMTP, o e-mail é exibido no terminal do servidor
+// para que "Esqueci minha senha" funcione durante o desenvolvimento.
+export const mailDevFallback =
+  !mailConfigured && process.env.NODE_ENV !== "production";
+export const mailAvailable = mailConfigured || mailDevFallback;
 export async function sendMail(to: string, subject: string, text: string) {
+  if (mailDevFallback) {
+    console.info(`\n[DEV E-MAIL] Para: ${to}\nAssunto: ${subject}\n${text}\n`);
+    return;
+  }
   if (!mailConfigured) throw new Error("SMTP não configurado");
   const transport = nodemailer.createTransport({
     host: process.env.SMTP_HOST,

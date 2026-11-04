@@ -1,9 +1,11 @@
 "use client";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 export function ResetForm({ token }: { token?: string }) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const router = useRouter();
   return (
     <form
       className="auth-form"
@@ -21,8 +23,9 @@ export function ResetForm({ token }: { token?: string }) {
             setMessage(
               r.error
                 ? "Link inválido ou expirado. Solicite outro link."
-                : "Senha atualizada. Você já pode entrar com a nova senha.",
+                : "Senha atualizada! Redirecionando para entrar…",
             );
+            if (!r.error) setTimeout(() => router.replace("/login"), 1500);
           } else {
             const r = await authClient.requestPasswordReset({
               email: String(data.get("email")),
