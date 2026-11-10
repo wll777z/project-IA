@@ -20,3 +20,7 @@ Abra **http://localhost:3000**. O setup prepara a configuração local, o banco 
 Consulte as [instruções completas](./vibepage/README.md) e os [registros de validação](./vibepage/VALIDATION.md).
 
 O workflow de verificação está em [`.github/workflows/vibepage.yml`](./.github/workflows/vibepage.yml). A demonstração estática não inclui o backend de contas; a versão completa exige Node.js e PostgreSQL.
+
+## Publicar na Render
+
+Use o [`render.yaml`](./render.yaml) para criar o site e o PostgreSQL pelo painel da Render. Siga o [guia de publicação](./vibepage/docs/RENDER.md).

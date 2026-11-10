@@ -83,6 +83,8 @@ Preencha `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `SMTP_FROM`. P
 
 ## Publicação completa
 
+Para usar a Render, siga o [guia de publicação](docs/RENDER.md). O Blueprint na raiz configura o serviço Node.js e o PostgreSQL.
+
 Para disponibilizar contas e perfis reais na internet é necessário um ambiente Node.js e um PostgreSQL hospedado. **Não foi provisionado um banco remoto.** O ChatGPT Sites atual hospeda somente a landing e a demonstração; ele não executa este backend PostgreSQL via conexão TCP.
 
 O código inclui `Dockerfile` com saída standalone do Next. Em um host de sua escolha:
