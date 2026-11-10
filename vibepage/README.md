@@ -51,9 +51,9 @@ No PowerShell a cópia é `Copy-Item .env.example .env`; no Linux/macOS, `cp .en
 
 Free: um perfil, até 100 links, username disponível, cores de destaque, uploads, temas Midnight Purple/Minimal Black/Ice Blue, marca e total de visitas.
 
-Pro: Cyber Neon/Pink Dream, animações, formato de botões, fundo personalizado, remoção da marca, cliques e detalhamento diário de 30 dias. R$ 9,90/mês continua sendo apenas uma sugestão de preço: **não há checkout nem cobrança**.
+Pro: Cyber Neon/Pink Dream, animações, formato de botões, fundo personalizado, remoção da marca, cliques e detalhamento diário de 30 dias. R$ 9,90/mês por **Pix manual**, sem renovação automática. O cliente acessa `/dashboard/pro`, copia a chave e envia o comprovante para wendellpereira087@gmail.com. A ativação exige conferência do recebimento e concessão administrativa com data de expiração.
 
-Não existe endpoint para o usuário promover a própria conta. O administrador pode conceder ou revogar uma permissão pelo terminal, sem registrar pagamento:
+Não existe endpoint para o usuário promover a própria conta. O administrador pode conceder ou revogar uma permissão pelo terminal, após conferir o recebimento no banco:
 
 ```bash
 npm run admin:plan -- pessoa@exemplo.com PRO 2026-12-31
@@ -77,7 +77,9 @@ npm start
 
 Veja [VALIDATION.md](VALIDATION.md) para os resultados reais, incluindo limitações. O workflow está em `../.github/workflows/vibepage.yml`, na raiz do repositório. Ele executa as verificações dentro de `vibepage/`.
 
-## E-mail opcional
+## E-mail para recuperação
+
+Na Render, prefira o envio por HTTPS: configure `RESEND_API_KEY` e `MAIL_FROM` (remetente verificado no Resend). Somente informar um endereço Gmail não configura o envio. As credenciais devem ficar nas configurações seguras da hospedagem. Consulte [docs/RENDER.md](docs/RENDER.md#recuperação-de-senha).
 
 Preencha `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e `SMTP_FROM`. Porta 465 usa TLS; outras portas exigem STARTTLS. Reinicie a aplicação. A recuperação permanece indisponível sem configuração. A confirmação de e-mail no cadastro ainda não é obrigatória; por isso não apresente as contas como e-mails verificados. Não houve envio real nem contratação de serviço de e-mail.
 

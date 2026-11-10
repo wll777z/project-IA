@@ -22,9 +22,12 @@ export default function Terms() {
       </p>
       <h2>Planos</h2>
       <p>
-        Não existe cobrança nesta etapa. R$ 9,90/mês é uma sugestão inicial para
-        o futuro plano Pro, não uma oferta de assinatura ativa. Recursos e
-        condições comerciais serão informados antes de qualquer contratação.
+        O plano Free é gratuito. O Pro custa R$ 9,90 por um mês de acesso, pago
+        por Pix manual, sem débito ou renovação automática. A ativação ocorre
+        após conferência do recebimento por Wendell Pereira. Envie o comprovante
+        e o e-mail da conta para wendellpereira087@gmail.com. Para dúvidas,
+        cancelamentos ou reembolsos, utilize esse mesmo contato; os direitos
+        previstos em lei são preservados.
       </p>
       <h2>Conta e dados</h2>
       <p>
