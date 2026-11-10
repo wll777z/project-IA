@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   Palette,
   Settings2,
+  Sparkles,
   ChartNoAxesCombined,
 } from "lucide-react";
 export const metadata = {
@@ -45,6 +46,10 @@ export default async function DashboardLayout({
             <Link href="/dashboard/estatisticas">
               <ChartNoAxesCombined size={17} />
               Estatísticas
+            </Link>
+            <Link href="/dashboard/pro">
+              <Sparkles size={17} />
+              Pro com Pix
             </Link>
             <Link href="/dashboard/conta">
               <Settings2 size={17} />

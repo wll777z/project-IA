@@ -15,3 +15,43 @@ O build instala as dependências e gera o Prisma/Next.js. A inicialização apli
 O banco aceita conexões internas dos serviços na Render; o acesso externo está desabilitado. Imagens e dados ficam no PostgreSQL. Antes de expirar ou trocar o banco gratuito, exporte e migre os dados. SMTP não é configurado por este Blueprint; recuperação de senha exige a configuração descrita no README.
 
 Este arquivo prepara a publicação, mas não comprova que recursos foram criados ou que o site está online. A URL pública só pode ser confirmada depois que a Render concluir o deploy.
+
+## Recuperação de senha
+
+A recuperação só fica disponível quando um serviço de envio está configurado.
+Informar um endereço Gmail, por si só, não autoriza o aplicativo a enviar e-mails.
+No serviço web da Render, em **Environment**, configure uma das opções e faça redeploy:
+
+- **Resend por HTTPS:** `RESEND_API_KEY` com a credencial do serviço e `MAIL_FROM`
+  com um remetente de domínio verificado no Resend. Um Gmail pessoal não é um
+  domínio que você possa verificar. O endereço `wendellpereira087@gmail.com` pode
+  continuar como contato para comprovantes, independentemente do remetente.
+- **SMTP existente:** `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD` e
+  `SMTP_FROM`. No Gmail, use senha de app, nunca a senha normal. Esta opção
+  depende da liberação de conexões SMTP pela hospedagem; prefira HTTPS se as
+  portas SMTP estiverem bloqueadas.
+
+Cadastre as credenciais somente nas configurações seguras da Render, nunca no
+Git. Se ambas as opções estiverem preenchidas, o aplicativo usa Resend.
+Confirme que `BETTER_AUTH_URL` é a origem HTTPS exata do site. Depois de reiniciar,
+solicite a recuperação com uma conta de teste, confira a entrega e abra o link
+para definir uma senha de pelo menos 12 caracteres. O link não pode ser reutilizado
+após a troca, e as sessões anteriores são revogadas.
+
+## Pro com Pix manual
+
+O botão do Pro leva à área autenticada `/dashboard/pro`, com a chave de telefone
+`+5511949345361`, recebedor Wendell Pereira, Nubank, e valor de R$ 9,90 por mês.
+Os comprovantes devem ser enviados para `wendellpereira087@gmail.com`, informando
+o e-mail da conta VibePage. Não há integração bancária nem aprovação automática.
+Confira o crédito diretamente no banco antes de liberar acesso; o comprovante
+sozinho não comprova recebimento. Após conferir, no terminal do serviço:
+
+```bash
+npm run admin:plan -- email-da-conta@example.com PRO AAAA-MM-DD
+```
+
+Substitua a data pela expiração de um mês de acesso e use sempre uma expiração
+para pagamentos mensais. Para revogar, use `npm run admin:plan -- email FREE`.
+Nenhuma credencial bancária é necessária. O site não envia e-mail de comprovante
+por conta própria: o botão abre o aplicativo de e-mail do cliente.

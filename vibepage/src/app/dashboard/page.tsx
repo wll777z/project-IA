@@ -51,7 +51,9 @@ export default async function Dashboard() {
           <Sparkles size={19} />
           <span>SEU PLANO</span>
           <strong>{isPro(entitlement) ? "Pro" : "Free"}</strong>
-          <small>Sem cobrança nesta versão</small>
+          <Link href="/dashboard/pro" className="text-button">
+            Pro com Pix →
+          </Link>
         </article>
       </div>
       <div className="dashboard-grid">

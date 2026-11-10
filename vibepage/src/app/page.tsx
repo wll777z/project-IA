@@ -175,7 +175,7 @@ export default function Home() {
           <div className="center-heading">
             <p className="kicker">COMECE COM A SUA VIBE</p>
             <h2>Seu espaço. No seu ritmo.</h2>
-            <p>Comece grátis. A evolução Pro chega depois.</p>
+            <p>Comece grátis ou escolha o Pro com pagamento manual por Pix.</p>
           </div>
           <div className="pricing-grid">
             <article className="price-card">
@@ -204,11 +204,11 @@ export default function Home() {
             </article>
             <article className="price-card pro">
               <span className="outline-pill">
-                <Sparkles size={13} /> PRO · EM BREVE
+                <Sparkles size={13} /> PRO · PIX MANUAL
               </span>
               <h3>Sua vibe, outro nível.</h3>
               <div className="price">
-                R$ 9,90<span>/ mês, valor sugerido</span>
+                R$ 9,90<span>/ mês</span>
               </div>
               <ul>
                 {[
@@ -224,8 +224,11 @@ export default function Home() {
                   </li>
                 ))}
               </ul>
+              <Link href="/dashboard/pro" className="button">
+                Pagar com Pix <ArrowRight size={16} />
+              </Link>
               <p className="coming-soon">
-                Em desenvolvimento · sem cobrança nesta versão
+                Ativação manual após conferência. Sem renovação automática.
               </p>
             </article>
           </div>
@@ -239,7 +242,7 @@ export default function Home() {
             {[
               [
                 "O VibePage é gratuito?",
-                "Sim. A proposta Free inclui um perfil e os recursos essenciais. A assinatura Pro ainda não está à venda e não há cobranças nesta versão.",
+                "Sim. O plano Free inclui um perfil e os recursos essenciais. O Pro custa R$ 9,90 por mês, por Pix manual, com ativação após conferência do pagamento e sem renovação automática.",
               ],
               [
                 "Preciso saber programar?",
