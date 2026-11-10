@@ -129,4 +129,4 @@ Nenhum plano pago é necessário para rodar localmente. A escolha e a disponibil
 
 O repositório [async-labs/saas](https://github.com/async-labs/saas), licença MIT, foi consultado pelo plugin GitHub. Aproveitamos padrões de separação entre interface, API e domínio; não copiamos código, cobranças, mensagens ou dependências. Detalhes em `docs/REFERENCE.md`.
 
-O aplicativo está em `vibepage/` no repositório https://github.com/wll777z/project-IA. O PastaPronta foi preservado na raiz. Clone o repositório, rode `cd project-IA/vibepage` e siga os comandos acima. O histórico de desenvolvimento local possui commits por etapa; nenhum arquivo do `nexa-ai` foi alterado. A demonstração online usa seu repositório de hospedagem separado.
+O aplicativo está em `vibepage/` no repositório https://github.com/wll777z/project-IA. Clone o repositório, rode `cd project-IA/vibepage` e siga os comandos acima. O histórico de desenvolvimento local possui commits por etapa; nenhum arquivo do `nexa-ai` foi alterado. A demonstração online usa seu repositório de hospedagem separado.
